@@ -1,7 +1,7 @@
-import * as d3 from 'd3'
+import * as d3 from 'd3';
 
-import BasePlot from '../common/base'
-import { linspace, meshgrid } from '../common/utils'
+import BasePlot from '../common/base';
+import { linspace, meshgrid } from '../common/utils';
 
 /**
  * Base Contour Plot Component
@@ -15,7 +15,7 @@ import { linspace, meshgrid } from '../common/utils'
  * @param {Boolean} shadeContour - Whether to shade the contour using the continuous color scheme
  */
 class BaseContourPlot extends BasePlot {
-    static requiredProps = ['func', 'domainX', 'domainY']
+    static requiredProps = ['func', 'domainX', 'domainY'];
 
     static defaultProps = {
         ...BasePlot.defaultProps,
@@ -24,42 +24,42 @@ class BaseContourPlot extends BasePlot {
         thresholds: 10,
         strokeColor: null,
         shadeContour: false,
-    }
+    };
 
     constructor(props) {
-        super(props)
+        super(props);
     }
 
     onSetupScales() {
         const paddedDomainX = this.domain.padDomain(
             this.scales.x.domain(),
             0.05
-        )
+        );
         const paddedDomainY = this.domain.padDomain(
             this.scales.y.domain(),
             0.05
-        )
+        );
 
-        this.xRange = linspace(...paddedDomainX, this.resolutionX)
-        this.yRange = linspace(...paddedDomainY, this.resolutionY)
+        this.xRange = linspace(...paddedDomainX, this.resolutionX);
+        this.yRange = linspace(...paddedDomainY, this.resolutionY);
 
-        this.fValues = []
+        this.fValues = [];
         for (let j = 0; j < this.resolutionY; j++) {
             for (let i = 0; i < this.resolutionX; i++) {
-                this.fValues.push(this.func(this.xRange[i], this.yRange[j]))
+                this.fValues.push(this.func(this.xRange[i], this.yRange[j]));
             }
         }
 
         if (this.shadeContour) {
-            const fDomain = d3.extent(this.fValues)
+            const fDomain = d3.extent(this.fValues);
             this.scales.color = this.scales.getColorScale(
                 fDomain,
                 this.colorConfig.continuousColorScheme
-            )
-            this.strokeColor = this.strokeColor ?? 'black'
+            );
+            this.strokeColor = this.strokeColor ?? 'black';
         } else {
-            this.scales.color = () => 'none'
-            this.strokeColor = 'currentColor'
+            this.scales.color = () => 'none';
+            this.strokeColor = 'currentColor';
         }
     }
 
@@ -73,7 +73,7 @@ class BaseContourPlot extends BasePlot {
                 thresholds: this.thresholds,
                 stroke: this.strokeColor,
             }
-        )
+        );
 
         // const fDomain = d3.extent(this.fValues);
         // contours.setStyles(
@@ -115,14 +115,14 @@ class BaseContourPlot extends BasePlot {
         //   }
         // )
 
-        this.onRenderComplete()
+        this.onRenderComplete();
     }
 
     onSetupLegend() {
         if (this.shadeContour) {
-            this.legend.addContinuousLegend(this.scales.color)
+            this.legend.addContinuousLegend(this.scales.color);
         }
     }
 }
 
-export default BaseContourPlot
+export default BaseContourPlot;

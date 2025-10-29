@@ -1,5 +1,5 @@
-import * as d3 from 'd3'
-import BasePlot from '../common/base'
+import * as d3 from 'd3';
+import BasePlot from '../common/base';
 
 /**
  * Base Image Plot Component
@@ -8,7 +8,7 @@ import BasePlot from '../common/base'
  * @param {String} imageURLClass - data field for URL string values
  */
 class BaseImagePlot extends BasePlot {
-    static requiredProps = ['data', 'imageURLClass']
+    static requiredProps = ['data', 'imageURLClass'];
 
     static defaultProps = {
         ...BasePlot.defaultProps,
@@ -16,10 +16,10 @@ class BaseImagePlot extends BasePlot {
         axisTickCount: 10,
         // showGrid: false,
         // showAxes: false
-    }
+    };
 
     constructor(props) {
-        super(props)
+        super(props);
     }
 
     renderElements() {
@@ -31,19 +31,19 @@ class BaseImagePlot extends BasePlot {
                 // useCornerCoords: true,
                 coordinateSystem: 'data',
             }
-        )
+        );
 
         image.whenReady().then(() => {
-            image.setCoords([0.7, 0.8]).render(2000)
+            image.setCoords([0.7, 0.8]).render(2000);
             // .end()
             // .then(() => {
             //   image.setCoords([1, 1])
             //   .render(3000)
             // });
-        })
+        });
 
-        this.onRenderComplete()
+        this.onRenderComplete();
     }
 }
 
-export default BaseImagePlot
+export default BaseImagePlot;

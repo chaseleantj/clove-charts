@@ -1,21 +1,21 @@
-import * as d3 from 'd3'
-import { DEFAULT_AXIS_CONFIG } from './config'
+import * as d3 from 'd3';
+import { DEFAULT_AXIS_CONFIG } from './config';
 
 class AxisManager {
     constructor(plotArea, plotWidth, plotHeight, axisConfig = {}) {
-        this.plotArea = plotArea
-        this.plotWidth = plotWidth
-        this.plotHeight = plotHeight
+        this.plotArea = plotArea;
+        this.plotWidth = plotWidth;
+        this.plotHeight = plotHeight;
 
         this.config = {
             ...DEFAULT_AXIS_CONFIG,
             ...axisConfig,
-        }
+        };
 
         this.axisGroup = this.plotArea
             .append('g')
             .attr('class', 'axes')
-            .attr('overflow', 'visible')
+            .attr('overflow', 'visible');
     }
 
     setXAxis(scale) {
@@ -29,9 +29,9 @@ class AxisManager {
                     .ticks(this.config.tickCount)
                     .tickSize(this.config.tickSize)
                     .tickFormat(this.config.tickFormat)
-            )
+            );
 
-        this.x.selectAll('text').attr('font-size', this.config.tickFontSize)
+        this.x.selectAll('text').attr('font-size', this.config.tickFontSize);
     }
 
     setYAxis(scale) {
@@ -44,9 +44,9 @@ class AxisManager {
                     .ticks(this.config.tickCount)
                     .tickSize(this.config.tickSize)
                     .tickFormat(this.config.tickFormat)
-            )
+            );
 
-        this.y.selectAll('text').attr('font-size', this.config.tickFontSize)
+        this.y.selectAll('text').attr('font-size', this.config.tickFontSize);
     }
 
     setXGrid() {
@@ -60,7 +60,7 @@ class AxisManager {
                 .attr('pointer-events', 'none')
                 .attr('y1', -this.plotHeight)
                 .attr('y2', 0)
-        )
+        );
     }
 
     setYGrid() {
@@ -74,7 +74,7 @@ class AxisManager {
                 .attr('pointer-events', 'none')
                 .attr('x1', 0)
                 .attr('x2', this.plotWidth)
-        )
+        );
     }
 
     setXLabel(label, margin, fontSize = 12) {
@@ -89,7 +89,7 @@ class AxisManager {
             .attr('class', 'axis-label')
             .attr('fill', 'currentColor')
             .attr('text-anchor', 'middle')
-            .text(label)
+            .text(label);
     }
 
     setYLabel(label, margin, fontSize = 12) {
@@ -105,7 +105,7 @@ class AxisManager {
             .attr('fill', 'currentColor')
             .attr('text-anchor', 'middle')
             .attr('transform', 'rotate(-90)')
-            .text(label)
+            .text(label);
     }
 
     updateXAxis(scale, transitionDuration = 0) {
@@ -118,14 +118,14 @@ class AxisManager {
                     .ticks(this.config.tickCount)
                     .tickSize(this.config.tickSize)
                     .tickFormat(this.config.tickFormat)
-            )
+            );
 
         this.x
             .selectAll('text')
             .filter(function () {
-                return !this.classList.contains('axis-label')
+                return !this.classList.contains('axis-label');
             })
-            .attr('font-size', this.config.tickFontSize)
+            .attr('font-size', this.config.tickFontSize);
     }
 
     updateYAxis(scale, transitionDuration = 0) {
@@ -138,23 +138,23 @@ class AxisManager {
                     .ticks(this.config.tickCount)
                     .tickSize(this.config.tickSize)
                     .tickFormat(this.config.tickFormat)
-            )
+            );
 
         this.y
             .selectAll('text')
             .filter(function () {
-                return !this.classList.contains('axis-label')
+                return !this.classList.contains('axis-label');
             })
-            .attr('font-size', this.config.tickFontSize)
+            .attr('font-size', this.config.tickFontSize);
     }
 
     removeXGrid() {
-        this.x.call((g) => g.selectAll('.grid').remove())
+        this.x.call((g) => g.selectAll('.grid').remove());
     }
 
     removeYGrid() {
-        this.y.call((g) => g.selectAll('.grid').remove())
+        this.y.call((g) => g.selectAll('.grid').remove());
     }
 }
 
-export default AxisManager
+export default AxisManager;

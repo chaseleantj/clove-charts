@@ -1,7 +1,7 @@
-import * as d3 from 'd3'
+import * as d3 from 'd3';
 
-import BasePlot from '../common/base'
-import { getDataType } from '../common/utils'
+import BasePlot from '../common/base';
+import { getDataType } from '../common/utils';
 
 /**
  * Base Line Plot Component
@@ -11,7 +11,7 @@ import { getDataType } from '../common/utils'
  * @param {Number} lineWidth - Stroke width of line
  */
 class BaseLinePlot extends BasePlot {
-    static requiredProps = ['data', 'xClass']
+    static requiredProps = ['data', 'xClass'];
 
     static defaultProps = {
         ...BasePlot.defaultProps,
@@ -19,31 +19,31 @@ class BaseLinePlot extends BasePlot {
         lineOpacity: 1,
         lineLabelWidth: 1,
         lineLabelColor: 'gray',
-    }
+    };
 
     constructor(props) {
-        super(props)
+        super(props);
     }
 
     shouldInitializeChart() {
         // First run the base validation
         if (!super.shouldInitializeChart()) {
-            return false
+            return false;
         }
 
         // Additional validation: must have either yClass or yClasses
         if (!this.props.yClass && !this.props.yClasses) {
             console.warn(
                 "BaseLinePlot: Must provide either 'yClass' or 'yClasses' prop"
-            )
-            return false
+            );
+            return false;
         }
 
-        return true
+        return true;
     }
 
     onInitializeProperties() {
-        this.yClasses = this.yClasses ?? [this.yClass]
+        this.yClasses = this.yClasses ?? [this.yClass];
     }
 
     renderElements() {
@@ -61,33 +61,33 @@ class BaseLinePlot extends BasePlot {
                     layerName: 'lines',
                     className: `line-plot line-plot-${yClass}`,
                 }
-            )
+            );
 
             // path.setStyles({
             //   strokeDashOffset: 0
             // }).render(10000);
         }
 
-        this.onRenderComplete()
+        this.onRenderComplete();
     }
 
     onSetupDomain() {
         const yPadding = this.scaleConfig.logY
             ? 0
-            : (this.paddingY ?? this.themeConfig.padding)
+            : (this.paddingY ?? this.themeConfig.padding);
         const yValues = this.yClasses
             .map((yClass) => this.domain.getDomain((d) => d[yClass], yPadding))
-            .flat()
+            .flat();
         this.domain.y = this.domainY ?? [
             Math.min(...yValues),
             Math.max(...yValues),
-        ]
+        ];
 
         if (getDataType(this.data, (d) => d[this.yClasses[0]]) === 'date') {
             this.domain.y = [
                 new Date(this.domain.y[0]),
                 new Date(this.domain.y[1]),
-            ]
+            ];
         }
     }
 
@@ -95,32 +95,32 @@ class BaseLinePlot extends BasePlot {
         this.scales.color = this.scales.getColorScale(
             this.yClasses,
             this.colorConfig.categoricalColorScheme
-        )
+        );
     }
 
     onSetupLegend() {
         if (this.yClasses.length > 1) {
-            this.legend.addCategoricalLegend()
+            this.legend.addCategoricalLegend();
             this.yClasses.forEach((yClass) => {
                 this.legend.addCategoricalItem(
                     'line',
                     this.scales.color(yClass),
                     yClass
-                )
-            })
+                );
+            });
         }
     }
 
     locateNearestDataPoint(event, className) {
-        const bisectCenter = d3.bisector((d) => d[className]).center
-        const xPos = d3.pointer(event, this.plot.node())[0]
-        const x0 = this.scales.x.invert(xPos)
-        const i = bisectCenter(this.data, x0)
-        return i
+        const bisectCenter = d3.bisector((d) => d[className]).center;
+        const xPos = d3.pointer(event, this.plot.node())[0];
+        const x0 = this.scales.x.invert(xPos);
+        const i = bisectCenter(this.data, x0);
+        return i;
     }
 
     setupLabels() {
-        this.primitives.createLayer('tooltips', 100)
+        this.primitives.createLayer('tooltips', 100);
 
         this.lineLabel = this.primitives.addLine(0, 0, 0, 0, {
             stroke: this.lineLabelColor,
@@ -129,9 +129,9 @@ class BaseLinePlot extends BasePlot {
             layerName: 'tooltips',
             className: 'line-label-tooltip',
             coordinateSystem: 'pixel',
-        })
+        });
 
-        this.pointLabels = {}
+        this.pointLabels = {};
         for (let yClass of this.yClasses) {
             this.pointLabels[yClass] = this.primitives.addPoint(0, 0, {
                 size: 50,
@@ -142,12 +142,12 @@ class BaseLinePlot extends BasePlot {
                 layerName: 'tooltips',
                 className: `point-label point-label-${yClass}`,
                 coordinateSystem: 'data',
-            })
+            });
         }
     }
 
     updateLabels(event) {
-        const d = this.data[this.locateNearestDataPoint(event, this.xClass)]
+        const d = this.data[this.locateNearestDataPoint(event, this.xClass)];
 
         this.lineLabel
             .setCoords(
@@ -156,63 +156,63 @@ class BaseLinePlot extends BasePlot {
                 this.scales.x(d[this.xClass]),
                 this.plotHeight
             )
-            .render()
+            .render();
 
-        this.lineLabel.show()
+        this.lineLabel.show();
 
         for (let yClass of this.yClasses) {
-            if (d[yClass] == undefined) continue
-            const pointLabel = this.pointLabels[yClass]
+            if (d[yClass] == undefined) continue;
+            const pointLabel = this.pointLabels[yClass];
             if (pointLabel) {
-                pointLabel.setCoords(d[this.xClass], d[yClass]).render()
-                pointLabel.show()
+                pointLabel.setCoords(d[this.xClass], d[yClass]).render();
+                pointLabel.show();
             }
         }
     }
 
     onSetupBrush() {
-        if (!this.tooltipConfig.tooltipRef.current) return
+        if (!this.tooltipConfig.tooltipRef.current) return;
         this.brush.brush.on('start.tooltip', () => {
-            this.hideTooltip()
-        })
+            this.hideTooltip();
+        });
     }
 
     onSetupTooltip() {
-        this.setupLabels()
+        this.setupLabels();
 
         this.interactionSurface
             .on('mousemove', (event) => {
-                if (this.brush && this.brush.brushing) return
+                if (this.brush && this.brush.brushing) return;
 
-                this.updateLabels(event)
+                this.updateLabels(event);
 
                 const d =
-                    this.data[this.locateNearestDataPoint(event, this.xClass)]
+                    this.data[this.locateNearestDataPoint(event, this.xClass)];
                 const tooltipDisplayClasses = this.tooltipConfig
-                    .tooltipClasses ?? [this.xClass, ...this.yClasses]
+                    .tooltipClasses ?? [this.xClass, ...this.yClasses];
                 if (d) {
-                    this.tooltip.formatTooltip(d, tooltipDisplayClasses)
-                    this.tooltip.positionTooltip(event)
-                    this.tooltip.show()
+                    this.tooltip.formatTooltip(d, tooltipDisplayClasses);
+                    this.tooltip.positionTooltip(event);
+                    this.tooltip.show();
                 }
             })
             .on('mouseout', () => {
-                this.hideTooltip()
-            })
+                this.hideTooltip();
+            });
     }
 
     hideTooltip() {
-        this.lineLabel.hide()
+        this.lineLabel.hide();
 
         for (let yClass of this.yClasses) {
-            const pointLabel = this.pointLabels[yClass]
+            const pointLabel = this.pointLabels[yClass];
             if (pointLabel) {
-                pointLabel.hide()
+                pointLabel.hide();
             }
         }
 
-        this.tooltip.hide()
+        this.tooltip.hide();
     }
 }
 
-export default BaseLinePlot
+export default BaseLinePlot;

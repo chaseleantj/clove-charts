@@ -1,6 +1,6 @@
-import * as d3 from 'd3'
+import * as d3 from 'd3';
 
-import BasePlot from '../common/base'
+import BasePlot from '../common/base';
 
 /**
  * Base Matrix Plot Component
@@ -11,7 +11,7 @@ import BasePlot from '../common/base'
  * @param {String} colorByClass - Data field to color elements by
  */
 class BaseMatrixPlot extends BasePlot {
-    static requiredProps = ['data', 'xClass', 'yClass']
+    static requiredProps = ['data', 'xClass', 'yClass'];
 
     static defaultProps = {
         ...BasePlot.defaultProps,
@@ -20,10 +20,10 @@ class BaseMatrixPlot extends BasePlot {
         showCellLabel: true,
         showLegend: true,
         formatNiceScales: false,
-    }
+    };
 
     constructor(props) {
-        super(props)
+        super(props);
     }
 
     onSetupScales() {
@@ -32,20 +32,20 @@ class BaseMatrixPlot extends BasePlot {
             .domain(this.domain.x)
             .range([0, this.plotWidth])
             .paddingInner(this.padding)
-            .paddingOuter(this.padding)
+            .paddingOuter(this.padding);
 
         this.scales.y = d3
             .scaleBand()
             .domain(this.domain.y)
             .range([0, this.plotHeight])
             .paddingInner(this.padding)
-            .paddingOuter(this.padding)
+            .paddingOuter(this.padding);
 
         if (this.colorByClass) {
             this.domain.color = this.domain.getDomain(
                 (d) => d[this.colorByClass]
-            )
-            this.scales.color = this.scales.getColorScale(this.domain.color)
+            );
+            this.scales.color = this.scales.getColorScale(this.domain.color);
         }
     }
 
@@ -61,7 +61,7 @@ class BaseMatrixPlot extends BasePlot {
                 className: 'matrix-plot',
                 coordinateSystem: 'pixel',
             }
-        )
+        );
 
         if (this.showCellLabel) {
             this.primitives.addTexts(
@@ -77,16 +77,16 @@ class BaseMatrixPlot extends BasePlot {
                     className: 'matrix-plot-label',
                     coordinateSystem: 'pixel',
                 }
-            )
+            );
         }
 
-        this.onRenderComplete()
+        this.onRenderComplete();
     }
 
     onSetupLegend() {
-        this.legend.setTitle(this.colorByClass)
-        this.legend.addContinuousLegend(this.scales.color)
+        this.legend.setTitle(this.colorByClass);
+        this.legend.addContinuousLegend(this.scales.color);
     }
 }
 
-export default BaseMatrixPlot
+export default BaseMatrixPlot;

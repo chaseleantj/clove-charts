@@ -1,46 +1,47 @@
 'use client';
 
 import * as d3 from 'd3';
-import { useRef, useState, useEffect, useMemo } from 'react'
-import BaseScatterPlot from '@/components/plots/templates/scatter-plot'
+import { useRef, useState, useEffect, useMemo } from 'react';
+import BaseScatterPlot from '@/components/plots/templates/scatter-plot';
 
-import styles from '@/components/plots/common/page.module.css'
+import styles from '@/components/plots/common/page.module.css';
 
 const PLOT_CONFIG = {
     themeConfig: { enableZoom: true },
     axisConfig: { xLabel: 'Sepal width (cm)', yLabel: 'Petal length (cm)' },
     absolutePositions: { top: '0%', right: '0%' },
     margin: { right: 55 },
-}
+};
 
 export default function IrisScatterChart() {
-    const tooltipRef = useRef(null)
-    const legendRef = useRef(null)
+    const tooltipRef = useRef(null);
+    const legendRef = useRef(null);
 
-    const [irisData, setIrisData] = useState([])
+    const [irisData, setIrisData] = useState([]);
 
     const legendConfig = useMemo(
         () => ({ legendRef, absolutePositions: PLOT_CONFIG.absolutePositions }),
         []
-    )
-    const tooltipConfig = useMemo(() => ({ tooltipRef }), [])
+    );
+    const tooltipConfig = useMemo(() => ({ tooltipRef }), []);
 
     useEffect(() => {
         async function fetchData() {
             try {
-                d3.csv("https://raw.githubusercontent.com/uiuc-cse/data-fa14/gh-pages/data/iris.csv", d3.autoType).then(
-                    (data) => {
-                        console.log(data);
-                        setIrisData(data);
-                    }
-                )
+                d3.csv(
+                    'https://raw.githubusercontent.com/uiuc-cse/data-fa14/gh-pages/data/iris.csv',
+                    d3.autoType
+                ).then((data) => {
+                    console.log(data);
+                    setIrisData(data);
+                });
             } catch (error) {
-                console.error('Error fetching data:', error)
-                setIrisData([])
+                console.error('Error fetching data:', error);
+                setIrisData([]);
             }
         }
-        fetchData()
-    }, [])
+        fetchData();
+    }, []);
 
     return (
         <div className={styles.chart}>
@@ -70,5 +71,5 @@ export default function IrisScatterChart() {
                 </div>
             </div>
         </div>
-    )
+    );
 }
