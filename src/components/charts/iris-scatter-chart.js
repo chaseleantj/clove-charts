@@ -1,8 +1,10 @@
-import * as d3 from 'd3'
-import { useRef, useState, useEffect, useMemo } from 'react'
-import BaseScatterPlot from '@/app/components/plots/templates/scatter-plot'
+'use client';
 
-import styles from '@/app/components/plots/common/page.module.css'
+import * as d3 from 'd3';
+import { useRef, useState, useEffect, useMemo } from 'react'
+import BaseScatterPlot from '@/components/plots/templates/scatter-plot'
+
+import styles from '@/components/plots/common/page.module.css'
 
 const PLOT_CONFIG = {
     themeConfig: { enableZoom: true },
@@ -26,10 +28,12 @@ export default function IrisScatterChart() {
     useEffect(() => {
         async function fetchData() {
             try {
-                const response = await fetch('/api/iris-data')
-                const output = await response.json()
-                const parsed = d3.csvParse(output, d3.autoType)
-                setIrisData(parsed)
+                d3.csv("https://raw.githubusercontent.com/uiuc-cse/data-fa14/gh-pages/data/iris.csv", d3.autoType).then(
+                    (data) => {
+                        console.log(data);
+                        setIrisData(data);
+                    }
+                )
             } catch (error) {
                 console.error('Error fetching data:', error)
                 setIrisData([])
@@ -46,9 +50,9 @@ export default function IrisScatterChart() {
                     <div ref={tooltipRef} className={styles.tooltip}></div>
                     <BaseScatterPlot
                         data={irisData}
-                        xClass="sepalWidthCm"
-                        yClass="petalLengthCm"
-                        colorByClass="petalWidthCm"
+                        xClass="sepal_width"
+                        yClass="petal_length"
+                        colorByClass="petal_width"
                         themeConfig={PLOT_CONFIG.themeConfig}
                         axisConfig={PLOT_CONFIG.axisConfig}
                         legendConfig={legendConfig}
