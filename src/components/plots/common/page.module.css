@@ -1,0 +1,67 @@
+.chart {
+    width: 100%;
+    max-width: 700px;
+    margin: auto;
+}
+
+.plotWrapper {
+    position: relative;
+    padding: 0.75em;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+    gap: 0.75em;
+    background-color: light-dark(var(--black-alpha-5), var(--white-alpha-5));
+}
+
+.plot {
+    flex: 1;
+    min-width: 0;
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    max-height: 600px;
+    margin: auto;
+}
+
+.legend {
+    position: absolute;
+    width: fit-content;
+    height: fit-content;
+    max-width: 130px;
+}
+
+.legendGroup {
+    display: flex;
+    flex-direction: column;
+}
+
+.tooltip {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: fit-content;
+    height: fit-content;
+    max-width: 200px;
+    font-size: 0.75em;
+    padding: 0.5em;
+    border-radius: 5px;
+    background-color: light-dark(var(--white-alpha-75), var(--black-alpha-75));
+    backdrop-filter: blur(2px);
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0; /* Invisible when initialized */
+}
+
+.footer {
+    padding: 0.5em;
+}
+
+.captions {
+    font-size: 0.75em;
+    max-width: 400px;
+    color: light-dark(var(--black-alpha-50), var(--white-alpha-50));
+    text-align: center;
+    margin: auto;
+}
