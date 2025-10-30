@@ -3,37 +3,46 @@
 import * as d3 from 'd3';
 import { useRef, useState, useEffect, useMemo } from 'react';
 import BaseScatterPlot from '@/components/plots/templates/scatter-plot';
+import { PlotConfig } from '@/components/plots/common/config';
 
 import styles from '@/components/plots/common/page.module.css';
 
-const PLOT_CONFIG = {
+
+interface IrisData {
+    sepal_length: number;
+    sepal_width: number;
+    petal_length: number;
+    petal_width: number;
+    species: string;
+}
+
+const PLOT_CONFIG: PlotConfig = {
     themeConfig: { enableZoom: true },
     axisConfig: { xLabel: 'Sepal width (cm)', yLabel: 'Petal length (cm)' },
-    absolutePositions: { top: '0%', right: '0%' },
     margin: { right: 55 },
 };
 
 export default function IrisScatterChart() {
-    const tooltipRef = useRef(null);
-    const legendRef = useRef(null);
+    const tooltipRef = useRef<HTMLDivElement>(null);
+    const legendRef = useRef<HTMLDivElement>(null);
 
-    const [irisData, setIrisData] = useState([]);
+    const [irisData, setIrisData] = useState<IrisData[]>([]);
 
     const legendConfig = useMemo(
-        () => ({ legendRef, absolutePositions: PLOT_CONFIG.absolutePositions }),
+        () => ({ legendRef, absolutePositions: { top: '0%', right: '0%' } }),
         []
     );
     const tooltipConfig = useMemo(() => ({ tooltipRef }), []);
 
     useEffect(() => {
-        async function fetchData() {
+        async function fetchData(): Promise<void> {
             try {
                 d3.csv(
                     'https://raw.githubusercontent.com/uiuc-cse/data-fa14/gh-pages/data/iris.csv',
                     d3.autoType
                 ).then((data) => {
                     console.log(data);
-                    setIrisData(data);
+                    setIrisData(data as IrisData[]);
                 });
             } catch (error) {
                 console.error('Error fetching data:', error);

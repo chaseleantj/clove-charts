@@ -69,7 +69,6 @@ export function getDataType(data, accessor = (d) => d) {
 
     for (let i = 0; i < data.length; i++) {
         const value = accessor(data[i]);
-        // console.log(data[i]);
         if (value !== undefined && value !== null) {
             if (typeof value === 'string') return 'string';
             if (value instanceof Date) return 'date';
