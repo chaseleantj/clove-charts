@@ -2,16 +2,27 @@ import React, { Component } from 'react';
 import * as d3 from 'd3';
 import { v4 as uuidv4 } from 'uuid';
 
-import PrimitiveManager from './primitive-manager';
-import TooltipManager from './tooltip-manager';
-import LegendManager from './legend-manager';
-import DomainManager from './domain-manager';
-import ScaleManager from './scale-manager';
-import AxisManager from './axis-manager';
-import BrushManager from './brush-manager';
-import { validateProps } from './utils';
+import PrimitiveManager from '@/components/plots/common/primitive-manager';
+import TooltipManager from '@/components/plots/common/tooltip-manager';
+import LegendManager from '@/components/plots/common/legend-manager';
+import DomainManager from '@/components/plots/common/domain-manager';
+import ScaleManager from '@/components/plots/common/scale-manager';
+import AxisManager from '@/components/plots/common/axis-manager';
+import BrushManager from '@/components/plots/common/brush-manager';
+import { validateProps } from '@/components/plots/common/utils';
 
 import {
+    ThemeConfig,
+    PlotDimensionConfig,
+    PlotMarginConfig,
+    DomainConfig,
+    ScaleConfig,
+    AxisConfig,
+    LegendConfig,
+    TooltipConfig,
+    ColorConfig,
+    PrimitiveConfig,
+    PlotConfig,
     DEFAULT_PLOT_MARGIN,
     DEFAULT_PLOT_DIMENSIONS,
     DEFAULT_THEME_CONFIG,
@@ -21,23 +32,23 @@ import {
     DEFAULT_LEGEND_CONFIG,
     DEFAULT_TOOLTIP_CONFIG,
     DEFAULT_COLOR_CONFIG,
-} from './config';
+} from '@/components/plots/common/config';
 
-/**
- * Base class for Base plots
- *
- * Props:
- * @param {Array} data - The data to be plotted
- * @param {String} xClass - Data field for x-axis values
- * @param {String} yClass - Data field for y-axis values
- * @param {Array} domainX - [min, max] for the x-domain
- * @param {Array} domainY - [min, max] for the y-domain
- */
-class BasePlot extends Component {
+interface PrimaryBasePlotProps {
+    data?: any;
+    xClass?: string | null;
+    yClass?: string | null;
+    domainX?: [number, number] | null;
+    domainY?: [number, number] | null;
+}
+
+type BasePlotProps = PrimaryBasePlotProps & PlotConfig;
+
+class BasePlot extends Component<BasePlotProps> {
     // Required props for the base class - subclasses can override this
-    static requiredProps = [];
+    static requiredProps: string[] = [];
 
-    static defaultProps = {
+    static defaultProps: PlotConfig = {
         margin: {},
         dimensions: {},
         themeConfig: {},
@@ -49,7 +60,44 @@ class BasePlot extends Component {
         colorConfig: {},
     };
 
-    constructor(props) {
+    margin!: PlotMarginConfig;
+    dimensions!: PlotDimensionConfig;
+    themeConfig!: ThemeConfig;
+    domainConfig!: DomainConfig;
+    scaleConfig!: ScaleConfig;
+    axisConfig!: AxisConfig;
+    legendConfig!: LegendConfig;
+    tooltipConfig!: TooltipConfig;
+    colorConfig!: ColorConfig;
+
+    width!: number;
+    height!: number;
+    plotWidth!: number;
+    plotHeight!: number;
+
+    domain!: DomainManager;
+    scales!: ScaleManager;
+    axes!: AxisManager;
+    legend!: LegendManager;
+    brush!: BrushManager;
+    tooltip!: TooltipManager;
+    primitives!: PrimitiveManager;
+    
+    ref: React.RefObject<HTMLDivElement>;
+    svg!: d3.Selection<SVGSVGElement, unknown, null, undefined>;
+    clip!: d3.Selection<d3.BaseType, unknown, null, undefined>;
+    plotArea!: d3.Selection<SVGGElement, unknown, null, undefined>;
+    plot!: d3.Selection<SVGGElement, unknown, null, undefined>;
+    interactionSurface!: d3.Selection<d3.BaseType, unknown, null, undefined> | d3.Selection<SVGRectElement, unknown, null, undefined>;
+
+
+    clipPathId: string;
+    updateFunctions: Array<() => void>;
+    // handleResize: () => void;
+    resizeObserver!: ResizeObserver;
+
+
+    constructor(props: BasePlotProps) {
         super(props);
         this.ref = React.createRef();
         this.clipPathId = 'clip-' + uuidv4();
@@ -74,8 +122,8 @@ class BasePlot extends Component {
         window.removeEventListener('resize', this.handleResize);
     }
 
-    componentDidUpdate(prevProps) {
-        const shouldRedraw = Object.keys(this.props).some(
+    componentDidUpdate(prevProps: BasePlotProps) {
+        const shouldRedraw = (Object.keys(this.props) as Array<keyof BasePlotProps>).some(
             (prop) => this.props[prop] !== prevProps[prop]
         );
         if (shouldRedraw) {
@@ -102,7 +150,7 @@ class BasePlot extends Component {
 
     initializeProperties() {
         // Copy props to instance variables for easier access
-        Object.assign(this, this.props);
+        // Object.assign(this, this.props);
 
         this.margin = {
             ...DEFAULT_PLOT_MARGIN,
@@ -375,7 +423,7 @@ class BasePlot extends Component {
         this.updateChart();
     }
 
-    zoomToSelection(extent) {
+    zoomToSelection(extent: [[number, number], [number, number]]) {
         // Check if the selection area is greater than the threshold pixels
         const threshold = this.themeConfig.zoomAreaThreshold;
         const shouldZoom =
@@ -421,7 +469,7 @@ class BasePlot extends Component {
         if (typeof ResizeObserver !== 'undefined') {
             this.resizeObserver = new ResizeObserver((entries) => {
                 const { width, height } = entries[0].contentRect;
-                this.updateDimensions(width, height);
+                this.updateDimensions(width);
             });
             this.resizeObserver.observe(this.ref.current);
         } else {
@@ -436,7 +484,7 @@ class BasePlot extends Component {
         this.updateDimensions(width);
     }
 
-    updateDimensions(containerWidth) {
+    updateDimensions(containerWidth: number) {
         if (!this.dimensions) return; // Chart not yet initialized
 
         const newWidth = this.dimensions.width ?? containerWidth;
@@ -467,7 +515,7 @@ class BasePlot extends Component {
         return [x, y];
     }
 
-    addUpdateFunction(updateFunction) {
+    addUpdateFunction(updateFunction : () => void) {
         this.updateFunctions.push(updateFunction);
     }
 
@@ -498,7 +546,7 @@ class BasePlot extends Component {
         this.onCleanup();
     }
 
-    handleDrawError(error) {
+    handleDrawError(error: Error) {
         console.error(`${this.constructor.name} chart drawing failed:`, error);
     }
 
