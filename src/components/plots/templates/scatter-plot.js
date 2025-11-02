@@ -3,6 +3,27 @@ import * as d3 from 'd3';
 import BasePlot from '../common/base';
 import { getDataType } from '../common/utils';
 
+
+
+// // In each subclass, define specific props
+// interface ScatterPlotProps extends Omit<BasePlotProps, 'data' | 'xClass' | 'yClass'> {
+//     data: Array<any>;   // Required
+//     xClass: string;     // Required
+//     yClass: string;     // Required
+// }
+
+// class ScatterPlot extends BasePlot {
+//     static requiredProps = ['data', 'xClass', 'yClass'] as const;
+    
+//     constructor(props: ScatterPlotProps) {
+//         super(props as any);  // Cast for base compatibility
+//         // TypeScript guarantees these exist
+//         this.data = props.data;
+//         this.xClass = props.xClass;
+//         this.yClass = props.yClass;
+//     }
+// }
+
 /**
  * Base Scatter Plot Component
  *
