@@ -6,10 +6,9 @@ import PrimitiveManager from '@/components/plots/common/primitive-manager';
 import TooltipManager from '@/components/plots/common/tooltip-manager';
 import LegendManager from '@/components/plots/common/legend-manager';
 import DomainManager from '@/components/plots/common/domain-manager';
-import ScaleManager from '@/components/plots/common/scale-manager';
+import ScaleManager, { AnyD3Scale, isContinuousScale } from '@/components/plots/common/scale-manager';
 import AxisManager from '@/components/plots/common/axis-manager';
 import BrushManager from '@/components/plots/common/brush-manager';
-// import { validateProps } from '@/components/plots/common/utils';
 
 import {
     PlotConfig,
@@ -23,10 +22,22 @@ import {
     DEFAULT_LEGEND_CONFIG,
     DEFAULT_TOOLTIP_CONFIG,
     DEFAULT_COLOR_CONFIG,
+    CoordinateSystem,
 } from '@/components/plots/common/config';
 
+interface Scale {
+    x: AnyD3Scale,
+    y: AnyD3Scale,
+    color: d3.ScaleSequential<string, never> | d3.ScaleOrdinal<string, string> | (() => string),
+}
+
+interface Domain {
+    x: [number, number] | [Date, Date] | string[],
+    y: [number, number] | [Date, Date] | string[],
+}
+
 interface PrimaryBasePlotProps {
-    data?: any;
+    data?: Record<string, any>[];
     xClass?: string;
     yClass?: string;
     domainX?: [number, number];
@@ -58,14 +69,18 @@ class BasePlot extends Component<BasePlotProps> {
     plotWidth!: number;
     plotHeight!: number;
 
-    domain!: DomainManager;
-    scales!: ScaleManager;
+    scale!: Scale;
+    domain!: Domain;
+
+    domainManager!: DomainManager<Record <string, any>>;
+    scaleManager!: ScaleManager;
+
     axes!: AxisManager;
     legend!: LegendManager;
     brush!: BrushManager;
     tooltip!: TooltipManager;
     primitives!: PrimitiveManager;
-    
+
     ref: React.RefObject<HTMLDivElement | null>;
     svg!: d3.Selection<SVGSVGElement, unknown, null, undefined>;
     clip!: d3.Selection<d3.BaseType, unknown, null, undefined>;
@@ -117,7 +132,7 @@ class BasePlot extends Component<BasePlotProps> {
     }
 
     shouldInitializeChart() {
-        const dataAvailable = this.props.data.length > 0;
+        const dataAvailable = this.props.data && this.props.data.length > 0;
         return dataAvailable;
     }
 
@@ -186,7 +201,7 @@ class BasePlot extends Component<BasePlotProps> {
     }
 
     setupDomain() {
-        this.domain = new DomainManager(this.props.data);
+        this.domainManager = new DomainManager(this.props.data as Record<string, any>[]);
 
         // x domain configuration
         if (this.props.domainX) {
@@ -196,7 +211,7 @@ class BasePlot extends Component<BasePlotProps> {
             const paddingX = this.config.scaleConfig.logX
                 ? 0
                 : this.config.domainConfig.paddingX;
-            this.domain.x = this.domain.getDomain(
+            this.domain.x = this.domainManager.getDomain(
                 (d) => d[xClass],
                 paddingX
             );
@@ -212,7 +227,7 @@ class BasePlot extends Component<BasePlotProps> {
             const paddingY = this.config.scaleConfig.logY
                 ? 0
                 : this.config.domainConfig.paddingY;
-            this.domain.y = this.domain.getDomain(
+            this.domain.y = this.domainManager.getDomain(
                 (d) => d[yClass],
                 paddingY
             );
@@ -224,33 +239,23 @@ class BasePlot extends Component<BasePlotProps> {
     }
 
     setupScales() {
-        this.scales = new ScaleManager(this.config.colorConfig);
+        this.scaleManager = new ScaleManager(this.config.colorConfig);
 
-        this.scales.x = this.scales.getScale(
+        this.scale.x = this.scaleManager.getScale(
             this.domain.x,
             [0, this.plotWidth],
             this.config.scaleConfig.logX,
             this.config.scaleConfig.formatNiceX
         );
 
-        this.scales.y = this.scales.getScale(
+        this.scale.y = this.scaleManager.getScale(
             this.domain.y,
             [this.plotHeight, 0],
             this.config.scaleConfig.logY,
             this.config.scaleConfig.formatNiceY
         );
 
-        this.scales.pixelToPercentWidth = this.scales.getScale(
-            [0, this.plotWidth],
-            [0, 1]
-        );
-
-        this.scales.pixelToPercentHeight = this.scales.getScale(
-            [0, this.plotHeight],
-            [0, 1]
-        );
-
-        this.scales.color = this.scales.getColorScale();
+        this.scale.color = this.scaleManager.getColorScale();
 
         this.onSetupScales();
     }
@@ -265,8 +270,8 @@ class BasePlot extends Component<BasePlotProps> {
             this.config.axisConfig
         );
 
-        this.axes.setXAxis(this.scales.x);
-        this.axes.setYAxis(this.scales.y);
+        this.axes.setXAxis(this.scale.x);
+        this.axes.setYAxis(this.scale.y);
 
         if (this.config.axisConfig.showGrid) {
             this.axes.setXGrid();
@@ -295,11 +300,11 @@ class BasePlot extends Component<BasePlotProps> {
                 this.axes.removeYGrid();
             }
             this.axes.updateXAxis(
-                this.scales.x,
+                this.scale.x,
                 this.config.themeConfig.transitionDuration
             );
             this.axes.updateYAxis(
-                this.scales.y,
+                this.scale.y,
                 this.config.themeConfig.transitionDuration
             );
             if (this.config.axisConfig.showGrid) {
@@ -343,13 +348,13 @@ class BasePlot extends Component<BasePlotProps> {
     }
 
     resetZoom() {
-        this.scales.setScaleDomain(
-            this.scales.x,
+        this.scaleManager.setScaleDomain(
+            this.scale.x,
             this.domain.x,
             this.config.scaleConfig.formatNiceX
         );
-        this.scales.setScaleDomain(
-            this.scales.y,
+        this.scaleManager.setScaleDomain(
+            this.scale.y,
             this.domain.y,
             this.config.scaleConfig.formatNiceY
         );
@@ -357,27 +362,33 @@ class BasePlot extends Component<BasePlotProps> {
     }
 
     zoomToSelection(extent: [[number, number], [number, number]]) {
+
+        if (!isContinuousScale(this.scale.x) || !isContinuousScale(this.scale.y)) {
+            console.warn('Zooming requires continuous scales');
+            return;
+        }
+
         // Check if the selection area is greater than the threshold pixels
         const threshold = this.config.themeConfig.zoomAreaThreshold;
         const shouldZoom =
             Math.abs(extent[1][0] - extent[0][0]) *
-                Math.abs(extent[1][1] - extent[0][1]) >
+            Math.abs(extent[1][1] - extent[0][1]) >
             threshold;
 
         if (!shouldZoom) return;
 
         const newXDomain = [
-            this.scales.x.invert(extent[0][0]),
-            this.scales.x.invert(extent[1][0]),
-        ];
+            this.scale.x.invert(extent[0][0]),
+            this.scale.x.invert(extent[1][0]),
+        ] as [number, number] | [Date, Date];
 
         const newYDomain = [
-            this.scales.y.invert(extent[1][1]),
-            this.scales.y.invert(extent[0][1]),
-        ];
+            this.scale.y.invert(extent[1][1]),
+            this.scale.y.invert(extent[0][1]),
+        ] as [number, number] | [Date, Date];
 
-        this.scales.setScaleDomain(this.scales.x, newXDomain, false);
-        this.scales.setScaleDomain(this.scales.y, newYDomain, false);
+        this.scaleManager.setScaleDomain(this.scale.x, newXDomain, false);
+        this.scaleManager.setScaleDomain(this.scale.y, newYDomain, false);
 
         this.updateChart();
     }
@@ -447,15 +458,19 @@ class BasePlot extends Component<BasePlotProps> {
         }
     }
 
-    getEventCoords(event: Event, coordinateSystem = 'pixel') {
+    getEventCoords(event: Event, coordinateSystem = CoordinateSystem.Pixel): [number, number] {
         const [x, y] = d3.pointer(event, this.plot.node());
-        if (coordinateSystem === 'data') {
-            return [this.scales.x.invert(x), this.scales.y.invert(y)];
+        if (coordinateSystem === CoordinateSystem.Data) {
+            if (!isContinuousScale(this.scale.x) || !isContinuousScale(this.scale.y)) {
+                console.warn('Categorical scales do not support detecting event coordinates in the data coordinate system');
+                return [x, y];
+            }
+            return [this.scale.x.invert(x), this.scale.y.invert(y)] as [number, number];
         }
         return [x, y];
     }
 
-    addUpdateFunction(updateFunction : () => void) {
+    addUpdateFunction(updateFunction: () => void) {
         this.updateFunctions.push(updateFunction);
     }
 
@@ -509,7 +524,7 @@ class BasePlot extends Component<BasePlotProps> {
             this.setupPhase();
             this.renderPhase();
         } catch (error) {
-            this.handleDrawError(error);``
+            this.handleDrawError(error); ``
             this.cleanup();
         }
     }
@@ -535,18 +550,18 @@ class BasePlot extends Component<BasePlotProps> {
     }
 
     // Lifecycle hooks - to be optionally overridden by subclasses
-    onInitializeProperties() {}
-    onInitializePlot() {}
-    onInitializePrimitives() {}
-    onSetupDomain() {}
-    onSetupScales() {}
-    onSetupAxes() {}
-    onSetupBrush() {}
-    onSetupLegend() {}
-    onSetupTooltip() {}
-    onRenderComplete() {}
-    onUpdateChart() {}
-    onCleanup() {}
+    onInitializeProperties() { }
+    onInitializePlot() { }
+    onInitializePrimitives() { }
+    onSetupDomain() { }
+    onSetupScales() { }
+    onSetupAxes() { }
+    onSetupBrush() { }
+    onSetupLegend() { }
+    onSetupTooltip() { }
+    onRenderComplete() { }
+    onUpdateChart() { }
+    onCleanup() { }
 
     render() {
         return <div ref={this.ref} style={{ width: '100%' }}></div>;
