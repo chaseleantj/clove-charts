@@ -7,7 +7,6 @@ import { PlotConfig } from '@/components/plots/common/config';
 
 import styles from '@/components/plots/common/page.module.css';
 
-
 interface IrisData {
     sepal_length: number;
     sepal_width: number;

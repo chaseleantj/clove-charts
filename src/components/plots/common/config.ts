@@ -8,10 +8,10 @@ export type AnyRange = string[] | [number, number];
 
 export const enum CoordinateSystem {
     Data = 'data',
-    Pixel = 'pixel'
+    Pixel = 'pixel',
 }
 
-export type TickFormatFunction = (value : DataValue) => string | null;
+export type TickFormatFunction = (value: DataValue) => string | null;
 
 export interface ThemeConfig {
     fontSize?: number;
@@ -110,16 +110,16 @@ export interface RequiredAxisConfig {
 export interface LegendConfig {
     legendRef?: { current: HTMLDivElement | null };
     title?: string | null;
-    maxHeight? : number | null;
-    absolutePositions? : {
+    maxHeight?: number | null;
+    absolutePositions?: {
         top: string;
         right: string;
-    }
-    titleFontSize? : number;
-    fontSize? : number;
-    categoricalItemHeight? : number;
-    continuousBarWidth? : number;
-    continuousBarLength? : number;
+    };
+    titleFontSize?: number;
+    fontSize?: number;
+    categoricalItemHeight?: number;
+    continuousBarWidth?: number;
+    continuousBarLength?: number;
 }
 
 export interface RequiredLegendConfig {
@@ -216,12 +216,10 @@ export function DEFAULT_TICK_FORMAT(d: number | string | Date): string | null {
     }
     if (typeof d === 'string') {
         return d;
-    }
-    else if (typeof d === 'number') {
+    } else if (typeof d === 'number') {
         if (d === 0) {
             return '0';
-        }
-        else if (Math.abs(d) >= 1000) {
+        } else if (Math.abs(d) >= 1000) {
             return d3.format('.2s')(d);
         }
     }
