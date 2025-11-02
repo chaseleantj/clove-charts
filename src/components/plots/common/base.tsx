@@ -53,12 +53,6 @@ class BasePlot extends Component<BasePlotProps> {
 
     config: RequiredPlotConfig;
 
-    data?: any;
-    xClass?: string;
-    yClass?: string;
-    domainX?: [number, number];
-    domainY?: [number, number];
-
     width!: number;
     height!: number;
     plotWidth!: number;
@@ -79,23 +73,13 @@ class BasePlot extends Component<BasePlotProps> {
     plot!: d3.Selection<SVGGElement, unknown, null, undefined>;
     interactionSurface!: d3.Selection<d3.BaseType, unknown, null, undefined> | d3.Selection<SVGRectElement, unknown, null, undefined>;
 
-
     clipPathId: string;
     updateFunctions: Array<() => void>;
     resizeObserver!: ResizeObserver;
 
-
     constructor(props: BasePlotProps) {
         super(props);
-
         this.config = getPlotConfig(props);
-
-        this.data = props.data;
-        this.xClass = props.xClass;
-        this.yClass = props.yClass;
-        this.domainX = props.domainX;
-        this.domainY = props.domainY;
-
         this.ref = React.createRef();
         this.clipPathId = 'clip-' + uuidv4();
         this.updateFunctions = [];
@@ -143,6 +127,7 @@ class BasePlot extends Component<BasePlotProps> {
     }
 
     initializeProperties() {
+        if (!this.ref.current) return;
         const rect = this.ref.current.getBoundingClientRect();
         this.width = this.config.dimensions.width ?? rect.width;
         this.height =
@@ -201,13 +186,13 @@ class BasePlot extends Component<BasePlotProps> {
     }
 
     setupDomain() {
-        this.domain = new DomainManager(this.data);
+        this.domain = new DomainManager(this.props.data);
 
         // x domain configuration
-        if (this.domainX) {
-            this.domain.x = this.domainX;
-        } else if (this.xClass) {
-            const xClass = this.xClass;
+        if (this.props.domainX) {
+            this.domain.x = this.props.domainX;
+        } else if (this.props.xClass) {
+            const xClass = this.props.xClass;
             const paddingX = this.config.scaleConfig.logX
                 ? 0
                 : this.config.domainConfig.paddingX;
@@ -220,10 +205,10 @@ class BasePlot extends Component<BasePlotProps> {
         }
 
         // y domain configuration
-        if (this.domainY) {
-            this.domain.y = this.domainY;
-        } else if (this.yClass) {
-            const yClass = this.yClass;
+        if (this.props.domainY) {
+            this.domain.y = this.props.domainY;
+        } else if (this.props.yClass) {
+            const yClass = this.props.yClass;
             const paddingY = this.config.scaleConfig.logY
                 ? 0
                 : this.config.domainConfig.paddingY;
@@ -290,7 +275,7 @@ class BasePlot extends Component<BasePlotProps> {
 
         this.axes.setXLabel(
             this.config.axisConfig.xLabel === null
-                ? this.xClass
+                ? this.props.xClass
                 : this.config.axisConfig.xLabel,
             this.config.margin.bottom,
             this.config.themeConfig.fontSize
@@ -298,7 +283,7 @@ class BasePlot extends Component<BasePlotProps> {
 
         this.axes.setYLabel(
             this.config.axisConfig.yLabel === null
-                ? this.yClass
+                ? this.props.yClass
                 : this.config.axisConfig.yLabel,
             this.config.margin.left,
             this.config.themeConfig.fontSize
@@ -414,12 +399,19 @@ class BasePlot extends Component<BasePlotProps> {
     }
 
     setupResizeObserver() {
+        const element = this.ref.current;
+
+        if (!element) {
+            console.warn('Ref not available for resize handling');
+            return;
+        }
+
         if (typeof ResizeObserver !== 'undefined') {
             this.resizeObserver = new ResizeObserver((entries) => {
                 const { width, height } = entries[0].contentRect;
                 this.updateDimensions(width);
             });
-            this.resizeObserver.observe(this.ref.current);
+            this.resizeObserver.observe(element);
         } else {
             window.addEventListener('resize', this.handleResize);
             this.handleResize();
