@@ -1,8 +1,20 @@
 import * as d3 from 'd3';
-import styles from './page.module.css';
 
 class BrushManager {
-    constructor(plot, extent, onBrush, resetBrush, transitionDuration) {
+
+    brushing: boolean;
+    zoomed: boolean;
+
+    brush: d3.BrushBehavior<unknown>;
+    brushElement: d3.Selection<SVGGElement, unknown, null, undefined>;
+
+    constructor(
+        private readonly plot: d3.Selection<SVGGElement, unknown, null, undefined>, 
+        public readonly extent: [[number, number], [number, number]], 
+        private readonly onBrush: (...args: any[]) => void, 
+        public readonly resetBrush: () => void, 
+        public readonly transitionDuration: number
+    ) {
         this.brushing = false;
         this.zoomed = false;
 
@@ -11,17 +23,14 @@ class BrushManager {
         this.onBrush = onBrush;
         this.resetBrush = resetBrush;
         this.transitionDuration = transitionDuration;
-        this.setupBrush();
-    }
 
-    setupBrush() {
         this.brush = d3
             .brush()
             .extent(this.extent)
-            .on('start', (event) => {
+            .on('start', () => {
                 this.brushing = true;
             })
-            .on('end', (event) => {
+            .on('end', (event: d3.D3BrushEvent<unknown>) => {
                 this.handleBrushEnd(event);
                 setTimeout(() => {
                     this.brushing = false;
@@ -35,7 +44,7 @@ class BrushManager {
             .call(this.brush);
     }
 
-    handleBrushEnd(event) {
+    private handleBrushEnd(event: d3.D3BrushEvent<unknown>): void {
         // Ignore programmatic events (e.g., brush.move)
         if (!event.sourceEvent) return;
         const extent = event.selection;

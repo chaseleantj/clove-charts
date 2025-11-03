@@ -78,36 +78,36 @@ export function getDataType(data, accessor = (d) => d) {
     return 'unknown';
 }
 
-export function validateProps(props, requiredProps, chartName = 'Base Plot') {
-    const missing = [];
+// export function validateProps(props, requiredProps, chartName = 'Base Plot') {
+//     const missing = [];
 
-    for (const prop of requiredProps) {
-        const value = props[prop];
+//     for (const prop of requiredProps) {
+//         const value = props[prop];
 
-        if (value === undefined || value === null) {
-            missing.push(prop);
-            continue;
-        }
+//         if (value === undefined || value === null) {
+//             missing.push(prop);
+//             continue;
+//         }
 
-        // Special validation for arrays that should not be empty
-        if (prop === 'data' && Array.isArray(value) && value.length === 0) {
-            missing.push(`${prop} (empty array)`);
-            continue;
-        }
+//         // Special validation for arrays that should not be empty
+//         if (prop === 'data' && Array.isArray(value) && value.length === 0) {
+//             missing.push(`${prop} (empty array)`);
+//             continue;
+//         }
 
-        // Special validation for string props that should not be empty
-        if (typeof value === 'string' && value.trim() === '') {
-            missing.push(`${prop} (empty string)`);
-            continue;
-        }
-    }
+//         // Special validation for string props that should not be empty
+//         if (typeof value === 'string' && value.trim() === '') {
+//             missing.push(`${prop} (empty string)`);
+//             continue;
+//         }
+//     }
 
-    if (missing.length > 0) {
-        const chartType = chartName;
-        const message = `${chartType}: Missing or invalid required props: ${missing.join(', ')}`;
-        console.warn(message);
-        return false;
-    }
+//     if (missing.length > 0) {
+//         const chartType = chartName;
+//         const message = `${chartType}: Missing or invalid required props: ${missing.join(', ')}`;
+//         console.warn(message);
+//         return false;
+//     }
 
-    return true;
-}
+//     return true;
+// }

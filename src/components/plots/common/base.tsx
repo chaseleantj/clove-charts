@@ -81,11 +81,11 @@ class BasePlot extends Component<BasePlotProps> {
 
     domainManager!: DomainManager<Record<string, any>>;
     scaleManager!: ScaleManager;
+    tooltipManager!: TooltipManager;
 
     axes!: AxisManager;
     legend!: LegendManager;
     brush!: BrushManager;
-    tooltip!: TooltipManager;
     primitives!: PrimitiveManager;
 
     ref: React.RefObject<HTMLDivElement | null>;
@@ -104,7 +104,7 @@ class BasePlot extends Component<BasePlotProps> {
     constructor(props: BasePlotProps) {
         super(props);
         this.config = getPlotConfig(props);
-        this.ref = React.createRef();
+        this.ref = React.createRef<HTMLDivElement>();
         this.clipPathId = 'clip-' + uuidv4();
         this.updateFunctions = [];
         this.handleResize = this.handleResize.bind(this);
@@ -337,8 +337,8 @@ class BasePlot extends Component<BasePlotProps> {
 
     setupTooltip(): void {
         if (!this.config.tooltipConfig.tooltipRef.current) return;
-        this.tooltip = new TooltipManager(this.config.tooltipConfig, this.ref);
-        this.tooltip.hide();
+        this.tooltipManager = new TooltipManager(this.config.tooltipConfig, this.ref);
+        this.tooltipManager.hideTooltip();
         this.onSetupTooltip();
     }
 
@@ -510,8 +510,8 @@ class BasePlot extends Component<BasePlotProps> {
         if (this.svg) {
             this.svg.selectAll('*').interrupt();
         }
-        if (this.tooltip) {
-            this.tooltip.hide();
+        if (this.tooltipManager) {
+            this.tooltipManager.hideTooltip();
         }
 
         d3.select(this.ref.current).selectAll('*').remove();
