@@ -1,16 +1,21 @@
 import * as d3 from 'd3';
-import { DEFAULT_AXIS_CONFIG } from './config';
+import { RequiredAxisConfig } from '@/components/plots/common/config';
 
 class AxisManager {
-    constructor(plotArea, plotWidth, plotHeight, axisConfig = {}) {
+
+    x!: d3.Selection<SVGGElement, unknown, null, undefined>;
+    y!: d3.Selection<SVGGElement, unknown, null, undefined>;
+    axisGroup: d3.Selection<SVGGElement, unknown, null, undefined>;
+
+    constructor(
+            private readonly plotArea: d3.Selection<SVGGElement, unknown, null, undefined>, 
+            private readonly plotWidth: number, 
+            private readonly plotHeight: number, 
+            private readonly axisConfig: RequiredAxisConfig
+        ) {
         this.plotArea = plotArea;
         this.plotWidth = plotWidth;
         this.plotHeight = plotHeight;
-
-        this.config = {
-            ...DEFAULT_AXIS_CONFIG,
-            ...axisConfig,
-        };
 
         this.axisGroup = this.plotArea
             .append('g')
@@ -18,35 +23,43 @@ class AxisManager {
             .attr('overflow', 'visible');
     }
 
-    setXAxis(scale) {
+    setXAxis(scale: d3.AxisScale<string>) {
+
+        let xAxis: d3.Axis<string> = d3
+            .axisBottom(scale)
+            .ticks(this.axisConfig.tickCount)
+            .tickSize(this.axisConfig.tickSize)
+
+        if (this.axisConfig.tickFormat) {
+            xAxis = xAxis.tickFormat(this.axisConfig.tickFormat);
+        }
+
         this.x = this.axisGroup
             .append('g')
             .attr('transform', `translate(0, ${this.plotHeight})`)
             .attr('class', `x-axis`)
-            .call(
-                d3
-                    .axisBottom(scale)
-                    .ticks(this.config.tickCount)
-                    .tickSize(this.config.tickSize)
-                    .tickFormat(this.config.tickFormat)
-            );
+            .call(xAxis);
 
-        this.x.selectAll('text').attr('font-size', this.config.tickFontSize);
+        this.x.selectAll('text').attr('font-size', this.axisConfig.tickFontSize);
     }
 
-    setYAxis(scale) {
+    setYAxis(scale: d3.AxisScale<string>) {
+
+        let yAxis: d3.Axis<string> = d3
+            .axisLeft(scale)
+            .ticks(this.axisConfig.tickCount)
+            .tickSize(this.axisConfig.tickSize)
+
+        if (this.axisConfig.tickFormat) {
+            yAxis = yAxis.tickFormat(this.axisConfig.tickFormat)
+        }
+
         this.y = this.axisGroup
             .append('g')
             .attr('class', `y-axis`)
-            .call(
-                d3
-                    .axisLeft(scale)
-                    .ticks(this.config.tickCount)
-                    .tickSize(this.config.tickSize)
-                    .tickFormat(this.config.tickFormat)
-            );
+            .call(yAxis);
 
-        this.y.selectAll('text').attr('font-size', this.config.tickFontSize);
+        this.y.selectAll('text').attr('font-size', this.axisConfig.tickFontSize);
     }
 
     setXGrid() {
@@ -56,7 +69,7 @@ class AxisManager {
                 .filter((d, i, nodes) => i < nodes.length)
                 .clone()
                 .attr('class', 'grid')
-                .attr('stroke', this.config.gridColor)
+                .attr('stroke', this.axisConfig.gridColor)
                 .attr('pointer-events', 'none')
                 .attr('y1', -this.plotHeight)
                 .attr('y2', 0)
@@ -70,14 +83,14 @@ class AxisManager {
                 .filter((d, i, nodes) => i < nodes.length)
                 .clone()
                 .attr('class', 'grid')
-                .attr('stroke', this.config.gridColor)
+                .attr('stroke', this.axisConfig.gridColor)
                 .attr('pointer-events', 'none')
                 .attr('x1', 0)
                 .attr('x2', this.plotWidth)
         );
     }
 
-    setXLabel(label, margin, fontSize = 12) {
+    setXLabel(label: string, margin: number, fontSize = 12) {
         this.x
             .append('g')
             .attr('font-size', fontSize)
@@ -92,7 +105,7 @@ class AxisManager {
             .text(label);
     }
 
-    setYLabel(label, margin, fontSize = 12) {
+    setYLabel(label: string | null, margin: number, fontSize = 12) {
         this.y
             .append('g')
             .attr('font-size', fontSize)
@@ -108,44 +121,52 @@ class AxisManager {
             .text(label);
     }
 
-    updateXAxis(scale, transitionDuration = 0) {
+    updateXAxis(scale: d3.AxisScale<string>, transitionDuration = 0) {
+
+        let xAxis = d3
+            .axisBottom(scale)
+            .ticks(this.axisConfig.tickCount)
+            .tickSize(this.axisConfig.tickSize);
+
+        if (this.axisConfig.tickFormat) {
+            xAxis = xAxis.tickFormat(this.axisConfig.tickFormat);
+        }
+
         this.x
             .transition()
             .duration(transitionDuration)
-            .call(
-                d3
-                    .axisBottom(scale)
-                    .ticks(this.config.tickCount)
-                    .tickSize(this.config.tickSize)
-                    .tickFormat(this.config.tickFormat)
-            );
+            .call(xAxis);
 
         this.x
             .selectAll('text')
             .filter(function () {
-                return !this.classList.contains('axis-label');
+                return this instanceof Element && !this.classList.contains('axis-label');
             })
-            .attr('font-size', this.config.tickFontSize);
+            .attr('font-size', this.axisConfig.tickFontSize);
     }
 
-    updateYAxis(scale, transitionDuration = 0) {
+    updateYAxis(scale: d3.AxisScale<string>, transitionDuration = 0) {
+
+        let yAxis = d3
+            .axisLeft(scale)
+            .ticks(this.axisConfig.tickCount)
+            .tickSize(this.axisConfig.tickSize);
+
+        if (this.axisConfig.tickFormat) {
+            yAxis = yAxis.tickFormat(this.axisConfig.tickFormat);
+        }
+
         this.y
             .transition()
             .duration(transitionDuration)
-            .call(
-                d3
-                    .axisLeft(scale)
-                    .ticks(this.config.tickCount)
-                    .tickSize(this.config.tickSize)
-                    .tickFormat(this.config.tickFormat)
-            );
+            .call(yAxis);
 
         this.y
             .selectAll('text')
             .filter(function () {
-                return !this.classList.contains('axis-label');
+                return this instanceof Element && !this.classList.contains('axis-label');
             })
-            .attr('font-size', this.config.tickFontSize);
+            .attr('font-size', this.axisConfig.tickFontSize);
     }
 
     removeXGrid() {

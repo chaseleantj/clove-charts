@@ -282,29 +282,37 @@ class BasePlot extends Component<BasePlotProps> {
             this.config.axisConfig
         );
 
-        this.axes.setXAxis(this.scale.x);
-        this.axes.setYAxis(this.scale.y);
+        this.axes.setXAxis(this.scale.x as d3.AxisScale<string>);
+        this.axes.setYAxis(this.scale.y as d3.AxisScale<string>);
 
         if (this.config.axisConfig.showGrid) {
             this.axes.setXGrid();
             this.axes.setYGrid();
         }
 
-        this.axes.setXLabel(
-            this.config.axisConfig.xLabel === null
-                ? this.props.xClass
-                : this.config.axisConfig.xLabel,
-            this.config.margin.bottom,
-            this.config.themeConfig.fontSize
-        );
+        const xLabel = this.config.axisConfig.xLabel === null
+        ? this.props.xClass
+        : this.config.axisConfig.xLabel;
 
-        this.axes.setYLabel(
-            this.config.axisConfig.yLabel === null
-                ? this.props.yClass
-                : this.config.axisConfig.yLabel,
-            this.config.margin.left,
-            this.config.themeConfig.fontSize
-        );
+        if (xLabel) {
+            this.axes.setXLabel(
+                xLabel,
+                this.config.margin.bottom,
+                this.config.themeConfig.fontSize
+            );
+        }
+
+        const yLabel = this.config.axisConfig.yLabel === null
+        ? this.props.yClass
+        : this.config.axisConfig.yLabel
+
+        if (yLabel) {
+            this.axes.setYLabel(
+                yLabel,
+                this.config.margin.left,
+                this.config.themeConfig.fontSize
+            );
+        }
 
         this.addUpdateFunction(() => {
             if (this.config.axisConfig.showGrid) {
@@ -312,11 +320,11 @@ class BasePlot extends Component<BasePlotProps> {
                 this.axes.removeYGrid();
             }
             this.axes.updateXAxis(
-                this.scale.x,
+                this.scale.x as d3.AxisScale<string>,
                 this.config.themeConfig.transitionDuration
             );
             this.axes.updateYAxis(
-                this.scale.y,
+                this.scale.y as d3.AxisScale<string>,
                 this.config.themeConfig.transitionDuration
             );
             if (this.config.axisConfig.showGrid) {

@@ -11,7 +11,7 @@ export const enum CoordinateSystem {
     Pixel = 'pixel',
 }
 
-export type TickFormatFunction = (value: DataValue) => string | null;
+export type TickFormatFunction = (domainValue: string, index: number) => string;
 
 export interface ThemeConfig {
     fontSize?: number;
@@ -210,10 +210,10 @@ export interface RequiredPlotConfig {
 const DEFAULT_FONT_SIZE = 14;
 const SMALL_FONT_SIZE = 12;
 
-export function DEFAULT_TICK_FORMAT(d: number | string | Date): string | null {
-    if (d instanceof Date) {
-        return null; // let d3 format the date itself
-    }
+export function DEFAULT_TICK_FORMAT(d: number | string | Date): string {
+    // if (d instanceof Date) {
+    //     return null; // let d3 format the date itself
+    // }
     if (typeof d === 'string') {
         return d;
     } else if (typeof d === 'number') {
