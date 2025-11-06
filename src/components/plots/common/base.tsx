@@ -28,18 +28,18 @@ import {
     CoordinateSystem,
 } from '@/components/plots/common/config';
 
+interface Domain {
+    x: [number, number] | [Date, Date] | string[];
+    y: [number, number] | [Date, Date] | string[];
+}
+
 interface Scale {
     x: AnyD3Scale;
     y: AnyD3Scale;
     color:
-        | d3.ScaleSequential<string, never>
+        d3.ScaleSequential<string, never>
         | d3.ScaleOrdinal<string, string>
         | (() => string);
-}
-
-interface Domain {
-    x: [number, number] | [Date, Date] | string[];
-    y: [number, number] | [Date, Date] | string[];
 }
 
 interface PrimaryBasePlotProps {
@@ -82,10 +82,10 @@ class BasePlot extends Component<BasePlotProps> {
     domainManager!: DomainManager<Record<string, any>>;
     scaleManager!: ScaleManager;
     tooltipManager!: TooltipManager;
+    axisManager!: AxisManager;
+    brushManager!: BrushManager;
 
-    axes!: AxisManager;
     legend!: LegendManager;
-    brush!: BrushManager;
     primitives!: PrimitiveManager;
 
     ref: React.RefObject<HTMLDivElement | null>;
@@ -275,19 +275,19 @@ class BasePlot extends Component<BasePlotProps> {
     setupAxes(): void {
         if (!this.config.axisConfig.showAxis) return;
 
-        this.axes = new AxisManager(
+        this.axisManager = new AxisManager(
             this.plotArea,
             this.plotWidth,
             this.plotHeight,
             this.config.axisConfig
         );
 
-        this.axes.setXAxis(this.scale.x as d3.AxisScale<string>);
-        this.axes.setYAxis(this.scale.y as d3.AxisScale<string>);
+        this.axisManager.setXAxis(this.scale.x as d3.AxisScale<string>);
+        this.axisManager.setYAxis(this.scale.y as d3.AxisScale<string>);
 
         if (this.config.axisConfig.showGrid) {
-            this.axes.setXGrid();
-            this.axes.setYGrid();
+            this.axisManager.setXGrid();
+            this.axisManager.setYGrid();
         }
 
         const xLabel = this.config.axisConfig.xLabel === null
@@ -295,7 +295,7 @@ class BasePlot extends Component<BasePlotProps> {
         : this.config.axisConfig.xLabel;
 
         if (xLabel) {
-            this.axes.setXLabel(
+            this.axisManager.setXLabel(
                 xLabel,
                 this.config.margin.bottom,
                 this.config.themeConfig.fontSize
@@ -307,7 +307,7 @@ class BasePlot extends Component<BasePlotProps> {
         : this.config.axisConfig.yLabel
 
         if (yLabel) {
-            this.axes.setYLabel(
+            this.axisManager.setYLabel(
                 yLabel,
                 this.config.margin.left,
                 this.config.themeConfig.fontSize
@@ -316,20 +316,20 @@ class BasePlot extends Component<BasePlotProps> {
 
         this.addUpdateFunction(() => {
             if (this.config.axisConfig.showGrid) {
-                this.axes.removeXGrid();
-                this.axes.removeYGrid();
+                this.axisManager.removeXGrid();
+                this.axisManager.removeYGrid();
             }
-            this.axes.updateXAxis(
+            this.axisManager.updateXAxis(
                 this.scale.x as d3.AxisScale<string>,
                 this.config.themeConfig.transitionDuration
             );
-            this.axes.updateYAxis(
+            this.axisManager.updateYAxis(
                 this.scale.y as d3.AxisScale<string>,
                 this.config.themeConfig.transitionDuration
             );
             if (this.config.axisConfig.showGrid) {
-                this.axes.setXGrid();
-                this.axes.setYGrid();
+                this.axisManager.setXGrid();
+                this.axisManager.setYGrid();
             }
         });
     }
@@ -353,7 +353,7 @@ class BasePlot extends Component<BasePlotProps> {
     setupBrush(): void {
         if (!this.config.themeConfig.enableZoom) return;
 
-        this.brush = new BrushManager(
+        this.brushManager = new BrushManager(
             this.plot,
             [
                 [0, 0],
@@ -416,7 +416,7 @@ class BasePlot extends Component<BasePlotProps> {
     }
 
     setupInteractionSurface(): void {
-        if (this.brush) {
+        if (this.brushManager) {
             this.interactionSurface = this.plot
                 .select('.brush')
                 .select('.overlay');

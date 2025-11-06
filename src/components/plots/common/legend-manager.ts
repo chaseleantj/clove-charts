@@ -1,18 +1,38 @@
 import * as d3 from 'd3';
-import styles from './page.module.css';
+import styles from '@/components/plots/common/page.module.css';
 import { v4 as uuidv4 } from 'uuid';
 
-class LegendManager {
-    constructor(legendConfig) {
-        this.config = legendConfig;
+import { RequiredLegendConfig } from '@/components/plots/common/config';
 
-        this.legend = d3.select(this.config.legendRef.current);
+interface CategoricalItems {
+    shape: string;
+    color: string;
+    text: string;
+}
+
+class LegendManager {
+
+    legend: d3.Selection<HTMLDivElement, unknown, null, undefined>;
+    gradientId: string;
+    categoricalItems: CategoricalItems[];
+
+    legendGroup: d3.Selection<HTMLDivElement, unknown, null, undefined>;
+    continuousContainer!: d3.Selection<HTMLDivElement, unknown, null, undefined>;
+    categoricalContainer!: d3.Selection<HTMLDivElement, unknown, null, undefined>;
+    
+    continuousSvg!: d3.Selection<SVGSVGElement, unknown, null, undefined>;
+    categoricalSvg!: d3.Selection<SVGSVGElement, unknown, null, undefined>;
+    categoricalGroup!: d3.Selection<SVGGElement, unknown, null, undefined>;
+
+    constructor(private readonly legendConfig: RequiredLegendConfig) {
+
+        this.legend = d3.select(this.legendConfig.legendRef.current!);
         this.gradientId = 'linear-gradient-' + uuidv4();
         this.categoricalItems = [];
 
         // Set CSS absolute position top/bottom/left/right
         for (const [key, value] of Object.entries(
-            this.config.absolutePositions
+            this.legendConfig.absolutePositions
         )) {
             this.legend.style(key, value);
         }
@@ -22,18 +42,18 @@ class LegendManager {
             .attr('class', styles.legendGroup);
     }
 
-    setTitle(title = null) {
+    setTitle(title?: string) {
         this.legendGroup.selectAll(`.${styles.legendTitle}`).remove();
 
-        const newTitle = title ?? this.config.title;
+        const newTitle = title ?? this.legendConfig.title;
         this.legendGroup
             .append('text')
-            .style('font-size', this.config.titleFontSize + 'px')
+            .style('font-size', this.legendConfig.titleFontSize + 'px')
             .style('margin-bottom', '5px')
             .html(newTitle);
     }
 
-    addContinuousLegend(colorScale) {
+    addContinuousLegend(colorScale: d3.ScaleSequential<string, never>) {
         this.continuousContainer = this.legendGroup
             .append('div')
             .style('text-align', 'right');
@@ -51,12 +71,7 @@ class LegendManager {
         linearGradient
             .selectAll('stop')
             .data(
-                colorScale.ticks
-                    ? colorScale.ticks().map((t, i, n) => ({
-                          offset: `${(100 * i) / n.length}%`,
-                          color: colorScale(t),
-                      }))
-                    : [0, 0.2, 0.4, 0.6, 0.8, 1].map((t) => ({
+                    [0, 0.2, 0.4, 0.6, 0.8, 1].map((t) => ({
                           offset: `${t * 100}%`,
                           color: colorScale(
                               colorScale.domain()[0] +
@@ -74,21 +89,21 @@ class LegendManager {
         this.continuousSvg
             .append('g')
             .append('rect')
-            .attr('width', this.config.continuousBarWidth)
-            .attr('height', this.config.continuousBarLength)
+            .attr('width', this.legendConfig.continuousBarWidth)
+            .attr('height', this.legendConfig.continuousBarLength)
             .style('fill', `url(#${this.gradientId})`);
 
         const axisScale = d3
             .scaleLinear()
             .domain(colorScale.domain())
-            .range([this.config.continuousBarLength, 0]);
+            .range([this.legendConfig.continuousBarLength, 0]);
 
-        const axisRight = (g) =>
+        const axisRight = (g: d3.Selection<SVGGElement, unknown, null, undefined>) =>
             g
                 .attr('class', `y-axis`)
                 .attr(
                     'transform',
-                    `translate(${this.config.continuousBarWidth + 5}, 0)`
+                    `translate(${this.legendConfig.continuousBarWidth + 5}, 0)`
                 )
                 .call(d3.axisRight(axisScale).ticks(5));
 
@@ -97,7 +112,7 @@ class LegendManager {
         this.setLegendDimensions(
             this.continuousSvg,
             this.continuousContainer,
-            this.config.continuousBarLength
+            this.legendConfig.continuousBarLength
         );
     }
 
@@ -109,7 +124,7 @@ class LegendManager {
         this.categoricalGroup = this.categoricalSvg.append('g');
     }
 
-    addCategoricalItem(shape, color, text) {
+    addCategoricalItem(shape: string, color: string, text: string) {
         const item = { shape, color, text };
         this.categoricalItems.push(item);
         this.renderCategoricalLegend();
@@ -119,7 +134,7 @@ class LegendManager {
         this.categoricalGroup.selectAll('*').remove();
 
         // Map shape names to d3 symbol types
-        const getSymbolType = (shape) => {
+        const getSymbolType = (shape: string) => {
             switch (shape) {
                 case 'circle':
                     return d3.symbolCircle;
@@ -145,8 +160,8 @@ class LegendManager {
             .enter()
             .each((d, i) => {
                 const y =
-                    i * this.config.categoricalItemHeight +
-                    this.config.categoricalItemHeight / 2;
+                    i * this.legendConfig.categoricalItemHeight +
+                    this.legendConfig.categoricalItemHeight / 2;
                 const group = this.categoricalGroup.append('g');
 
                 if (d.shape === 'line') {
@@ -185,10 +200,10 @@ class LegendManager {
             .attr(
                 'y',
                 (d, i) =>
-                    i * this.config.categoricalItemHeight +
-                    this.config.categoricalItemHeight / 2
+                    i * this.legendConfig.categoricalItemHeight +
+                    this.legendConfig.categoricalItemHeight / 2
             )
-            .attr('font-size', this.config.fontSize)
+            .attr('font-size', this.legendConfig.fontSize)
             .attr('fill', 'currentColor')
             .attr('dominant-baseline', 'middle')
             .attr('text-anchor', 'start');
@@ -196,7 +211,7 @@ class LegendManager {
         this.setLegendDimensions(
             this.categoricalSvg,
             this.categoricalContainer,
-            this.categoricalItems.length * this.config.categoricalItemHeight
+            this.categoricalItems.length * this.legendConfig.categoricalItemHeight
         );
     }
 
@@ -212,9 +227,16 @@ class LegendManager {
         }
     }
 
-    setLegendDimensions(legendSvg, container = null, contentHeight = null) {
+    setLegendDimensions(
+        legendSvg: d3.Selection<SVGSVGElement, unknown, null, undefined>, 
+        container: d3.Selection<HTMLDivElement, unknown, null, undefined>, 
+        contentHeight: number
+    ) {
         // Calculate the bounding box of everything drawn
-        const bbox = legendSvg.node().getBBox();
+        const bbox = legendSvg.node()?.getBBox();
+
+        if (!bbox) return;
+
         const w = Math.max(bbox.width, 1);
         const h = Math.max(contentHeight + 10 || bbox.height, 1);
 
@@ -228,12 +250,12 @@ class LegendManager {
 
         // Make the legend scrollable if it's too tall
         if (
-            container &&
+            this.legendConfig.maxHeight &&
             contentHeight &&
-            contentHeight > this.config.maxHeight
+            contentHeight > this.legendConfig.maxHeight
         ) {
             container
-                .style('max-height', `${this.config.maxHeight}px`)
+                .style('max-height', `${this.legendConfig.maxHeight}px`)
                 .style('overflow-y', 'auto');
         }
     }

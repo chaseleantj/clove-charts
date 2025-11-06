@@ -1,23 +1,20 @@
 import katex from 'katex';
 
-export function linspace(start, end, num) {
+import { DataValue } from '@/components/plots/common/config';
+
+export function linspace(start: number, end: number, num: number): number[] {
     return Array.from(
         { length: num },
         (_, i) => start + (end - start) * (i / (num - 1))
     );
 }
 
-export function meshgrid(arr1, arr2) {
+export function meshgrid(arr1: number[], arr2: number[]): [number, number][][] {
     const w = arr1.length;
     const h = arr2.length;
-    let grid = Array(h)
-        .fill()
-        .map(() =>
-            Array(w)
-                .fill()
-                .map(() => [])
-        );
+    const grid: [number, number][][] = [];
     for (let j = 0; j < h; j++) {
+        grid[j] = [];
         for (let i = 0; i < w; i++) {
             grid[j][i] = [arr1[i], arr2[j]];
         }
@@ -25,8 +22,18 @@ export function meshgrid(arr1, arr2) {
     return grid;
 }
 
-export function renderKatex(text, element, x, y, angle = null) {
-    const nodeName = element.node().nodeName.toLowerCase();
+export function renderKatex(
+    text: string, 
+    element: d3.Selection<SVGForeignObjectElement, unknown, null, undefined>,
+    x: number, 
+    y: number, 
+    angle?: number
+): d3.Selection<SVGForeignObjectElement, unknown, null, undefined> {
+
+    if (!element) return element;
+
+    const nodeName = element.node()?.nodeName.toLowerCase() ?? 'unknown';
+
     if (nodeName !== 'foreignobject') {
         console.warn(
             'Expected a <foreignObject> element for KaTeX rendering, but got:',
@@ -48,7 +55,7 @@ export function renderKatex(text, element, x, y, angle = null) {
 
     // Measure after next paint so layout is final
     requestAnimationFrame(() => {
-        const { width, height } = div.node().getBoundingClientRect();
+    const { width, height } = (div.node() as Element)?.getBoundingClientRect() ?? { width: 0, height: 0 };
 
         // Only set the dimensions afterwards, once the width and height are measured accurately
         element
@@ -64,11 +71,11 @@ export function renderKatex(text, element, x, y, angle = null) {
     return element;
 }
 
-export function getDataType(data, accessor = (d) => d) {
+export function getDataType(data: DataValue[]) {
     if (!data) return 'unknown';
 
     for (let i = 0; i < data.length; i++) {
-        const value = accessor(data[i]);
+        const value = data[i];
         if (value !== undefined && value !== null) {
             if (typeof value === 'string') return 'string';
             if (value instanceof Date) return 'date';
