@@ -1,5 +1,6 @@
 import * as d3 from 'd3';
-import { renderKatex } from './utils';
+import { renderKatex } from '../utils';
+
 
 export class Primitive {
     constructor(manager, element, options = {}) {
@@ -917,56 +918,18 @@ export class BatchTextPrimitive extends BatchPrimitive {
     }
 }
 
-export const PRIMITIVE_LOOKUP = new Map([
-    [
-        'point',
-        { class: PointPrimitive, isBatch: false, htmlElementType: 'path' },
-    ],
-    ['line', { class: LinePrimitive, isBatch: false, htmlElementType: 'line' }],
-    [
-        'rect',
-        { class: RectanglePrimitive, isBatch: false, htmlElementType: 'rect' },
-    ],
-    ['text', { class: TextPrimitive, isBatch: false, htmlElementType: 'text' }],
-    ['path', { class: PathPrimitive, isBatch: false, htmlElementType: 'path' }],
-    [
-        'contour',
-        { class: ContourPrimitive, isBatch: false, htmlElementType: 'g' },
-    ],
-    [
-        'image',
-        { class: ImagePrimitive, isBatch: false, htmlElementType: 'image' },
-    ],
-    [
-        'batch-points',
-        { class: BatchPointsPrimitive, isBatch: true, htmlElementType: 'g' },
-    ],
-    [
-        'batch-lines',
-        { class: BatchLinesPrimitive, isBatch: true, htmlElementType: 'g' },
-    ],
-    [
-        'batch-rectangles',
-        {
-            class: BatchRectanglesPrimitive,
-            isBatch: true,
-            htmlElementType: 'g',
-        },
-    ],
-    [
-        'batch-text',
-        { class: BatchTextPrimitive, isBatch: true, htmlElementType: 'g' },
-    ],
+type PrimitiveConstructor = new (manager: any, element: any, options: any) => Primitive;
+
+export const PRIMITIVE_LOOKUP = new Map<PrimitiveConstructor, { isBatch: boolean; htmlElementType: string }>([
+    [PointPrimitive, { isBatch: false, htmlElementType: 'path' }],
+    [LinePrimitive, { isBatch: false, htmlElementType: 'line' }],
+    [RectanglePrimitive, { isBatch: false, htmlElementType: 'rect' }],
+    [TextPrimitive, { isBatch: false, htmlElementType: 'text' }],
+    [PathPrimitive, { isBatch: false, htmlElementType: 'path' }],
+    [ContourPrimitive, { isBatch: false, htmlElementType: 'g' }],
+    [ImagePrimitive, { isBatch: false, htmlElementType: 'image' }],
+    [BatchPointsPrimitive, { isBatch: true, htmlElementType: 'g' }],
+    [BatchLinesPrimitive, { isBatch: true, htmlElementType: 'g' }],
+    [BatchRectanglesPrimitive, { isBatch: true, htmlElementType: 'g' }],
+    [BatchTextPrimitive, { isBatch: true, htmlElementType: 'g' }],
 ]);
-
-export default class PrimitiveFactory {
-    static create(type, manager, element, options) {
-        const primitiveInfo = PRIMITIVE_LOOKUP.get(type);
-
-        if (!primitiveInfo) {
-            throw new Error(`Unknown primitive type: ${type}`);
-        }
-
-        return new primitiveInfo.class(manager, element, options);
-    }
-}

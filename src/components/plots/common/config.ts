@@ -3,7 +3,7 @@ import * as d3 from 'd3';
 import {
     TickFormatFunction,
     CoordinateSystem,
-} from '@/components/plots/common/typing';
+} from '@/components/plots/common/types';
 
 export interface ThemeConfig {
     fontSize?: number;

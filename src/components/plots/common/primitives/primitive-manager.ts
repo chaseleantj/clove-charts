@@ -1,28 +1,55 @@
 import * as d3 from 'd3';
 import { v4 as uuidv4 } from 'uuid';
-import PrimitiveFactory, { PRIMITIVE_LOOKUP } from './primitives';
-import { DEFAULT_PRIMITIVE_CONFIG } from './config';
+import BasePlot from '@/components/plots/common/base';
+import {
+    Primitive,
+    PointPrimitive,
+    LinePrimitive,
+    RectanglePrimitive,
+    TextPrimitive,
+    PathPrimitive,
+    ContourPrimitive,
+    ImagePrimitive,
+    BatchPointsPrimitive,
+    BatchLinesPrimitive,
+    BatchRectanglesPrimitive,
+    BatchTextPrimitive,
+} from '@/components/plots/common/primitives/primitives';
+import { PRIMITIVE_LOOKUP } from '@/components/plots/common/primitives/primitives';
+import { DEFAULT_PRIMITIVE_CONFIG } from '@/components/plots/common/config';
+
+type Layer = d3.Selection<SVGGElement, unknown, null, undefined>;
+
+interface LayerObject {
+    layer: Layer,
+    zIndex: number,
+    primitiveIds: Set<string> // just stores the primitive ids
+}
 
 class PrimitiveManager {
-    constructor(plotInstance) {
-        this.BasePlot = plotInstance;
+
+    primitives: Map<string, Primitive>;
+    layerObjectMap: Map<string, LayerObject>;
+    defaultLayer: d3.Selection<SVGGElement, unknown, null, undefined>;
+
+    constructor(private readonly BasePlot: BasePlot) {
         this.primitives = new Map();
-        this.layers = new Map();
+        this.layerObjectMap = new Map();
         this.defaultLayer = this.createLayer(
             DEFAULT_PRIMITIVE_CONFIG.layerName
         );
     }
 
-    createLayer(name, zIndex = 0) {
+    createLayer(name: string, zIndex = 0): Layer {
         const layer = this.BasePlot.plot
             .append('g')
             .attr('class', `layer-${name}`)
             .attr('data-z-index', zIndex);
 
-        this.layers.set(name, {
-            element: layer,
+        this.layerObjectMap.set(name, {
+            layer,
             zIndex,
-            primitives: new Set(),
+            primitiveIds: new Set(),
         });
         this.sortLayers();
 
@@ -30,50 +57,55 @@ class PrimitiveManager {
     }
 
     getLayer(name = DEFAULT_PRIMITIVE_CONFIG.layerName) {
-        return this.layers.has(name)
-            ? this.layers.get(name).element
+        return this.layerObjectMap.has(name)
+            ? this.layerObjectMap.get(name)!.layer
             : this.createLayer(name, 0);
     }
 
     sortLayers() {
-        const layersArray = Array.from(this.layers.values()).sort(
+        const layersArray = Array.from(this.layerObjectMap.values()).sort(
             (a, b) => a.zIndex - b.zIndex
         );
 
         layersArray.forEach((layer) => {
-            layer.element.raise();
+            layer.layer.raise();
         });
     }
 
-    addPrimitive(type, config) {
-        // Merge default config with provided config, giving priority to provided values
+    addPrimitive<T extends new (...args: any[]) => Primitive>(
+        primitiveClass: T,
+        config: any
+    ): InstanceType<T> {
+        const primitiveInfo = PRIMITIVE_LOOKUP.get(primitiveClass);
+        if (!primitiveInfo) {
+            throw new Error(`Unknown primitive class: ${primitiveClass.name}`);
+        }
+
         const options = {
-            className: `primitive-${type}`,
+            className: `primitive-${primitiveClass.name.replace('Primitive', '').toLowerCase()}`,
             ...DEFAULT_PRIMITIVE_CONFIG,
             ...config,
         };
 
         const layer = this.getLayer(options.layerName);
-        const element = this.createSvgElement(type, layer, options);
-        const primitive = PrimitiveFactory.create(type, this, element, options);
+        const element = this.createSvgElement(primitiveClass, layer, options, primitiveInfo);
+        const primitive = new primitiveClass(this, element, options);
 
-        const id = options.dataId || `${type}-${uuidv4()}`;
+        const id = options.dataId || `${primitiveClass.name}-${uuidv4()}`;
         this.primitives.set(id, primitive);
-        this.layers.get(options.layerName).primitives.add(id);
+        this.layerObjectMap.get(options.layerName)!.primitiveIds.add(id);
 
-        return primitive;
+        return primitive as InstanceType<T>;
     }
 
-    createSvgElement(type, layer, options) {
-        const primitiveInfo = PRIMITIVE_LOOKUP.get(type);
+    createSvgElement(primitiveClass: any, layer: any, options: any, primitiveInfo: { isBatch: boolean; htmlElementType: string }) {
         const isBatch = primitiveInfo.isBatch;
         const className = isBatch
             ? options.className + '-group'
             : options.className;
 
-        // Use <foreignObject> when rendering KaTeX so that HTML can live inside SVG
         const elementType =
-            type === 'text' && options.latex
+            primitiveClass === TextPrimitive && options.latex
                 ? 'foreignObject'
                 : primitiveInfo.htmlElementType;
         const element = layer.append(elementType);
@@ -82,7 +114,6 @@ class PrimitiveManager {
             .attr('class', className)
             .attr('pointer-events', options.pointerEvents);
 
-        // TODO: Make distinction between individual and batch primitives, and assign the data-id as an accessor for batch primitives
         if (options.hasOwnProperty('dataId')) {
             element.attr('data-id', options.dataId);
         }
@@ -90,7 +121,7 @@ class PrimitiveManager {
         return element;
     }
 
-    addPoint(x, y, options = {}) {
+    addPoint(x: number, y: number, options = {}) {
         options = {
             size: 64,
             fill: DEFAULT_PRIMITIVE_CONFIG.fill,
@@ -100,7 +131,7 @@ class PrimitiveManager {
             ...options,
         };
 
-        const point = this.addPrimitive('point', options);
+        const point = this.addPrimitive(PointPrimitive, options);
 
         point.setCoords(x, y).render();
 
@@ -115,7 +146,7 @@ class PrimitiveManager {
         return point;
     }
 
-    addLine(x1, y1, x2, y2, options = {}) {
+    addLine(x1: number, y1: number, x2: number, y2: number, options = {}) {
         options = {
             stroke: DEFAULT_PRIMITIVE_CONFIG.stroke,
             strokeWidth: 1.5,
@@ -123,7 +154,7 @@ class PrimitiveManager {
             ...options,
         };
 
-        const line = this.addPrimitive('line', options);
+        const line = this.addPrimitive(LinePrimitive, options);
 
         line.setCoords(x1, y1, x2, y2).render();
 
@@ -147,7 +178,7 @@ class PrimitiveManager {
             ...options,
         };
 
-        const path = this.addPrimitive('path', options);
+        const path = this.addPrimitive(PathPrimitive, options);
 
         path.setData(dataPoints)
             .setCoordinateAccessors(xAccessor, yAccessor)
@@ -164,14 +195,14 @@ class PrimitiveManager {
         return path;
     }
 
-    addRectangle(x1, y1, x2, y2, options = {}) {
+    addRectangle(x1: number, y1: number, x2: number, y2: number, options = {}) {
         options = {
             fill: DEFAULT_PRIMITIVE_CONFIG.fill,
             stroke: 'none',
             strokeWidth: 1,
         };
 
-        const rect = this.addPrimitive('rect', options);
+        const rect = this.addPrimitive(RectanglePrimitive, options);
 
         rect.setCoords(x1, y1, x2, y2).render();
 
@@ -198,7 +229,7 @@ class PrimitiveManager {
             ...options,
         };
 
-        const text = this.addPrimitive('text', options);
+        const text = this.addPrimitive(TextPrimitive, options);
 
         text.setText(textContent)
             .setCoords(x, y)
@@ -227,7 +258,7 @@ class PrimitiveManager {
             ...options,
         };
 
-        const contour = this.addPrimitive('contour', options);
+        const contour = this.addPrimitive(ContourPrimitive, options);
 
         contour.setData(fValues, xRange, yRange).render();
 
@@ -250,7 +281,7 @@ class PrimitiveManager {
             ...options,
         };
 
-        const image = this.addPrimitive('image', options);
+        const image = this.addPrimitive(ImagePrimitive, options);
 
         // image.element.attr('preserveAspectRatio', image.preserveAspectRatio);
 
@@ -282,7 +313,7 @@ class PrimitiveManager {
             ...options,
         };
 
-        const points = this.addPrimitive('batch-points', options);
+        const points = this.addPrimitive(BatchPointsPrimitive, options);
 
         points
             .setData(dataArray, options.keyAccessor)
@@ -315,7 +346,7 @@ class PrimitiveManager {
             ...options,
         };
 
-        const lines = this.addPrimitive('batch-lines', options);
+        const lines = this.addPrimitive(BatchLinesPrimitive, options);
 
         lines
             .setData(dataArray, options.keyAccessor)
@@ -353,7 +384,7 @@ class PrimitiveManager {
             ...options,
         };
 
-        const rectangles = this.addPrimitive('batch-rectangles', options);
+        const rectangles = this.addPrimitive(BatchRectanglesPrimitive, options);
 
         rectangles
             .setData(dataArray, options.keyAccessor)
@@ -387,7 +418,7 @@ class PrimitiveManager {
             ...options,
         };
 
-        const texts = this.addPrimitive('batch-text', options);
+        const texts = this.addPrimitive(BatchTextPrimitive, options);
 
         texts
             .setData(dataArray, options.keyAccessor)
@@ -436,29 +467,29 @@ class PrimitiveManager {
         return markerId;
     }
 
-    getPrimitive(id) {
+    getPrimitive(id: string) {
         return this.primitives.get(id);
     }
 
-    removePrimitive(id) {
+    removePrimitive(id: string) {
         const primitive = this.getPrimitive(id);
         if (primitive) {
             primitive.remove();
             this.primitives.delete(id);
 
             // Remove from layer tracking
-            this.layers.forEach((layer) => {
-                layer.primitives.delete(id);
+            this.layerObjectMap.forEach((layer) => {
+                layer.primitiveIds.delete(id);
             });
         }
     }
 
-    clearLayer(layerName) {
-        if (this.layers.has(layerName)) {
-            const layer = this.layers.get(layerName);
+    clearLayer(layerName: string) {
+        if (this.layerObjectMap.has(layerName)) {
+            const layerObject = this.layerObjectMap.get(layerName);
 
             // Remove all primitives in this layer
-            layer.primitives.forEach((id) => {
+            layerObject!.primitiveIds.forEach((id) => {
                 const primitive = this.primitives.get(id);
                 if (primitive) {
                     primitive.remove();
@@ -467,38 +498,35 @@ class PrimitiveManager {
             });
 
             // Clear the layer
-            layer.element.selectAll('*').remove();
-            layer.primitives.clear();
+            layerObject!.layer.selectAll('*').remove();
+            layerObject!.primitiveIds.clear();
         }
     }
 
     clearAll() {
-        // Remove all primitives
         this.primitives.forEach((primitive) => {
             primitive.remove();
         });
 
-        // Clear all layers
-        this.layers.forEach((layer) => {
-            layer.element.selectAll('*').remove();
-            layer.primitives.clear();
+        this.layerObjectMap.forEach((layer) => {
+            layer!.layer.selectAll('*').remove();
+            layer!.primitiveIds.clear();
         });
 
-        // Clear primitive map
         this.primitives.clear();
     }
 
-    getPrimitivesByType(type) {
+    getPrimitivesByType<T extends new (...args: any[]) => Primitive>(primitiveClass: T): InstanceType<T>[] {
         return Array.from(this.primitives.values()).filter(
-            (p) => p.type === type
-        );
+            (p) => p instanceof primitiveClass
+        ) as InstanceType<T>[];
     }
 
-    getPrimitivesByLayer(layerName) {
-        const layer = this.layers.get(layerName);
+    getPrimitivesByLayer(layerName: string) {
+        const layer = this.layerObjectMap.get(layerName);
         if (!layer) return [];
 
-        return Array.from(layer.primitives)
+        return Array.from(layer.primitiveIds)
             .map((id) => this.primitives.get(id))
             .filter(Boolean);
     }

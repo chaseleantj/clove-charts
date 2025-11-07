@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { DataValue, DataAccessor } from '@/components/plots/common/typing';
+import { DataValue, DataAccessor } from '@/components/plots/common/types';
 import {
     isDateValue,
     isDefined,

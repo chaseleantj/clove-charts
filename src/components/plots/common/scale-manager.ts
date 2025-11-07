@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 import { RequiredColorConfig } from '@/components/plots/common/config';
-import { AnyDomain, AnyRange } from '@/components/plots/common/typing';
+import { AnyDomain, AnyRange } from '@/components/plots/common/types';
 import {
     isDateTuple,
     isNumberTuple,

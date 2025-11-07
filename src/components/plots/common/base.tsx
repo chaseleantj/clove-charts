@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import * as d3 from 'd3';
 import { v4 as uuidv4 } from 'uuid';
 
-import PrimitiveManager from '@/components/plots/common/primitive-manager';
+import PrimitiveManager from '@/components/plots/common/primitives/primitive-manager';
 import TooltipManager from '@/components/plots/common/tooltip-manager';
 import LegendManager from '@/components/plots/common/legend-manager';
 import DomainManager from '@/components/plots/common/domain-manager';
@@ -26,7 +26,7 @@ import {
     DEFAULT_TOOLTIP_CONFIG,
     DEFAULT_COLOR_CONFIG,
 } from '@/components/plots/common/config';
-import { CoordinateSystem } from '@/components/plots/common/typing';
+import { CoordinateSystem } from '@/components/plots/common/types';
 
 interface Domain {
     x: [number, number] | [Date, Date] | string[];
