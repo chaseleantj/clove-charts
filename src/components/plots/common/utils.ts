@@ -21,13 +21,12 @@ export function meshgrid(arr1: number[], arr2: number[]): [number, number][][] {
 }
 
 export function renderKatex(
-    text: string, 
+    text: string,
     element: d3.Selection<SVGForeignObjectElement, unknown, null, undefined>,
-    x: number, 
-    y: number, 
+    x: number,
+    y: number,
     angle?: number
 ): d3.Selection<SVGForeignObjectElement, unknown, null, undefined> {
-
     if (!element) return element;
 
     const nodeName = element.node()?.nodeName.toLowerCase() ?? 'unknown';
@@ -53,7 +52,9 @@ export function renderKatex(
 
     // Measure after next paint so layout is final
     requestAnimationFrame(() => {
-    const { width, height } = (div.node() as Element)?.getBoundingClientRect() ?? { width: 0, height: 0 };
+        const { width, height } = (
+            div.node() as Element
+        )?.getBoundingClientRect() ?? { width: 0, height: 0 };
 
         // Only set the dimensions afterwards, once the width and height are measured accurately
         element

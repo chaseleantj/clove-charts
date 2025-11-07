@@ -37,7 +37,7 @@ interface Scale {
     x: AnyD3Scale;
     y: AnyD3Scale;
     color:
-        d3.ScaleSequential<string, never>
+        | d3.ScaleSequential<string, never>
         | d3.ScaleOrdinal<string, string>
         | (() => string);
 }
@@ -290,9 +290,10 @@ class BasePlot extends Component<BasePlotProps> {
             this.axisManager.setYGrid();
         }
 
-        const xLabel = this.config.axisConfig.xLabel === null
-        ? this.props.xClass
-        : this.config.axisConfig.xLabel;
+        const xLabel =
+            this.config.axisConfig.xLabel === null
+                ? this.props.xClass
+                : this.config.axisConfig.xLabel;
 
         if (xLabel) {
             this.axisManager.setXLabel(
@@ -302,9 +303,10 @@ class BasePlot extends Component<BasePlotProps> {
             );
         }
 
-        const yLabel = this.config.axisConfig.yLabel === null
-        ? this.props.yClass
-        : this.config.axisConfig.yLabel
+        const yLabel =
+            this.config.axisConfig.yLabel === null
+                ? this.props.yClass
+                : this.config.axisConfig.yLabel;
 
         if (yLabel) {
             this.axisManager.setYLabel(
@@ -345,7 +347,10 @@ class BasePlot extends Component<BasePlotProps> {
 
     setupTooltip(): void {
         if (!this.config.tooltipConfig.tooltipRef.current) return;
-        this.tooltipManager = new TooltipManager(this.config.tooltipConfig, this.ref);
+        this.tooltipManager = new TooltipManager(
+            this.config.tooltipConfig,
+            this.ref
+        );
         this.tooltipManager.hideTooltip();
         this.onSetupTooltip();
     }

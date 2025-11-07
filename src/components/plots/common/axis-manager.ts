@@ -2,17 +2,21 @@ import * as d3 from 'd3';
 import { RequiredAxisConfig } from '@/components/plots/common/config';
 
 class AxisManager {
-
     x!: d3.Selection<SVGGElement, unknown, null, undefined>;
     y!: d3.Selection<SVGGElement, unknown, null, undefined>;
     axisGroup: d3.Selection<SVGGElement, unknown, null, undefined>;
 
     constructor(
-            private readonly plotArea: d3.Selection<SVGGElement, unknown, null, undefined>, 
-            private readonly plotWidth: number, 
-            private readonly plotHeight: number, 
-            private readonly axisConfig: RequiredAxisConfig
-        ) {
+        private readonly plotArea: d3.Selection<
+            SVGGElement,
+            unknown,
+            null,
+            undefined
+        >,
+        private readonly plotWidth: number,
+        private readonly plotHeight: number,
+        private readonly axisConfig: RequiredAxisConfig
+    ) {
         this.plotArea = plotArea;
         this.plotWidth = plotWidth;
         this.plotHeight = plotHeight;
@@ -24,11 +28,10 @@ class AxisManager {
     }
 
     setXAxis(scale: d3.AxisScale<string>) {
-
         let xAxis: d3.Axis<string> = d3
             .axisBottom(scale)
             .ticks(this.axisConfig.tickCount)
-            .tickSize(this.axisConfig.tickSize)
+            .tickSize(this.axisConfig.tickSize);
 
         if (this.axisConfig.tickFormat) {
             xAxis = xAxis.tickFormat(this.axisConfig.tickFormat);
@@ -40,26 +43,26 @@ class AxisManager {
             .attr('class', `x-axis`)
             .call(xAxis);
 
-        this.x.selectAll('text').attr('font-size', this.axisConfig.tickFontSize);
+        this.x
+            .selectAll('text')
+            .attr('font-size', this.axisConfig.tickFontSize);
     }
 
     setYAxis(scale: d3.AxisScale<string>) {
-
         let yAxis: d3.Axis<string> = d3
             .axisLeft(scale)
             .ticks(this.axisConfig.tickCount)
-            .tickSize(this.axisConfig.tickSize)
+            .tickSize(this.axisConfig.tickSize);
 
         if (this.axisConfig.tickFormat) {
-            yAxis = yAxis.tickFormat(this.axisConfig.tickFormat)
+            yAxis = yAxis.tickFormat(this.axisConfig.tickFormat);
         }
 
-        this.y = this.axisGroup
-            .append('g')
-            .attr('class', `y-axis`)
-            .call(yAxis);
+        this.y = this.axisGroup.append('g').attr('class', `y-axis`).call(yAxis);
 
-        this.y.selectAll('text').attr('font-size', this.axisConfig.tickFontSize);
+        this.y
+            .selectAll('text')
+            .attr('font-size', this.axisConfig.tickFontSize);
     }
 
     setXGrid() {
@@ -122,7 +125,6 @@ class AxisManager {
     }
 
     updateXAxis(scale: d3.AxisScale<string>, transitionDuration = 0) {
-
         let xAxis = d3
             .axisBottom(scale)
             .ticks(this.axisConfig.tickCount)
@@ -132,21 +134,20 @@ class AxisManager {
             xAxis = xAxis.tickFormat(this.axisConfig.tickFormat);
         }
 
-        this.x
-            .transition()
-            .duration(transitionDuration)
-            .call(xAxis);
+        this.x.transition().duration(transitionDuration).call(xAxis);
 
         this.x
             .selectAll('text')
             .filter(function () {
-                return this instanceof Element && !this.classList.contains('axis-label');
+                return (
+                    this instanceof Element &&
+                    !this.classList.contains('axis-label')
+                );
             })
             .attr('font-size', this.axisConfig.tickFontSize);
     }
 
     updateYAxis(scale: d3.AxisScale<string>, transitionDuration = 0) {
-
         let yAxis = d3
             .axisLeft(scale)
             .ticks(this.axisConfig.tickCount)
@@ -156,15 +157,15 @@ class AxisManager {
             yAxis = yAxis.tickFormat(this.axisConfig.tickFormat);
         }
 
-        this.y
-            .transition()
-            .duration(transitionDuration)
-            .call(yAxis);
+        this.y.transition().duration(transitionDuration).call(yAxis);
 
         this.y
             .selectAll('text')
             .filter(function () {
-                return this instanceof Element && !this.classList.contains('axis-label');
+                return (
+                    this instanceof Element &&
+                    !this.classList.contains('axis-label')
+                );
             })
             .attr('font-size', this.axisConfig.tickFontSize);
     }

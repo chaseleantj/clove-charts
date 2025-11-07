@@ -5,11 +5,10 @@ import { RequiredTooltipConfig } from '@/components/plots/common/config';
 import { DEFAULT_TICK_FORMAT } from '@/components/plots/common/config';
 
 class TooltipManager {
-
     tooltip: d3.Selection<HTMLDivElement, unknown, null, undefined>;
 
     constructor(
-        private readonly tooltipConfig: RequiredTooltipConfig, 
+        private readonly tooltipConfig: RequiredTooltipConfig,
         private readonly plotRef: React.RefObject<HTMLDivElement | null>
     ) {
         this.tooltip = d3.select(this.tooltipConfig.tooltipRef.current!);
@@ -26,13 +25,20 @@ class TooltipManager {
 
     public positionTooltip(event: MouseEvent): void {
         const x =
-            event.pageX - this.getBoundingClient().left + this.tooltipConfig.offsetX;
+            event.pageX -
+            this.getBoundingClient().left +
+            this.tooltipConfig.offsetX;
         const y =
-            event.pageY - this.getBoundingClient().top + this.tooltipConfig.offsetY;
+            event.pageY -
+            this.getBoundingClient().top +
+            this.tooltipConfig.offsetY;
         this.tooltip.style('transform', `translate(${x}px,${y}px)`);
     }
 
-    public formatTooltip(d: Record<string, any>, displayClasses: string[]): void {
+    public formatTooltip(
+        d: Record<string, any>,
+        displayClasses: string[]
+    ): void {
         let content = '';
         displayClasses = [...new Set(displayClasses)];
         for (let displayClass of displayClasses) {

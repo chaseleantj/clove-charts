@@ -1,7 +1,6 @@
 import * as d3 from 'd3';
 
 class BrushManager {
-
     brushing: boolean;
     zoomed: boolean;
 
@@ -9,10 +8,15 @@ class BrushManager {
     brushElement: d3.Selection<SVGGElement, unknown, null, undefined>;
 
     constructor(
-        private readonly plot: d3.Selection<SVGGElement, unknown, null, undefined>, 
-        public readonly extent: [[number, number], [number, number]], 
-        private readonly onBrush: (...args: any[]) => void, 
-        public readonly resetBrush: () => void, 
+        private readonly plot: d3.Selection<
+            SVGGElement,
+            unknown,
+            null,
+            undefined
+        >,
+        public readonly extent: [[number, number], [number, number]],
+        private readonly onBrush: (...args: any[]) => void,
+        public readonly resetBrush: () => void,
         public readonly transitionDuration: number
     ) {
         this.brushing = false;

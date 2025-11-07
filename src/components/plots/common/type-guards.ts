@@ -60,10 +60,11 @@ export function isDateTuple(value: unknown): value is [Date, Date] {
     );
 }
 
-export function getDomainKind(domain: AnyDomain): 'string' | 'number' | 'date' | 'unknown' {
+export function getDomainKind(
+    domain: AnyDomain
+): 'string' | 'number' | 'date' | 'unknown' {
     if (isStringArray(domain)) return 'string';
     if (isNumberTuple(domain)) return 'number';
     if (isDateTuple(domain)) return 'date';
     return 'unknown';
 }
-

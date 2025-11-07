@@ -11,21 +11,29 @@ interface CategoricalItems {
 }
 
 class LegendManager {
-
     legend: d3.Selection<HTMLDivElement, unknown, null, undefined>;
     gradientId: string;
     categoricalItems: CategoricalItems[];
 
     legendGroup: d3.Selection<HTMLDivElement, unknown, null, undefined>;
-    continuousContainer!: d3.Selection<HTMLDivElement, unknown, null, undefined>;
-    categoricalContainer!: d3.Selection<HTMLDivElement, unknown, null, undefined>;
-    
+    continuousContainer!: d3.Selection<
+        HTMLDivElement,
+        unknown,
+        null,
+        undefined
+    >;
+    categoricalContainer!: d3.Selection<
+        HTMLDivElement,
+        unknown,
+        null,
+        undefined
+    >;
+
     continuousSvg!: d3.Selection<SVGSVGElement, unknown, null, undefined>;
     categoricalSvg!: d3.Selection<SVGSVGElement, unknown, null, undefined>;
     categoricalGroup!: d3.Selection<SVGGElement, unknown, null, undefined>;
 
     constructor(private readonly legendConfig: RequiredLegendConfig) {
-
         this.legend = d3.select(this.legendConfig.legendRef.current!);
         this.gradientId = 'linear-gradient-' + uuidv4();
         this.categoricalItems = [];
@@ -71,15 +79,15 @@ class LegendManager {
         linearGradient
             .selectAll('stop')
             .data(
-                    [0, 0.2, 0.4, 0.6, 0.8, 1].map((t) => ({
-                          offset: `${t * 100}%`,
-                          color: colorScale(
-                              colorScale.domain()[0] +
-                                  t *
-                                      (colorScale.domain()[1] -
-                                          colorScale.domain()[0])
-                          ),
-                      }))
+                [0, 0.2, 0.4, 0.6, 0.8, 1].map((t) => ({
+                    offset: `${t * 100}%`,
+                    color: colorScale(
+                        colorScale.domain()[0] +
+                            t *
+                                (colorScale.domain()[1] -
+                                    colorScale.domain()[0])
+                    ),
+                }))
             )
             .enter()
             .append('stop')
@@ -98,7 +106,9 @@ class LegendManager {
             .domain(colorScale.domain())
             .range([this.legendConfig.continuousBarLength, 0]);
 
-        const axisRight = (g: d3.Selection<SVGGElement, unknown, null, undefined>) =>
+        const axisRight = (
+            g: d3.Selection<SVGGElement, unknown, null, undefined>
+        ) =>
             g
                 .attr('class', `y-axis`)
                 .attr(
@@ -211,7 +221,8 @@ class LegendManager {
         this.setLegendDimensions(
             this.categoricalSvg,
             this.categoricalContainer,
-            this.categoricalItems.length * this.legendConfig.categoricalItemHeight
+            this.categoricalItems.length *
+                this.legendConfig.categoricalItemHeight
         );
     }
 
@@ -228,8 +239,8 @@ class LegendManager {
     }
 
     private setLegendDimensions(
-        legendSvg: d3.Selection<SVGSVGElement, unknown, null, undefined>, 
-        container: d3.Selection<HTMLDivElement, unknown, null, undefined>, 
+        legendSvg: d3.Selection<SVGSVGElement, unknown, null, undefined>,
+        container: d3.Selection<HTMLDivElement, unknown, null, undefined>,
         contentHeight: number
     ) {
         // Calculate the bounding box of everything drawn

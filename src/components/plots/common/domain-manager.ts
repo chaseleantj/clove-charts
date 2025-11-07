@@ -46,7 +46,10 @@ class DomainManager<T extends Record<string, any>> {
         }
 
         if (values.every(isNumberValue)) {
-            const numberDomain = this.getNumberDomain(values as number[], padding);
+            const numberDomain = this.getNumberDomain(
+                values as number[],
+                padding
+            );
             if (numberDomain) return numberDomain;
         }
 
@@ -57,9 +60,7 @@ class DomainManager<T extends Record<string, any>> {
     private collectValues<R extends DataValue>(
         accessor: DataAccessor<T, R>
     ): DataValue[] {
-        return this.data
-            .map(accessor)
-            .filter(isDefined) as DataValue[];
+        return this.data.map(accessor).filter(isDefined) as DataValue[];
     }
 
     private getDateDomain(
@@ -68,7 +69,7 @@ class DomainManager<T extends Record<string, any>> {
     ): [Date, Date] | undefined {
         const [minValue, maxValue] = d3.extent(values) as [
             Date | undefined,
-            Date | undefined
+            Date | undefined,
         ];
 
         if (!minValue || !maxValue) {
@@ -93,7 +94,7 @@ class DomainManager<T extends Record<string, any>> {
 
         const [minValue, maxValue] = d3.extent(cleanValues) as [
             number | undefined,
-            number | undefined
+            number | undefined,
         ];
 
         if (

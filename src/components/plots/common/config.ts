@@ -1,6 +1,9 @@
 import * as d3 from 'd3';
 
-import { TickFormatFunction, CoordinateSystem } from '@/components/plots/common/typing';
+import {
+    TickFormatFunction,
+    CoordinateSystem,
+} from '@/components/plots/common/typing';
 
 export interface ThemeConfig {
     fontSize?: number;
