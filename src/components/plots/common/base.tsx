@@ -25,8 +25,8 @@ import {
     DEFAULT_LEGEND_CONFIG,
     DEFAULT_TOOLTIP_CONFIG,
     DEFAULT_COLOR_CONFIG,
-    CoordinateSystem,
 } from '@/components/plots/common/config';
+import { CoordinateSystem } from '@/components/plots/common/typing';
 
 interface Domain {
     x: [number, number] | [Date, Date] | string[];

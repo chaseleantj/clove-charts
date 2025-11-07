@@ -42,7 +42,7 @@ class LegendManager {
             .attr('class', styles.legendGroup);
     }
 
-    setTitle(title?: string) {
+    public setTitle(title?: string) {
         this.legendGroup.selectAll(`.${styles.legendTitle}`).remove();
 
         const newTitle = title ?? this.legendConfig.title;
@@ -53,7 +53,7 @@ class LegendManager {
             .html(newTitle);
     }
 
-    addContinuousLegend(colorScale: d3.ScaleSequential<string, never>) {
+    public addContinuousLegend(colorScale: d3.ScaleSequential<string, never>) {
         this.continuousContainer = this.legendGroup
             .append('div')
             .style('text-align', 'right');
@@ -116,7 +116,7 @@ class LegendManager {
         );
     }
 
-    addCategoricalLegend() {
+    public addCategoricalLegend() {
         this.categoricalContainer = this.legendGroup
             .append('div')
             .style('text-align', 'right');
@@ -124,13 +124,13 @@ class LegendManager {
         this.categoricalGroup = this.categoricalSvg.append('g');
     }
 
-    addCategoricalItem(shape: string, color: string, text: string) {
+    public addCategoricalItem(shape: string, color: string, text: string) {
         const item = { shape, color, text };
         this.categoricalItems.push(item);
         this.renderCategoricalLegend();
     }
 
-    renderCategoricalLegend() {
+    public renderCategoricalLegend() {
         this.categoricalGroup.selectAll('*').remove();
 
         // Map shape names to d3 symbol types
@@ -215,7 +215,7 @@ class LegendManager {
         );
     }
 
-    clearCategoricalLegend() {
+    public clearCategoricalLegend() {
         this.categoricalItems = [];
         if (this.categoricalGroup) {
             this.categoricalGroup.selectAll('*').remove();
@@ -227,7 +227,7 @@ class LegendManager {
         }
     }
 
-    setLegendDimensions(
+    private setLegendDimensions(
         legendSvg: d3.Selection<SVGSVGElement, unknown, null, undefined>, 
         container: d3.Selection<HTMLDivElement, unknown, null, undefined>, 
         contentHeight: number

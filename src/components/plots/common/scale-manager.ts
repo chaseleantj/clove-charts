@@ -1,9 +1,14 @@
 import * as d3 from 'd3';
+import { RequiredColorConfig } from '@/components/plots/common/config';
 import {
     AnyDomain,
-    AnyRange,
-    RequiredColorConfig,
-} from '@/components/plots/common/config';
+    AnyRange
+} from '@/components/plots/common/typing'
+import {
+    isDateTuple,
+    isNumberTuple,
+    isStringArray,
+} from '@/components/plots/common/type-guards';
 
 export type ContinuousD3Scale =
     | d3.ScaleTime<number, number>
@@ -18,30 +23,6 @@ export function isContinuousScale(
     scale: AnyD3Scale
 ): scale is ContinuousD3Scale {
     return 'invert' in scale;
-}
-
-function isStringArray(value: unknown): value is string[] {
-    return (
-        Array.isArray(value) && value.length > 0 && typeof value[0] === 'string'
-    );
-}
-
-function isNumberTuple(value: unknown): value is [number, number] {
-    return (
-        Array.isArray(value) &&
-        value.length === 2 &&
-        typeof value[0] === 'number' &&
-        typeof value[1] === 'number'
-    );
-}
-
-function isDateTuple(value: unknown): value is [Date, Date] {
-    return (
-        Array.isArray(value) &&
-        value.length === 2 &&
-        value[0] instanceof Date &&
-        value[1] instanceof Date
-    );
 }
 
 class ScaleManager {
@@ -82,7 +63,7 @@ class ScaleManager {
         formatNiceScales?: boolean
     ): AnyD3Scale;
 
-    getScale(
+    public getScale(
         domain: AnyDomain,
         range: AnyRange,
         log = false,
@@ -130,7 +111,7 @@ class ScaleManager {
         colorScheme?: readonly string[]
     ): d3.ScaleOrdinal<string, string>;
 
-    getColorScale(
+    public getColorScale(
         domain?: AnyDomain,
         colorScheme?: readonly string[] | ((t: number) => string)
     ):
@@ -168,7 +149,7 @@ class ScaleManager {
         }
     }
 
-    setScaleDomain(
+    public setScaleDomain(
         scale: AnyD3Scale,
         domain: AnyDomain,
         formatNiceScales: boolean
@@ -198,7 +179,7 @@ class ScaleManager {
         }
     }
 
-    getDomainToRangeFactor(
+    public getDomainToRangeFactor(
         scale:
             | d3.ScaleLinear<number, number>
             | d3.ScaleLogarithmic<number, number>

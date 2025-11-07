@@ -16,15 +16,15 @@ class TooltipManager {
         this.plotRef = plotRef;
     }
 
-    showTooltip(): void {
+    public showTooltip(): void {
         this.tooltip.style('opacity', 1);
     }
 
-    hideTooltip(): void {
+    public hideTooltip(): void {
         this.tooltip.style('opacity', 0);
     }
 
-    positionTooltip(event: MouseEvent): void {
+    public positionTooltip(event: MouseEvent): void {
         const x =
             event.pageX - this.getBoundingClient().left + this.tooltipConfig.offsetX;
         const y =
@@ -32,7 +32,7 @@ class TooltipManager {
         this.tooltip.style('transform', `translate(${x}px,${y}px)`);
     }
 
-    formatTooltip(d: Record<string, any>, displayClasses: string[]): void {
+    public formatTooltip(d: Record<string, any>, displayClasses: string[]): void {
         let content = '';
         displayClasses = [...new Set(displayClasses)];
         for (let displayClass of displayClasses) {
@@ -49,7 +49,7 @@ class TooltipManager {
     }
 
     // Returns an object with the absolute left and top position of the current chart as well as the width and height. Used for moving tooltips.
-    getBoundingClient() {
+    private getBoundingClient() {
         if (!this.plotRef.current) {
             throw new Error('Plot ref is not available');
         }

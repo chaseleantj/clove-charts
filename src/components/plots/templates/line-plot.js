@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 
 import BasePlot from '../common/base';
-import { getDataType } from '../common/utils';
+import { isDateValue, isDefined } from '../common/value-type-guards';
 
 /**
  * Base Line Plot Component
@@ -83,7 +83,11 @@ class BaseLinePlot extends BasePlot {
             Math.max(...yValues),
         ];
 
-        if (getDataType(this.data, (d) => d[this.yClasses[0]]) === 'date') {
+        const firstDefinedValue = this.data
+            .map((d) => d[this.yClasses[0]])
+            .find((value) => isDefined(value));
+
+        if (isDateValue(firstDefinedValue)) {
             this.domain.y = [
                 new Date(this.domain.y[0]),
                 new Date(this.domain.y[1]),

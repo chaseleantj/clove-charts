@@ -1,6 +1,11 @@
 import * as d3 from 'd3';
-import { DataValue, DataAccessor } from '@/components/plots/common/config';
-import { getDataType } from '@/components/plots/common/utils';
+import { DataValue, DataAccessor } from '@/components/plots/common/typing';
+import {
+    isDateValue,
+    isDefined,
+    isNumberValue,
+    isStringValue,
+} from '@/components/plots/common/type-guards';
 
 class DomainManager<T extends Record<string, any>> {
     constructor(private readonly data: T[]) {}
@@ -20,63 +25,87 @@ class DomainManager<T extends Record<string, any>> {
         padding?: number
     ): [Date, Date];
 
-    getDomain(
+    public getDomain(
         accessor: DataAccessor<T, DataValue>,
         padding = 0
     ): string[] | [number, number] | [Date, Date] {
-        const dataType = getDataType(this.data, accessor);
+        const values = this.collectValues(accessor);
 
-        if (dataType === 'string') {
-            return [
-                ...new Set(this.data.map(accessor as DataAccessor<T, string>)),
-            ];
-        } else {
-            return this.getNumericalDomain(
-                accessor as DataAccessor<T, number | Date>,
-                padding
-            );
-        }
-    }
-
-    getNumericalDomain(
-        accessor: DataAccessor<T, number | Date>,
-        padding = 0
-    ): [number, number] | [Date, Date] {
-        const minValue = d3.min(this.data, accessor);
-        const maxValue = d3.max(this.data, accessor);
-
-        // Handle undefined/null cases
-        if (minValue === undefined || maxValue === undefined) {
+        if (values.length === 0) {
             console.warn('Unable to find data domain! Using defaults [0, 1]');
             return [0, 1];
         }
 
-        const dataType = getDataType(this.data, accessor);
+        if (values.every(isStringValue)) {
+            return [...new Set(values as string[])];
+        }
+
+        if (values.every(isDateValue)) {
+            const dateDomain = this.getDateDomain(values as Date[], padding);
+            if (dateDomain) return dateDomain;
+        }
+
+        if (values.every(isNumberValue)) {
+            const numberDomain = this.getNumberDomain(values as number[], padding);
+            if (numberDomain) return numberDomain;
+        }
+
+        console.warn('Mixed or unsupported data types! Using defaults [0, 1]');
+        return [0, 1];
+    }
+
+    private collectValues<R extends DataValue>(
+        accessor: DataAccessor<T, R>
+    ): DataValue[] {
+        return this.data
+            .map(accessor)
+            .filter(isDefined) as DataValue[];
+    }
+
+    private getDateDomain(
+        values: Date[],
+        padding = 0
+    ): [Date, Date] | undefined {
+        const [minValue, maxValue] = d3.extent(values) as [
+            Date | undefined,
+            Date | undefined
+        ];
+
+        if (!minValue || !maxValue) {
+            return undefined;
+        }
+
+        const diff = maxValue.getTime() - minValue.getTime();
+        return [
+            new Date(minValue.getTime() - padding * diff),
+            new Date(maxValue.getTime() + padding * diff),
+        ];
+    }
+
+    private getNumberDomain(
+        values: number[],
+        padding = 0
+    ): [number, number] | undefined {
+        const cleanValues = values.filter(isNumberValue);
+        if (cleanValues.length === 0) {
+            return undefined;
+        }
+
+        const [minValue, maxValue] = d3.extent(cleanValues) as [
+            number | undefined,
+            number | undefined
+        ];
 
         if (
-            dataType === 'date' &&
-            minValue instanceof Date &&
-            maxValue instanceof Date
+            minValue === undefined ||
+            maxValue === undefined ||
+            Number.isNaN(minValue) ||
+            Number.isNaN(maxValue)
         ) {
-            const diff = maxValue.getTime() - minValue.getTime();
-            return [
-                new Date(minValue.getTime() - padding * diff),
-                new Date(maxValue.getTime() + padding * diff),
-            ];
+            return undefined;
         }
 
-        if (typeof minValue === 'number' && typeof maxValue === 'number') {
-            if (isNaN(minValue) || isNaN(maxValue)) {
-                console.warn(
-                    'Unable to find data domain! Using defaults [0, 1]'
-                );
-                return [0, 1];
-            }
-            return this.padDomain([minValue, maxValue], padding);
-        }
-
-        console.warn('Unable to determine data type! Using defaults [0, 1]');
-        return [0, 1];
+        return this.padDomain([minValue, maxValue], padding);
     }
 
     private padDomain(

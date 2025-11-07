@@ -1,7 +1,5 @@
 import katex from 'katex';
 
-import { DataValue } from '@/components/plots/common/config';
-
 export function linspace(start: number, end: number, num: number): number[] {
     return Array.from(
         { length: num },
@@ -70,51 +68,3 @@ export function renderKatex(
     });
     return element;
 }
-
-export function getDataType(data: DataValue[]) {
-    if (!data) return 'unknown';
-
-    for (let i = 0; i < data.length; i++) {
-        const value = data[i];
-        if (value !== undefined && value !== null) {
-            if (typeof value === 'string') return 'string';
-            if (value instanceof Date) return 'date';
-            if (typeof value === 'number' && !isNaN(value)) return 'number';
-        }
-    }
-    return 'unknown';
-}
-
-// export function validateProps(props, requiredProps, chartName = 'Base Plot') {
-//     const missing = [];
-
-//     for (const prop of requiredProps) {
-//         const value = props[prop];
-
-//         if (value === undefined || value === null) {
-//             missing.push(prop);
-//             continue;
-//         }
-
-//         // Special validation for arrays that should not be empty
-//         if (prop === 'data' && Array.isArray(value) && value.length === 0) {
-//             missing.push(`${prop} (empty array)`);
-//             continue;
-//         }
-
-//         // Special validation for string props that should not be empty
-//         if (typeof value === 'string' && value.trim() === '') {
-//             missing.push(`${prop} (empty string)`);
-//             continue;
-//         }
-//     }
-
-//     if (missing.length > 0) {
-//         const chartType = chartName;
-//         const message = `${chartType}: Missing or invalid required props: ${missing.join(', ')}`;
-//         console.warn(message);
-//         return false;
-//     }
-
-//     return true;
-// }

@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 
 import BasePlot from '../common/base';
-import { getDataType } from '../common/utils';
+import { getDomainKind } from '../common/type-guards';
 
 // // In each subclass, define specific props
 // interface ScatterPlotProps extends Omit<BasePlotProps, 'data' | 'xClass' | 'yClass'> {
@@ -79,8 +79,8 @@ class BaseScatterPlot extends BasePlot {
 
         this.legend.setTitle(this.legendTitle ?? this.colorByClass);
 
-        const dtype = getDataType(this.domain.color);
-        if (dtype === 'string') {
+        const domainKind = getDomainKind(this.domain.color);
+        if (domainKind === 'string') {
             this.legend.addCategoricalLegend();
             const classes = this.scales.color.domain();
             classes.forEach((cls) => {
@@ -90,7 +90,7 @@ class BaseScatterPlot extends BasePlot {
                     cls
                 );
             });
-        } else if (dtype === 'number') {
+        } else if (domainKind === 'number' || domainKind === 'date') {
             this.legend.addContinuousLegend(this.scales.color);
         }
     }
