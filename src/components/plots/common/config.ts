@@ -13,24 +13,10 @@ export interface ThemeConfig {
     zoomAreaThreshold?: number;
 }
 
-export interface RequiredThemeConfig {
-    fontSize: number;
-    smallFontSize: number;
-    transitionDuration: number;
-    enableZoom: boolean;
-    zoomAreaThreshold: number;
-}
-
 export interface PlotDimensionConfig {
     width?: number | null;
     height?: number | null;
     heightToWidthRatio?: number;
-}
-
-export interface RequiredPlotDimensionConfig {
-    width: number | null;
-    height: number | null;
-    heightToWidthRatio: number;
 }
 
 export interface PlotMarginConfig {
@@ -40,13 +26,6 @@ export interface PlotMarginConfig {
     right?: number;
 }
 
-export interface RequiredPlotMarginConfig {
-    top: number;
-    bottom: number;
-    left: number;
-    right: number;
-}
-
 export interface DomainConfig {
     paddingX?: number;
     paddingY?: number;
@@ -54,25 +33,11 @@ export interface DomainConfig {
     defaultDomainY?: [number, number];
 }
 
-export interface RequiredDomainConfig {
-    paddingX: number;
-    paddingY: number;
-    defaultDomainX: [number, number];
-    defaultDomainY: [number, number];
-}
-
 export interface ScaleConfig {
     logX?: boolean;
     logY?: boolean;
     formatNiceX?: boolean;
     formatNiceY?: boolean;
-}
-
-export interface RequiredScaleConfig {
-    logX: boolean;
-    logY: boolean;
-    formatNiceX: boolean;
-    formatNiceY: boolean;
 }
 
 export interface AxisConfig {
@@ -85,18 +50,6 @@ export interface AxisConfig {
     tickFontSize?: number;
     tickFormat?: TickFormatFunction | null;
     gridColor?: string;
-}
-
-export interface RequiredAxisConfig {
-    showAxis: boolean;
-    showGrid: boolean;
-    xLabel: string | null;
-    yLabel: string | null;
-    tickCount: number;
-    tickSize: number;
-    tickFontSize: number;
-    tickFormat: TickFormatFunction | null;
-    gridColor: string;
 }
 
 export interface LegendConfig {
@@ -114,33 +67,11 @@ export interface LegendConfig {
     continuousBarLength?: number;
 }
 
-export interface RequiredLegendConfig {
-    legendRef: { current: HTMLDivElement | null };
-    title: string | null;
-    maxHeight: number | null;
-    absolutePositions: {
-        top: string;
-        right: string;
-    };
-    titleFontSize: number;
-    fontSize: number;
-    categoricalItemHeight: number;
-    continuousBarWidth: number;
-    continuousBarLength: number;
-}
-
 export interface TooltipConfig {
     tooltipRef?: { current: HTMLDivElement | null };
     tooltipClasses?: string[] | null;
     offsetX?: number;
     offsetY?: number;
-}
-
-export interface RequiredTooltipConfig {
-    tooltipRef: { current: HTMLDivElement | null };
-    tooltipClasses: string[] | null;
-    offsetX: number;
-    offsetY: number;
 }
 
 export interface ColorConfig {
@@ -149,30 +80,15 @@ export interface ColorConfig {
     continuousColorScheme?: (t: number) => string;
 }
 
-export interface RequiredColorConfig {
-    defaultColor: string;
-    categoricalColorScheme: readonly string[];
-    continuousColorScheme: (t: number) => string;
-}
-
 export interface PrimitiveConfig {
     fill?: string;
     stroke?: string;
+    strokeWidth?: number;
     pointerEvents?: string;
     coordinateSystem?: CoordinateSystem;
     staticElement?: boolean;
     layerName?: string;
     opacity?: number;
-}
-
-export interface RequiredPrimitiveConfig {
-    fill: string;
-    stroke: string;
-    pointerEvents: string;
-    coordinateSystem: CoordinateSystem;
-    staticElement: boolean;
-    layerName: string;
-    opacity: number;
 }
 
 export interface PlotConfig {
@@ -188,15 +104,15 @@ export interface PlotConfig {
 }
 
 export interface RequiredPlotConfig {
-    margin: RequiredPlotMarginConfig;
-    dimensions: RequiredPlotDimensionConfig;
-    themeConfig: RequiredThemeConfig;
-    domainConfig: RequiredDomainConfig;
-    scaleConfig: RequiredScaleConfig;
-    axisConfig: RequiredAxisConfig;
-    legendConfig: RequiredLegendConfig;
-    tooltipConfig: RequiredTooltipConfig;
-    colorConfig: RequiredColorConfig;
+    margin: Required<PlotMarginConfig>;
+    dimensions: Required<PlotDimensionConfig>;
+    themeConfig: Required<ThemeConfig>;
+    domainConfig: Required<DomainConfig>;
+    scaleConfig: Required<ScaleConfig>;
+    axisConfig: Required<AxisConfig>;
+    legendConfig: Required<LegendConfig>;
+    tooltipConfig: Required<TooltipConfig>;
+    colorConfig: Required<ColorConfig>;
 }
 
 const DEFAULT_FONT_SIZE = 14;
@@ -218,7 +134,7 @@ export function DEFAULT_TICK_FORMAT(d: number | string | Date): string {
     return String(d);
 }
 
-export const DEFAULT_THEME_CONFIG: RequiredThemeConfig = {
+export const DEFAULT_THEME_CONFIG: Required<ThemeConfig> = {
     fontSize: DEFAULT_FONT_SIZE,
     smallFontSize: SMALL_FONT_SIZE,
     transitionDuration: 500,
@@ -226,34 +142,34 @@ export const DEFAULT_THEME_CONFIG: RequiredThemeConfig = {
     zoomAreaThreshold: 1000,
 };
 
-export const DEFAULT_PLOT_DIMENSIONS: RequiredPlotDimensionConfig = {
+export const DEFAULT_PLOT_DIMENSIONS: Required<PlotDimensionConfig> = {
     width: null,
     height: null,
     heightToWidthRatio: 0.8,
 };
 
-export const DEFAULT_PLOT_MARGIN: RequiredPlotMarginConfig = {
+export const DEFAULT_PLOT_MARGIN: Required<PlotMarginConfig> = {
     top: 20,
     bottom: 45,
     left: 55,
     right: 20,
 };
 
-export const DEFAULT_DOMAIN_CONFIG: RequiredDomainConfig = {
+export const DEFAULT_DOMAIN_CONFIG: Required<DomainConfig> = {
     paddingX: 0.05,
     paddingY: 0.05,
     defaultDomainX: [0, 1],
     defaultDomainY: [0, 1],
 };
 
-export const DEFAULT_SCALE_CONFIG: RequiredScaleConfig = {
+export const DEFAULT_SCALE_CONFIG: Required<ScaleConfig> = {
     logX: false,
     logY: false,
     formatNiceX: true,
     formatNiceY: true,
 };
 
-export const DEFAULT_AXIS_CONFIG: RequiredAxisConfig = {
+export const DEFAULT_AXIS_CONFIG: Required<AxisConfig> = {
     showAxis: true,
     showGrid: true,
     xLabel: null,
@@ -265,7 +181,7 @@ export const DEFAULT_AXIS_CONFIG: RequiredAxisConfig = {
     gridColor: 'light-dark(rgba(0, 0, 0, 0.1), rgba(255, 255, 255, 0.1))',
 };
 
-export const DEFAULT_LEGEND_CONFIG: RequiredLegendConfig = {
+export const DEFAULT_LEGEND_CONFIG: Required<LegendConfig> = {
     legendRef: { current: null },
     title: null,
     maxHeight: null, // automatically set to plotHeight otherwise
@@ -281,22 +197,23 @@ export const DEFAULT_LEGEND_CONFIG: RequiredLegendConfig = {
     continuousBarLength: 200,
 };
 
-export const DEFAULT_TOOLTIP_CONFIG: RequiredTooltipConfig = {
+export const DEFAULT_TOOLTIP_CONFIG: Required<TooltipConfig> = {
     tooltipRef: { current: null },
     tooltipClasses: null,
     offsetX: 20,
     offsetY: -20,
 };
 
-export const DEFAULT_COLOR_CONFIG: RequiredColorConfig = {
+export const DEFAULT_COLOR_CONFIG: Required<ColorConfig> = {
     defaultColor: 'steelblue',
     categoricalColorScheme: d3.schemeTableau10,
     continuousColorScheme: d3.interpolateViridis,
 };
 
-export const DEFAULT_PRIMITIVE_CONFIG: RequiredPrimitiveConfig = {
+export const DEFAULT_PRIMITIVE_CONFIG: Required<PrimitiveConfig> = {
     fill: 'currentColor',
     stroke: 'currentColor',
+    strokeWidth: 1,
     pointerEvents: 'none',
     coordinateSystem: CoordinateSystem.Data,
     staticElement: false,

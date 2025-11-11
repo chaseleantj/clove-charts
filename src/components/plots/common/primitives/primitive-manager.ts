@@ -4,9 +4,13 @@ import BasePlot from '@/components/plots/common/base';
 import {
     Primitive,
     PointPrimitive,
+    PointPrimitiveOptions,
     LinePrimitive,
+    LinePrimitiveOptions,
     RectanglePrimitive,
+    RectanglePrimitiveOptions,
     TextPrimitive,
+    TextPrimitiveOptions,
     PathPrimitive,
     ContourPrimitive,
     ImagePrimitive,
@@ -14,9 +18,11 @@ import {
     BatchLinesPrimitive,
     BatchRectanglesPrimitive,
     BatchTextPrimitive,
+    PrimitiveInfo,
+    PRIMITIVE_LOOKUP,
 } from '@/components/plots/common/primitives/primitives';
-import { PRIMITIVE_LOOKUP } from '@/components/plots/common/primitives/primitives';
-import { DEFAULT_PRIMITIVE_CONFIG } from '@/components/plots/common/config';
+import { DEFAULT_PRIMITIVE_CONFIG, PrimitiveConfig } from '@/components/plots/common/config';
+import { CoordinateSystem } from '@/components/plots/common/types';
 
 type Layer = d3.Selection<SVGGElement, unknown, null, undefined>;
 
@@ -32,7 +38,7 @@ class PrimitiveManager {
     layerObjectMap: Map<string, LayerObject>;
     defaultLayer: d3.Selection<SVGGElement, unknown, null, undefined>;
 
-    constructor(private readonly BasePlot: BasePlot) {
+    constructor(public BasePlot: BasePlot) {
         this.primitives = new Map();
         this.layerObjectMap = new Map();
         this.defaultLayer = this.createLayer(
@@ -40,7 +46,7 @@ class PrimitiveManager {
         );
     }
 
-    createLayer(name: string, zIndex = 0): Layer {
+    public createLayer(name: string, zIndex = 0): Layer {
         const layer = this.BasePlot.plot
             .append('g')
             .attr('class', `layer-${name}`)
@@ -56,13 +62,13 @@ class PrimitiveManager {
         return layer;
     }
 
-    getLayer(name = DEFAULT_PRIMITIVE_CONFIG.layerName) {
+    public getLayer(name = DEFAULT_PRIMITIVE_CONFIG.layerName): Layer {
         return this.layerObjectMap.has(name)
             ? this.layerObjectMap.get(name)!.layer
             : this.createLayer(name, 0);
     }
 
-    sortLayers() {
+    public sortLayers(): void {
         const layersArray = Array.from(this.layerObjectMap.values()).sort(
             (a, b) => a.zIndex - b.zIndex
         );
@@ -72,7 +78,7 @@ class PrimitiveManager {
         });
     }
 
-    addPrimitive<T extends new (...args: any[]) => Primitive>(
+    private addPrimitive<T extends new (...args: any[]) => Primitive>(
         primitiveClass: T,
         config: any
     ): InstanceType<T> {
@@ -98,14 +104,19 @@ class PrimitiveManager {
         return primitive as InstanceType<T>;
     }
 
-    createSvgElement(primitiveClass: any, layer: any, options: any, primitiveInfo: { isBatch: boolean; htmlElementType: string }) {
+    private createSvgElement<T extends new (...args: any[]) => Primitive>(
+        primitiveClass: T, 
+        layer: Layer, 
+        options: any,
+        primitiveInfo: PrimitiveInfo
+    ): d3.Selection<d3.BaseType, unknown, null, undefined> {
         const isBatch = primitiveInfo.isBatch;
         const className = isBatch
             ? options.className + '-group'
             : options.className;
 
         const elementType =
-            primitiveClass === TextPrimitive && options.latex
+            primitiveClass instanceof TextPrimitive && options.latex
                 ? 'foreignObject'
                 : primitiveInfo.htmlElementType;
         const element = layer.append(elementType);
@@ -121,12 +132,12 @@ class PrimitiveManager {
         return element;
     }
 
-    addPoint(x: number, y: number, options = {}) {
+    addPoint(x: number, y: number, options: PointPrimitiveOptions & PrimitiveConfig = {}): PointPrimitive {
         options = {
             size: 64,
-            fill: DEFAULT_PRIMITIVE_CONFIG.fill,
+            // fill: DEFAULT_PRIMITIVE_CONFIG.fill,
             stroke: 'none',
-            strokeWidth: 1,
+            // strokeWidth: 1,
             symbolType: d3.symbolCircle,
             ...options,
         };
@@ -135,20 +146,20 @@ class PrimitiveManager {
 
         point.setCoords(x, y).render();
 
-        if (point.options.coordinateSystem === 'data') {
+        if (point.options.coordinateSystem === CoordinateSystem.Data) {
             point.createUpdateFunction(function () {
                 point
-                    .setCoords(point.x, point.y)
-                    .render(this.themeConfig.transitionDuration);
+                    .setCoords(point.x!, point.y!)
+                    .render(this.config.themeConfig.transitionDuration);
             });
         }
 
         return point;
     }
 
-    addLine(x1: number, y1: number, x2: number, y2: number, options = {}) {
+    addLine(x1: number, y1: number, x2: number, y2: number, options: LinePrimitiveOptions & PrimitiveConfig = {}) {
         options = {
-            stroke: DEFAULT_PRIMITIVE_CONFIG.stroke,
+            // stroke: DEFAULT_PRIMITIVE_CONFIG.stroke,
             strokeWidth: 1.5,
             arrow: 'none',
             ...options,
@@ -158,10 +169,10 @@ class PrimitiveManager {
 
         line.setCoords(x1, y1, x2, y2).render();
 
-        if (line.options.coordinateSystem === 'data') {
+        if (line.options.coordinateSystem === CoordinateSystem.Data) {
             line.createUpdateFunction(function () {
-                line.setCoords(line.x1, line.y1, line.x2, line.y2).render(
-                    this.themeConfig.transitionDuration
+                line.setCoords(line.x1!, line.y1!, line.x2!, line.y2!).render(
+                    this.config.themeConfig.transitionDuration
                 );
             });
         }
@@ -171,7 +182,7 @@ class PrimitiveManager {
 
     addPath(dataPoints, xAccessor, yAccessor, options = {}) {
         options = {
-            stroke: DEFAULT_PRIMITIVE_CONFIG.stroke,
+            // stroke: DEFAULT_PRIMITIVE_CONFIG.stroke,
             strokeWidth: 1.5,
             fill: 'none',
             curve: d3.curveLinear,
@@ -184,7 +195,7 @@ class PrimitiveManager {
             .setCoordinateAccessors(xAccessor, yAccessor)
             .render();
 
-        if (path.options.coordinateSystem === 'data') {
+        if (path.options.coordinateSystem === CoordinateSystem.Data) {
             path.createUpdateFunction(function () {
                 path.setData(dataPoints)
                     .setCoordinateAccessors(xAccessor, yAccessor)
@@ -195,21 +206,21 @@ class PrimitiveManager {
         return path;
     }
 
-    addRectangle(x1: number, y1: number, x2: number, y2: number, options = {}) {
+    addRectangle(x1: number, y1: number, x2: number, y2: number, options: PrimitiveConfig & RectanglePrimitiveOptions = {}) {
         options = {
-            fill: DEFAULT_PRIMITIVE_CONFIG.fill,
-            stroke: 'none',
-            strokeWidth: 1,
+            // fill: DEFAULT_PRIMITIVE_CONFIG.fill,
+            // stroke: 'none',
+            // strokeWidth: 1,
         };
 
         const rect = this.addPrimitive(RectanglePrimitive, options);
 
         rect.setCoords(x1, y1, x2, y2).render();
 
-        if (rect.options.coordinateSystem === 'data') {
+        if (rect.options.coordinateSystem === CoordinateSystem.Data) {
             rect.createUpdateFunction(function () {
-                rect.setCoords(rect.x1, rect.y1, rect.x2, rect.y2).render(
-                    this.themeConfig.transitionDuration
+                rect.setCoords(rect.x1!, rect.y1!, rect.x2!, rect.y2!).render(
+                    this.config.themeConfig.transitionDuration
                 );
             });
         }
@@ -217,11 +228,11 @@ class PrimitiveManager {
         return rect;
     }
 
-    addText(textContent, x, y, options = {}) {
+    addText(textContent: string, x: number, y: number, options: PrimitiveConfig & TextPrimitiveOptions = {}) {
         options = {
             fontSize: 12,
             fontFamily: null,
-            fill: 'currentColor',
+            // fill: 'currentColor',
             anchor: 'middle',
             baseline: 'middle',
             angle: 0,
@@ -233,14 +244,14 @@ class PrimitiveManager {
 
         text.setText(textContent)
             .setCoords(x, y)
-            .setAngle(options.angle)
+            .setAngle(options.angle!)
             .render();
 
-        if (text.options.coordinateSystem === 'data') {
+        if (text.options.coordinateSystem === CoordinateSystem.Data) {
             text.createUpdateFunction(function () {
-                text.setCoords(text.x, text.y)
+                text.setCoords(text.x!, text.y!)
                     .setAngle(text.angle)
-                    .render(this.themeConfig.transitionDuration);
+                    .render(this.config.themeConfig.transitionDuration);
             });
         }
 
@@ -262,7 +273,7 @@ class PrimitiveManager {
 
         contour.setData(fValues, xRange, yRange).render();
 
-        if (contour.options.coordinateSystem === 'data') {
+        if (contour.options.coordinateSystem === CoordinateSystem.Data) {
             contour.createUpdateFunction(function () {
                 contour
                     .setData(contour.fValues, contour.xRange, contour.yRange)
@@ -288,13 +299,13 @@ class PrimitiveManager {
         image
             .loadImage(href)
             .then(() => {
-                if (image.options.coordinateSystem === 'data') {
+                if (image.options.coordinateSystem === CoordinateSystem.Data) {
                     image.createUpdateFunction(function () {
                         image.render(this.themeConfig.transitionDuration);
                     });
                 }
             })
-            .catch((error) => {
+            .catch((error: unknown) => {
                 console.error('Image loading failed:', error);
             });
 
@@ -305,7 +316,7 @@ class PrimitiveManager {
         options = {
             className: 'primitive-batch-points',
             size: 64,
-            fill: DEFAULT_PRIMITIVE_CONFIG.fill,
+            // fill: DEFAULT_PRIMITIVE_CONFIG.fill,
             stroke: 'none',
             strokeWidth: 1,
             symbolType: d3.symbolCircle,
@@ -320,7 +331,7 @@ class PrimitiveManager {
             .setCoordinateAccessors(xAccessor, yAccessor)
             .render();
 
-        if (points.options.coordinateSystem === 'data') {
+        if (points.options.coordinateSystem === CoordinateSystem.Data) {
             points.createUpdateFunction(function () {
                 points.render(this.themeConfig.transitionDuration);
             });
@@ -339,7 +350,7 @@ class PrimitiveManager {
     ) {
         options = {
             className: 'primitive-batch-lines',
-            stroke: DEFAULT_PRIMITIVE_CONFIG.stroke,
+            // stroke: DEFAULT_PRIMITIVE_CONFIG.stroke,
             strokeWidth: 1.5,
             keyAccessor: (d, i) => i,
             arrow: 'none',
@@ -358,7 +369,7 @@ class PrimitiveManager {
             )
             .render();
 
-        if (lines.options.coordinateSystem === 'data') {
+        if (lines.options.coordinateSystem === CoordinateSystem.Data) {
             lines.createUpdateFunction(function () {
                 lines.render(this.themeConfig.transitionDuration);
             });
@@ -396,7 +407,7 @@ class PrimitiveManager {
             )
             .render();
 
-        if (rectangles.options.coordinateSystem === 'data') {
+        if (rectangles.options.coordinateSystem === CoordinateSystem.Data) {
             rectangles.createUpdateFunction(function () {
                 rectangles.render(this.themeConfig.transitionDuration);
             });
@@ -431,7 +442,7 @@ class PrimitiveManager {
 
         texts.render();
 
-        if (texts.options.coordinateSystem === 'data') {
+        if (texts.options.coordinateSystem === CoordinateSystem.Data) {
             texts.createUpdateFunction(function () {
                 texts.render(this.themeConfig.transitionDuration);
             });
@@ -441,7 +452,7 @@ class PrimitiveManager {
     }
 
     // Create arrowheads of different color
-    createArrowMarker(color, direction) {
+    createArrowMarker(color: string, direction: 'start' | 'end'): string {
         const defs = this.BasePlot.svg.select('defs');
         const markerId = `arrow-${direction}-${color.replace('#', '')}`;
 
@@ -467,11 +478,11 @@ class PrimitiveManager {
         return markerId;
     }
 
-    getPrimitive(id: string) {
+    getPrimitive(id: string): Primitive | undefined {
         return this.primitives.get(id);
     }
 
-    removePrimitive(id: string) {
+    removePrimitive(id: string): boolean {
         const primitive = this.getPrimitive(id);
         if (primitive) {
             primitive.remove();
@@ -481,10 +492,12 @@ class PrimitiveManager {
             this.layerObjectMap.forEach((layer) => {
                 layer.primitiveIds.delete(id);
             });
+            return true;
         }
+        return false;
     }
 
-    clearLayer(layerName: string) {
+    clearLayer(layerName: string): void {
         if (this.layerObjectMap.has(layerName)) {
             const layerObject = this.layerObjectMap.get(layerName);
 
@@ -503,7 +516,7 @@ class PrimitiveManager {
         }
     }
 
-    clearAll() {
+    clearAll(): void {
         this.primitives.forEach((primitive) => {
             primitive.remove();
         });
@@ -522,13 +535,13 @@ class PrimitiveManager {
         ) as InstanceType<T>[];
     }
 
-    getPrimitivesByLayer(layerName: string) {
+    getPrimitivesByLayer(layerName: string): Primitive[] {
         const layer = this.layerObjectMap.get(layerName);
         if (!layer) return [];
 
         return Array.from(layer.primitiveIds)
             .map((id) => this.primitives.get(id))
-            .filter(Boolean);
+            .filter(Boolean) as Primitive[];
     }
 }
 

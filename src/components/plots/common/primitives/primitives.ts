@@ -1,16 +1,30 @@
 import * as d3 from 'd3';
-import { renderKatex } from '../utils';
+
+import PrimitiveManager from '@/components/plots/common/primitives/primitive-manager';
+import type BasePlot from '@/components/plots/common/base';
+import { PrimitiveConfig } from '@/components/plots/common/config';
+import { CoordinateSystem } from '@/components/plots/common/types';
+import { renderKatex } from '@/components/plots/common/utils';
+
+
+type Element = d3.Selection<d3.BaseType, unknown, null, undefined>;
+type ElementOrTransition = d3.Selection<d3.BaseType, unknown, null, undefined> | d3.Transition<d3.BaseType, unknown, null, undefined>;
+type EasingFunction = ((t: number) => number);
 
 
 export class Primitive {
-    constructor(manager, element, options = {}) {
-        this.manager = manager;
-        this.element = element;
+    updateFunc: (() => void) | null;
+
+    constructor(
+        protected readonly manager: PrimitiveManager, 
+        protected readonly element: Element, 
+        public options: Required<PrimitiveConfig>
+    ) {
         this.options = options;
         this.updateFunc = null;
 
         // Force elements to be static when using pixel coordinates
-        if (this.options.coordinateSystem === 'pixel') {
+        if (this.options.coordinateSystem === CoordinateSystem.Pixel) {
             this.options.staticElement = true;
         }
     }
@@ -21,45 +35,30 @@ export class Primitive {
     }
 
     // Converts coordinates based on coordinate system
-    convertX(x) {
-        return this.options.coordinateSystem === 'pixel'
+    convertX(x: number) {
+        return this.options.coordinateSystem === CoordinateSystem.Pixel
             ? x
-            : this.manager.BasePlot.scales.x(x);
+            : this.manager.BasePlot.scale.x(x);
     }
 
-    convertY(y) {
-        return this.options.coordinateSystem === 'pixel'
+    convertY(y: number) {
+        return this.options.coordinateSystem === CoordinateSystem.Pixel
             ? y
-            : this.manager.BasePlot.scales.y(y);
+            : this.manager.BasePlot.scale.y(y);
     }
 
-    convertWidthFactor(w) {
-        return this.options.coordinateSystem === 'pixel'
-            ? w
-            : this.manager.BasePlot.scales.getDomainToRangeFactor(
-                  this.manager.BasePlot.scales.x
-              ) * w;
-    }
-
-    convertHeightFactor(h) {
-        return this.options.coordinateSystem === 'pixel'
-            ? h
-            : this.manager.BasePlot.scales.getDomainToRangeFactor(
-                  this.manager.BasePlot.scales.y
-              ) * h;
-    }
-
-    getElementWithTransition(element, transitionDuration = 0, ease = null) {
+    getElementWithTransition(element: Element, transitionDuration = 0, ease?: EasingFunction): ElementOrTransition {
         if (transitionDuration > 0) {
-            element = element.transition().duration(transitionDuration);
+            let transitionElement = element.transition().duration(transitionDuration);
             if (ease) {
-                element = element.ease(ease);
+                transitionElement = transitionElement.ease(ease);
             }
+            return transitionElement;
         }
         return element;
     }
 
-    createUpdateFunction(updateCallback) {
+    createUpdateFunction(updateCallback: (this: BasePlot) => void): this {
         if (!this.options.staticElement) {
             this.updateFunc = updateCallback.bind(this.manager.BasePlot);
             this.manager.BasePlot.addUpdateFunction(this.updateFunc);
@@ -97,41 +96,56 @@ export class Primitive {
     }
 }
 
+export interface PointPrimitiveOptions {
+    size?: number;
+    symbolType?: d3.SymbolType;
+    // fill?: string;
+    // stroke?: string;
+    // strokeWidth?: number;
+}
+
 export class PointPrimitive extends Primitive {
-    constructor(manager, element, options) {
+
+    x?: number;
+    y?: number;
+    size: number;
+    symbolType: d3.SymbolType;
+    declare options: Required<PrimitiveConfig> & Required<PointPrimitiveOptions>;
+    
+    constructor(
+            manager: PrimitiveManager, 
+            element: Element, 
+            options: Required<PrimitiveConfig> & Required<PointPrimitiveOptions>
+        ) {
         super(manager, element, options);
-        this.type = 'point';
-        this.size = options.size || 64;
-        this.symbolType = options.symbolType || d3.symbolCircle;
-        ((this.x = null), (this.y = null));
+        this.size = options.size;
+        this.symbolType = options.symbolType;
     }
 
-    setSize(size) {
+    setSize(size: number): PointPrimitive {
         this.size = size;
         return this;
     }
 
-    setSymbolType(symbolType) {
+    setSymbolType(symbolType: d3.SymbolType): PointPrimitive {
         this.symbolType = symbolType;
         return this;
     }
 
-    setCoords(x, y) {
+    setCoords(x: number, y: number): PointPrimitive {
         this.x = x;
         this.y = y;
         return this;
     }
 
-    render(transitionDuration = 0, ease = null) {
-        // const element = transitionDuration > 0
-        // ? this.element.transition().duration(transitionDuration)
-        // : this.element;
-
+    render(transitionDuration = 0, ease?: EasingFunction): ElementOrTransition {
+        // Cast to any due to TypeScript limitation: Selection and Transition both support
+        // .attr() identically, but TypeScript can't properly infer overloads on union types
         const element = this.getElementWithTransition(
             this.element,
             transitionDuration,
             ease
-        );
+        ) as any;
 
         const symbolGenerator = d3
             .symbol()
@@ -146,22 +160,36 @@ export class PointPrimitive extends Primitive {
             .attr('opacity', this.options.opacity)
             .attr(
                 'transform',
-                `translate(${this.convertX(this.x)}, ${this.convertY(this.y)})`
-            );
+                `translate(${this.convertX(this.x!)}, ${this.convertY(this.y!)})`
+            )
     }
 }
 
+export interface LinePrimitiveOptions {
+    arrow?: 'start' | 'end' | 'both' | 'none',
+    // stroke?: string,
+    // strokeWidth?: number,
+    strokeDashArray?: string,
+    strokeDashOffset?: number
+}
+
 export class LinePrimitive extends Primitive {
-    constructor(manager, element, options) {
+
+    x1?: number;
+    y1?: number;
+    x2?: number;
+    y2?: number;
+    declare options: Required<PrimitiveConfig> & Required<LinePrimitiveOptions>;
+
+    constructor(
+            manager: PrimitiveManager, 
+            element: Element, 
+            options: Required<PrimitiveConfig> & Required<LinePrimitiveOptions>
+        ) {
         super(manager, element, options);
-        this.type = 'line';
-        ((this.x1 = null),
-            (this.y1 = null),
-            (this.x2 = null),
-            (this.y2 = null));
     }
 
-    setCoords(x1, y1, x2, y2) {
+    setCoords(x1: number, y1: number, x2: number, y2: number): LinePrimitive {
         this.x1 = x1;
         this.y1 = y1;
         this.x2 = x2;
@@ -169,7 +197,7 @@ export class LinePrimitive extends Primitive {
         return this;
     }
 
-    render(transitionDuration = 0, ease = null) {
+    render(transitionDuration = 0, ease?: EasingFunction): ElementOrTransition {
         let markerStart = null;
         let markerEnd = null;
 
@@ -192,13 +220,13 @@ export class LinePrimitive extends Primitive {
             this.element,
             transitionDuration,
             ease
-        );
+        ) as any;
 
-        element
-            .attr('x1', this.convertX(this.x1))
-            .attr('y1', this.convertY(this.y1))
-            .attr('x2', this.convertX(this.x2))
-            .attr('y2', this.convertY(this.y2))
+        return element
+            .attr('x1', this.convertX(this.x1!))
+            .attr('y1', this.convertY(this.y1!))
+            .attr('x2', this.convertX(this.x2!))
+            .attr('y2', this.convertY(this.y2!))
             .attr('marker-start', markerStart)
             .attr('marker-end', markerEnd)
             .attr('opacity', this.options.opacity)
@@ -209,17 +237,29 @@ export class LinePrimitive extends Primitive {
     }
 }
 
+export interface RectanglePrimitiveOptions {
+    // fill?: string;
+    // stroke?: string;
+    // strokeWidth?: number;
+}
+
 export class RectanglePrimitive extends Primitive {
-    constructor(manager, element, options) {
+
+    x1?: number;
+    y1?: number;
+    x2?: number;
+    y2?: number;
+    declare options: Required<PrimitiveConfig> & Required<RectanglePrimitiveOptions>;
+
+    constructor(
+        manager: PrimitiveManager,
+        element: Element,
+        options: Required<PrimitiveConfig> & Required<RectanglePrimitiveOptions>
+    ) {
         super(manager, element, options);
-        this.type = 'rect';
-        ((this.x1 = null),
-            (this.y1 = null),
-            (this.x2 = null),
-            (this.y2 = null));
     }
 
-    setCoords(x1, y1, x2, y2) {
+    setCoords(x1: number, y1: number, x2: number, y2: number): RectanglePrimitive {
         this.x1 = x1;
         this.y1 = y1;
         this.x2 = x2;
@@ -227,24 +267,24 @@ export class RectanglePrimitive extends Primitive {
         return this;
     }
 
-    render(transitionDuration = 0, ease = null) {
+    render(transitionDuration = 0, ease?: EasingFunction): ElementOrTransition {
         const element = this.getElementWithTransition(
             this.element,
             transitionDuration,
             ease
-        );
+        ) as any;
 
-        const scaledX1 = this.convertX(this.x1);
-        const scaledY1 = this.convertY(this.y1);
-        const scaledX2 = this.convertX(this.x2);
-        const scaledY2 = this.convertY(this.y2);
+        const scaledX1 = this.convertX(this.x1!);
+        const scaledY1 = this.convertY(this.y1!);
+        const scaledX2 = this.convertX(this.x2!);
+        const scaledY2 = this.convertY(this.y2!);
 
         const rectX = Math.min(scaledX1, scaledX2);
         const rectY = Math.min(scaledY1, scaledY2);
         const rectWidth = Math.abs(scaledX2 - scaledX1);
         const rectHeight = Math.abs(scaledY2 - scaledY1);
 
-        element
+        return element
             .attr('x', rectX)
             .attr('y', rectY)
             .attr('width', rectWidth)
@@ -256,16 +296,36 @@ export class RectanglePrimitive extends Primitive {
     }
 }
 
+export interface TextPrimitiveOptions {
+    fontSize?: number;
+    fontFamily?: string | null;
+    // fill?: string;
+    anchor?: 'start' | 'middle' | 'end';
+    baseline?: 'auto' | 'text-bottom' | 'alphabetic' | 'ideographic' | 'middle' | 'central' | 'mathematical' | 'hanging' | 'text-top';
+    angle?: number;
+    latex?: boolean;
+}
+
 // Currently does not support animations with latex rendering
 export class TextPrimitive extends Primitive {
-    constructor(manager, element, options) {
+
+    x?: number;
+    y?: number;
+    angle: number;
+    text: string;
+    declare options: Required<PrimitiveConfig> & Required<TextPrimitiveOptions>;
+
+    constructor(
+        manager: PrimitiveManager,
+        element: Element,
+        options: Required<PrimitiveConfig> & Required<TextPrimitiveOptions>
+    ) {
         super(manager, element, options);
-        this.type = 'text';
-        ((this.x = null), (this.y = null), (this.angle = null));
         this.text = '';
+        this.angle = options.angle;
     }
 
-    setText(text) {
+    setText(text: string): TextPrimitive {
         this.text = text;
         if (!this.options.latex) {
             this.element.text(text);
@@ -273,30 +333,30 @@ export class TextPrimitive extends Primitive {
         return this;
     }
 
-    setAngle(angle) {
+    setAngle(angle: number): TextPrimitive {
         this.angle = angle;
         return this;
     }
 
-    setCoords(x, y) {
+    setCoords(x: number, y: number): TextPrimitive {
         this.x = x;
         this.y = y;
         return this;
     }
 
-    render(duration = 0, ease = null) {
+    render(duration = 0, ease?: EasingFunction): ElementOrTransition {
         let element = this.getElementWithTransition(
             this.element,
             duration,
             ease
-        );
-        const x = this.convertX(this.x);
-        const y = this.convertY(this.y);
+        ) as any;
+        const x = this.convertX(this.x!);
+        const y = this.convertY(this.y!);
 
         if (this.options.latex) {
-            element = this._renderKatex(element, x, y);
+            element = this.renderKatex(element, x, y);
         } else {
-            element = this._renderPlainText(element, x, y);
+            element = this.renderPlainText(element, x, y);
         }
 
         element.attr('opacity', this.options.opacity);
@@ -304,7 +364,7 @@ export class TextPrimitive extends Primitive {
         return element;
     }
 
-    _renderPlainText(element, x, y) {
+    renderPlainText(element: any, x: number, y: number): ElementOrTransition {
         element
             .attr('x', x)
             .attr('y', y)
@@ -322,7 +382,7 @@ export class TextPrimitive extends Primitive {
         return element;
     }
 
-    _renderKatex(element, x, y) {
+    renderKatex(element: any, x: number, y: number): any {
         return renderKatex(this.text, element, x, y, this.angle);
     }
 }
@@ -920,7 +980,9 @@ export class BatchTextPrimitive extends BatchPrimitive {
 
 type PrimitiveConstructor = new (manager: any, element: any, options: any) => Primitive;
 
-export const PRIMITIVE_LOOKUP = new Map<PrimitiveConstructor, { isBatch: boolean; htmlElementType: string }>([
+export type PrimitiveInfo = { isBatch: boolean; htmlElementType: string }
+
+export const PRIMITIVE_LOOKUP = new Map<PrimitiveConstructor, PrimitiveInfo>([
     [PointPrimitive, { isBatch: false, htmlElementType: 'path' }],
     [LinePrimitive, { isBatch: false, htmlElementType: 'line' }],
     [RectanglePrimitive, { isBatch: false, htmlElementType: 'rect' }],
