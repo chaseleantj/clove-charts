@@ -89,6 +89,7 @@ export interface PrimitiveConfig {
     staticElement?: boolean;
     layerName?: string;
     opacity?: number;
+    className?: string;
 }
 
 export interface PlotConfig {
@@ -219,4 +220,5 @@ export const DEFAULT_PRIMITIVE_CONFIG: Required<PrimitiveConfig> = {
     staticElement: false,
     layerName: 'default',
     opacity: 1,
+    className: 'primitive'
 };

@@ -2,6 +2,7 @@ import * as d3 from 'd3';
 
 import PrimitiveManager from '@/components/plots/common/primitives/primitive-manager';
 import type BasePlot from '@/components/plots/common/base';
+import { isContinuousScale } from '@/components/plots/common/scale-manager';
 import { PrimitiveConfig } from '@/components/plots/common/config';
 import { CoordinateSystem } from '@/components/plots/common/types';
 import { renderKatex } from '@/components/plots/common/utils';
@@ -35,16 +36,20 @@ export class Primitive {
     }
 
     // Converts coordinates based on coordinate system
-    convertX(x: number) {
-        return this.options.coordinateSystem === CoordinateSystem.Pixel
-            ? x
-            : this.manager.BasePlot.scale.x(x);
+    convertX(x: number): number {
+        if (this.options.coordinateSystem === CoordinateSystem.Pixel) {
+            return x;
+        }
+        const scale = this.manager.BasePlot.scale.x;
+        return isContinuousScale(scale) ? scale(x) : x;
     }
 
-    convertY(y: number) {
-        return this.options.coordinateSystem === CoordinateSystem.Pixel
-            ? y
-            : this.manager.BasePlot.scale.y(y);
+    convertY(y: number): number {
+        if (this.options.coordinateSystem === CoordinateSystem.Pixel) {
+            return y;
+        }
+        const scale = this.manager.BasePlot.scale.y;
+        return isContinuousScale(scale) ? scale(y) : y;
     }
 
     getElementWithTransition(element: Element, transitionDuration = 0, ease?: EasingFunction): ElementOrTransition {
@@ -387,41 +392,67 @@ export class TextPrimitive extends Primitive {
     }
 }
 
+export interface PathPrimitiveOptions {
+    strokeDashArray?: string;
+    strokeDashOffset?: number;
+    curve?: d3.CurveFactory | d3.CurveFactoryLineOnly;
+}
+
 export class PathPrimitive extends Primitive {
-    constructor(manager, element, options) {
+
+    dataPoints: Record<string, any>[];
+    xAccessor!: (d: Record<string, any>) => number | null | undefined;
+    yAccessor!: (d: Record<string, any>) => number | null | undefined;
+    declare options: Required<PrimitiveConfig> & Required<PathPrimitiveOptions>;
+
+    constructor(
+        manager: PrimitiveManager, 
+        element: Element, 
+        options: Required<PrimitiveConfig> & Required<PathPrimitiveOptions>
+    ) {
         super(manager, element, options);
-        this.type = 'path';
-        this.dataPoints = null;
+        this.dataPoints = [];
     }
 
-    setData(dataPoints) {
+    setData(dataPoints: Record<string, any>[]): PathPrimitive {
         this.dataPoints = dataPoints;
         return this;
     }
 
-    setCoordinateAccessors(xAccessor, yAccessor) {
+    setCoordinateAccessors(
+        xAccessor: (d: Record<string, any>) => number | null | undefined, 
+        yAccessor: (d: Record<string, any>) => number | null | undefined
+    ): PathPrimitive {
         this.xAccessor = xAccessor;
         this.yAccessor = yAccessor;
         return this;
     }
 
-    render(transitionDuration = 0, ease = null) {
+    render(transitionDuration = 0, ease?: EasingFunction): ElementOrTransition {
         const element = this.getElementWithTransition(
             this.element,
             transitionDuration,
             ease
-        );
+        ) as any;
 
         const lineGenerator = d3
-            .line()
-            .x((d) => this.convertX(this.xAccessor(d)))
-            .y((d) => this.convertY(this.yAccessor(d)))
-            .defined(
-                (d) => this.xAccessor(d) != null && this.yAccessor(d) != null
-            )
+            .line<Record<string, any>>()
+            .x((d) => {
+                const val = this.xAccessor(d);
+                return val != null ? this.convertX(val) : 0;
+            })
+            .y((d) => {
+                const val = this.yAccessor(d);
+                return val != null ? this.convertY(val) : 0;
+            })
+            .defined((d) => {
+                const x = this.xAccessor(d);
+                const y = this.yAccessor(d);
+                return x != null && y != null && !isNaN(x) && !isNaN(y);
+            })
             .curve(this.options.curve);
 
-        element
+        return element
             .attr('fill', this.options.fill)
             .attr('opacity', this.options.opacity)
             .attr('stroke', this.options.stroke)
@@ -432,18 +463,37 @@ export class PathPrimitive extends Primitive {
     }
 }
 
-export class ContourPrimitive extends Primitive {
-    constructor(manager, element, options) {
-        super(manager, element, options);
-        this.type = 'contour';
-        this.elementSelection = d3.select(null);
+export interface ContourPrimitiveOptions {
+    thresholds?: number | number[],
+    colorScale?: d3.ScaleSequential<string, never> | ((t: number) => string);
+}
 
-        this.fValues = null;
-        this.xRange = null;
-        this.yRange = null;
+export class ContourPrimitive extends Primitive {
+    
+    fValues: number[];
+    xRange: number[];
+    yRange: number[];
+    declare options: Required<PrimitiveConfig> & Required<ContourPrimitiveOptions>
+
+    constructor(
+            manager: PrimitiveManager, 
+            element: Element,
+            options: Required<PrimitiveConfig> & Required<ContourPrimitiveOptions>
+        ) {
+        super(manager, element, options);
+        // this.elementSelection = d3.select(null);
+
+        this.fValues = [];
+        this.xRange = [];
+        this.yRange = [];
     }
 
-    _calculateContours(fValues, xRange, yRange, thresholds) {
+    _calculateContours(
+        fValues: number[], 
+        xRange: number[], 
+        yRange: number[], 
+        thresholds: number | number[]
+    ): d3.ContourMultiPolygon[] {
         const resolutionX = xRange.length;
         const resolutionY = yRange.length;
 
@@ -453,11 +503,11 @@ export class ContourPrimitive extends Primitive {
             .thresholds(thresholds)(fValues);
     }
 
-    _createPathGenerator(xRange, yRange) {
+    _createPathGenerator(xRange: number[], yRange: number[]) {
         const resolutionX = xRange.length;
         const resolutionY = yRange.length;
-        const domainX = d3.extent(xRange);
-        const domainY = d3.extent(yRange);
+        const domainX = d3.extent<number>(xRange) as [number, number];
+        const domainY = d3.extent<number>(yRange) as [number, number];
 
         const idxToDomainX = d3
             .scaleLinear()
@@ -482,14 +532,14 @@ export class ContourPrimitive extends Primitive {
         );
     }
 
-    setData(fValues, xRange, yRange) {
+    setData(fValues: number[], xRange: number[], yRange: number[]) {
         this.fValues = fValues;
         this.xRange = xRange;
         this.yRange = yRange;
         return this;
     }
 
-    render(transitionDuration = 0, ease = null) {
+    render(transitionDuration = 0, ease?: EasingFunction) {
         const contours = this._calculateContours(
             this.fValues,
             this.xRange,
@@ -502,26 +552,26 @@ export class ContourPrimitive extends Primitive {
         );
 
         const selection = this.element
-            .selectAll(`path.${this.options.className}`)
+            .selectAll<SVGPathElement, d3.ContourMultiPolygon>(`path.${this.options.className}`)
             .data(contours, (d, i) => i);
 
         selection.exit().remove();
         const enter = selection.enter().append('path');
         const merged = enter.merge(selection);
 
-        this.elementSelection = merged;
+        // this.elementSelection = merged;
 
         const finalSelection = this.getElementWithTransition(
             merged,
             transitionDuration,
             ease
-        );
+        ) as any;
 
         return finalSelection
             .attr('stroke', this.options.stroke)
             .attr('stroke-width', this.options.strokeWidth)
             .attr('opacity', this.options.opacity)
-            .attr('fill', (d) =>
+            .attr('fill', (d: {value: number}) =>
                 this.options.colorScale
                     ? this.options.colorScale(d.value)
                     : 'none'

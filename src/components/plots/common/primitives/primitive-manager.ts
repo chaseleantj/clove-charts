@@ -12,7 +12,9 @@ import {
     TextPrimitive,
     TextPrimitiveOptions,
     PathPrimitive,
+    PathPrimitiveOptions,
     ContourPrimitive,
+    ContourPrimitiveOptions,
     ImagePrimitive,
     BatchPointsPrimitive,
     BatchLinesPrimitive,
@@ -88,8 +90,8 @@ class PrimitiveManager {
         }
 
         const options = {
-            className: `primitive-${primitiveClass.name.replace('Primitive', '').toLowerCase()}`,
             ...DEFAULT_PRIMITIVE_CONFIG,
+            className: `primitive-${primitiveClass.name.replace('Primitive', '').toLowerCase()}`,
             ...config,
         };
 
@@ -135,9 +137,7 @@ class PrimitiveManager {
     addPoint(x: number, y: number, options: PointPrimitiveOptions & PrimitiveConfig = {}): PointPrimitive {
         options = {
             size: 64,
-            // fill: DEFAULT_PRIMITIVE_CONFIG.fill,
             stroke: 'none',
-            // strokeWidth: 1,
             symbolType: d3.symbolCircle,
             ...options,
         };
@@ -159,7 +159,6 @@ class PrimitiveManager {
 
     addLine(x1: number, y1: number, x2: number, y2: number, options: LinePrimitiveOptions & PrimitiveConfig = {}) {
         options = {
-            // stroke: DEFAULT_PRIMITIVE_CONFIG.stroke,
             strokeWidth: 1.5,
             arrow: 'none',
             ...options,
@@ -180,9 +179,13 @@ class PrimitiveManager {
         return line;
     }
 
-    addPath(dataPoints, xAccessor, yAccessor, options = {}) {
+    addPath(
+        dataPoints: Record<string, any>[],
+        xAccessor: (d: Record<string, any>) => number | null | undefined,
+        yAccessor: (d: Record<string, any>) => number | null | undefined,
+        options: PathPrimitiveOptions & PrimitiveConfig = {}
+    ) {
         options = {
-            // stroke: DEFAULT_PRIMITIVE_CONFIG.stroke,
             strokeWidth: 1.5,
             fill: 'none',
             curve: d3.curveLinear,
@@ -199,7 +202,7 @@ class PrimitiveManager {
             path.createUpdateFunction(function () {
                 path.setData(dataPoints)
                     .setCoordinateAccessors(xAccessor, yAccessor)
-                    .render(this.themeConfig.transitionDuration);
+                    .render(this.config.themeConfig.transitionDuration);
             });
         }
 
@@ -207,11 +210,7 @@ class PrimitiveManager {
     }
 
     addRectangle(x1: number, y1: number, x2: number, y2: number, options: PrimitiveConfig & RectanglePrimitiveOptions = {}) {
-        options = {
-            // fill: DEFAULT_PRIMITIVE_CONFIG.fill,
-            // stroke: 'none',
-            // strokeWidth: 1,
-        };
+        options = {};
 
         const rect = this.addPrimitive(RectanglePrimitive, options);
 
@@ -232,7 +231,6 @@ class PrimitiveManager {
         options = {
             fontSize: 12,
             fontFamily: null,
-            // fill: 'currentColor',
             anchor: 'middle',
             baseline: 'middle',
             angle: 0,
@@ -258,14 +256,16 @@ class PrimitiveManager {
         return text;
     }
 
-    addContour(fValues, xRange, yRange, options = {}) {
+    addContour(
+        fValues: number[], 
+        xRange: number[], 
+        yRange: number[], 
+        options: PrimitiveConfig & ContourPrimitiveOptions = {}
+    ) {
         options = {
             thresholds: 10,
-            stroke: 'currentColor',
-            strokeWidth: 1,
-            className: 'primitive-contours',
+            // className: 'primitive-contours',
             colorScale: d3.interpolateRdBu,
-            opacity: 1,
             ...options,
         };
 
@@ -277,7 +277,7 @@ class PrimitiveManager {
             contour.createUpdateFunction(function () {
                 contour
                     .setData(contour.fValues, contour.xRange, contour.yRange)
-                    .render(this.themeConfig.transitionDuration);
+                    .render(this.config.themeConfig.transitionDuration);
             });
         }
 
@@ -301,7 +301,7 @@ class PrimitiveManager {
             .then(() => {
                 if (image.options.coordinateSystem === CoordinateSystem.Data) {
                     image.createUpdateFunction(function () {
-                        image.render(this.themeConfig.transitionDuration);
+                        image.render(this.config.themeConfig.transitionDuration);
                     });
                 }
             })
@@ -333,7 +333,7 @@ class PrimitiveManager {
 
         if (points.options.coordinateSystem === CoordinateSystem.Data) {
             points.createUpdateFunction(function () {
-                points.render(this.themeConfig.transitionDuration);
+                points.render(this.config.themeConfig.transitionDuration);
             });
         }
 
@@ -371,7 +371,7 @@ class PrimitiveManager {
 
         if (lines.options.coordinateSystem === CoordinateSystem.Data) {
             lines.createUpdateFunction(function () {
-                lines.render(this.themeConfig.transitionDuration);
+                lines.render(this.config.themeConfig.transitionDuration);
             });
         }
 
@@ -409,7 +409,7 @@ class PrimitiveManager {
 
         if (rectangles.options.coordinateSystem === CoordinateSystem.Data) {
             rectangles.createUpdateFunction(function () {
-                rectangles.render(this.themeConfig.transitionDuration);
+                rectangles.render(this.config.themeConfig.transitionDuration);
             });
         }
 
@@ -444,7 +444,7 @@ class PrimitiveManager {
 
         if (texts.options.coordinateSystem === CoordinateSystem.Data) {
             texts.createUpdateFunction(function () {
-                texts.render(this.themeConfig.transitionDuration);
+                texts.render(this.config.themeConfig.transitionDuration);
             });
         }
 
