@@ -16,6 +16,7 @@ import {
     ContourPrimitive,
     ContourPrimitiveOptions,
     ImagePrimitive,
+    ImagePrimitiveOptions,
     BatchPointsPrimitive,
     BatchLinesPrimitive,
     BatchRectanglesPrimitive,
@@ -157,7 +158,7 @@ class PrimitiveManager {
         return point;
     }
 
-    addLine(x1: number, y1: number, x2: number, y2: number, options: LinePrimitiveOptions & PrimitiveConfig = {}) {
+    addLine(x1: number, y1: number, x2: number, y2: number, options: LinePrimitiveOptions & PrimitiveConfig = {}): LinePrimitive {
         options = {
             strokeWidth: 1.5,
             arrow: 'none',
@@ -184,7 +185,7 @@ class PrimitiveManager {
         xAccessor: (d: Record<string, any>) => number | null | undefined,
         yAccessor: (d: Record<string, any>) => number | null | undefined,
         options: PathPrimitiveOptions & PrimitiveConfig = {}
-    ) {
+    ): PathPrimitive {
         options = {
             strokeWidth: 1.5,
             fill: 'none',
@@ -209,7 +210,7 @@ class PrimitiveManager {
         return path;
     }
 
-    addRectangle(x1: number, y1: number, x2: number, y2: number, options: PrimitiveConfig & RectanglePrimitiveOptions = {}) {
+    addRectangle(x1: number, y1: number, x2: number, y2: number, options: PrimitiveConfig & RectanglePrimitiveOptions = {}): RectanglePrimitive {
         options = {};
 
         const rect = this.addPrimitive(RectanglePrimitive, options);
@@ -227,7 +228,7 @@ class PrimitiveManager {
         return rect;
     }
 
-    addText(textContent: string, x: number, y: number, options: PrimitiveConfig & TextPrimitiveOptions = {}) {
+    addText(textContent: string, x: number, y: number, options: PrimitiveConfig & TextPrimitiveOptions = {}): TextPrimitive {
         options = {
             fontSize: 12,
             fontFamily: null,
@@ -261,7 +262,7 @@ class PrimitiveManager {
         xRange: number[], 
         yRange: number[], 
         options: PrimitiveConfig & ContourPrimitiveOptions = {}
-    ) {
+    ): ContourPrimitive {
         options = {
             thresholds: 10,
             // className: 'primitive-contours',
@@ -284,17 +285,16 @@ class PrimitiveManager {
         return contour;
     }
 
-    addImage(href, options = {}) {
+    addImage(href: string, options: PrimitiveConfig & ImagePrimitiveOptions = {}): ImagePrimitive {
         options = {
-            coords: null,
             width: null,
+            coords: null,
             useCornerCoords: false,
+            preserveAspectRatio: 'xMidYMid meet',
             ...options,
         };
 
         const image = this.addPrimitive(ImagePrimitive, options);
-
-        // image.element.attr('preserveAspectRatio', image.preserveAspectRatio);
 
         image
             .loadImage(href)

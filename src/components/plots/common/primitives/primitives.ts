@@ -30,13 +30,13 @@ export class Primitive {
         }
     }
 
-    setStyles(styles = {}) {
+    public setStyles(styles = {}) {
         this.options = { ...this.options, ...styles };
         return this;
     }
 
     // Converts coordinates based on coordinate system
-    convertX(x: number): number {
+    public convertX(x: number): number {
         if (this.options.coordinateSystem === CoordinateSystem.Pixel) {
             return x;
         }
@@ -44,7 +44,7 @@ export class Primitive {
         return isContinuousScale(scale) ? scale(x) : x;
     }
 
-    convertY(y: number): number {
+    public convertY(y: number): number {
         if (this.options.coordinateSystem === CoordinateSystem.Pixel) {
             return y;
         }
@@ -52,7 +52,11 @@ export class Primitive {
         return isContinuousScale(scale) ? scale(y) : y;
     }
 
-    getElementWithTransition(element: Element, transitionDuration = 0, ease?: EasingFunction): ElementOrTransition {
+    protected getElementWithTransition<GElement extends d3.BaseType, Datum, PElement extends d3.BaseType, PDatum>(
+        element: d3.Selection<GElement, Datum, PElement, PDatum>, 
+        transitionDuration = 0, 
+        ease?: EasingFunction
+    ): d3.Selection<GElement, Datum, PElement, PDatum> | d3.Transition<GElement, Datum, PElement, PDatum> {
         if (transitionDuration > 0) {
             let transitionElement = element.transition().duration(transitionDuration);
             if (ease) {
@@ -63,7 +67,7 @@ export class Primitive {
         return element;
     }
 
-    createUpdateFunction(updateCallback: (this: BasePlot) => void): this {
+    public createUpdateFunction(updateCallback: (this: BasePlot) => void): this {
         if (!this.options.staticElement) {
             this.updateFunc = updateCallback.bind(this.manager.BasePlot);
             this.manager.BasePlot.addUpdateFunction(this.updateFunc);
@@ -71,13 +75,13 @@ export class Primitive {
         return this;
     }
 
-    update() {
+    public update() {
         if (this.updateFunc) {
             this.updateFunc();
         }
     }
 
-    remove() {
+    public remove() {
         this.element.remove();
         if (this.updateFunc) {
             // Remove from update functions in BasePlot
@@ -90,12 +94,12 @@ export class Primitive {
         }
     }
 
-    show() {
+    public show() {
         this.element.style('opacity', this.options.opacity);
         return this;
     }
 
-    hide() {
+    public hide() {
         this.element.style('opacity', 0);
         return this;
     }
@@ -127,23 +131,23 @@ export class PointPrimitive extends Primitive {
         this.symbolType = options.symbolType;
     }
 
-    setSize(size: number): PointPrimitive {
+    public setSize(size: number): PointPrimitive {
         this.size = size;
         return this;
     }
 
-    setSymbolType(symbolType: d3.SymbolType): PointPrimitive {
+    public setSymbolType(symbolType: d3.SymbolType): PointPrimitive {
         this.symbolType = symbolType;
         return this;
     }
 
-    setCoords(x: number, y: number): PointPrimitive {
+    public setCoords(x: number, y: number): PointPrimitive {
         this.x = x;
         this.y = y;
         return this;
     }
 
-    render(transitionDuration = 0, ease?: EasingFunction): ElementOrTransition {
+    public render(transitionDuration = 0, ease?: EasingFunction): ElementOrTransition {
         // Cast to any due to TypeScript limitation: Selection and Transition both support
         // .attr() identically, but TypeScript can't properly infer overloads on union types
         const element = this.getElementWithTransition(
@@ -194,7 +198,7 @@ export class LinePrimitive extends Primitive {
         super(manager, element, options);
     }
 
-    setCoords(x1: number, y1: number, x2: number, y2: number): LinePrimitive {
+    public setCoords(x1: number, y1: number, x2: number, y2: number): LinePrimitive {
         this.x1 = x1;
         this.y1 = y1;
         this.x2 = x2;
@@ -202,7 +206,7 @@ export class LinePrimitive extends Primitive {
         return this;
     }
 
-    render(transitionDuration = 0, ease?: EasingFunction): ElementOrTransition {
+    public render(transitionDuration = 0, ease?: EasingFunction): ElementOrTransition {
         let markerStart = null;
         let markerEnd = null;
 
@@ -264,7 +268,7 @@ export class RectanglePrimitive extends Primitive {
         super(manager, element, options);
     }
 
-    setCoords(x1: number, y1: number, x2: number, y2: number): RectanglePrimitive {
+    public setCoords(x1: number, y1: number, x2: number, y2: number): RectanglePrimitive {
         this.x1 = x1;
         this.y1 = y1;
         this.x2 = x2;
@@ -272,7 +276,7 @@ export class RectanglePrimitive extends Primitive {
         return this;
     }
 
-    render(transitionDuration = 0, ease?: EasingFunction): ElementOrTransition {
+    public render(transitionDuration = 0, ease?: EasingFunction): ElementOrTransition {
         const element = this.getElementWithTransition(
             this.element,
             transitionDuration,
@@ -330,7 +334,7 @@ export class TextPrimitive extends Primitive {
         this.angle = options.angle;
     }
 
-    setText(text: string): TextPrimitive {
+    public setText(text: string): TextPrimitive {
         this.text = text;
         if (!this.options.latex) {
             this.element.text(text);
@@ -338,18 +342,18 @@ export class TextPrimitive extends Primitive {
         return this;
     }
 
-    setAngle(angle: number): TextPrimitive {
+    public setAngle(angle: number): TextPrimitive {
         this.angle = angle;
         return this;
     }
 
-    setCoords(x: number, y: number): TextPrimitive {
+    public setCoords(x: number, y: number): TextPrimitive {
         this.x = x;
         this.y = y;
         return this;
     }
 
-    render(duration = 0, ease?: EasingFunction): ElementOrTransition {
+    public render(duration = 0, ease?: EasingFunction): ElementOrTransition {
         let element = this.getElementWithTransition(
             this.element,
             duration,
@@ -369,7 +373,7 @@ export class TextPrimitive extends Primitive {
         return element;
     }
 
-    renderPlainText(element: any, x: number, y: number): ElementOrTransition {
+    private renderPlainText(element: any, x: number, y: number): ElementOrTransition {
         element
             .attr('x', x)
             .attr('y', y)
@@ -387,7 +391,7 @@ export class TextPrimitive extends Primitive {
         return element;
     }
 
-    renderKatex(element: any, x: number, y: number): any {
+    private renderKatex(element: any, x: number, y: number): any {
         return renderKatex(this.text, element, x, y, this.angle);
     }
 }
@@ -414,12 +418,12 @@ export class PathPrimitive extends Primitive {
         this.dataPoints = [];
     }
 
-    setData(dataPoints: Record<string, any>[]): PathPrimitive {
+    public setData(dataPoints: Record<string, any>[]): PathPrimitive {
         this.dataPoints = dataPoints;
         return this;
     }
 
-    setCoordinateAccessors(
+    public setCoordinateAccessors(
         xAccessor: (d: Record<string, any>) => number | null | undefined, 
         yAccessor: (d: Record<string, any>) => number | null | undefined
     ): PathPrimitive {
@@ -428,7 +432,7 @@ export class PathPrimitive extends Primitive {
         return this;
     }
 
-    render(transitionDuration = 0, ease?: EasingFunction): ElementOrTransition {
+    public render(transitionDuration = 0, ease?: EasingFunction): ElementOrTransition {
         const element = this.getElementWithTransition(
             this.element,
             transitionDuration,
@@ -488,7 +492,7 @@ export class ContourPrimitive extends Primitive {
         this.yRange = [];
     }
 
-    _calculateContours(
+    private calculateContours(
         fValues: number[], 
         xRange: number[], 
         yRange: number[], 
@@ -503,7 +507,7 @@ export class ContourPrimitive extends Primitive {
             .thresholds(thresholds)(fValues);
     }
 
-    _createPathGenerator(xRange: number[], yRange: number[]) {
+    private createPathGenerator(xRange: number[], yRange: number[]) {
         const resolutionX = xRange.length;
         const resolutionY = yRange.length;
         const domainX = d3.extent<number>(xRange) as [number, number];
@@ -532,21 +536,21 @@ export class ContourPrimitive extends Primitive {
         );
     }
 
-    setData(fValues: number[], xRange: number[], yRange: number[]) {
+    public setData(fValues: number[], xRange: number[], yRange: number[]) {
         this.fValues = fValues;
         this.xRange = xRange;
         this.yRange = yRange;
         return this;
     }
 
-    render(transitionDuration = 0, ease?: EasingFunction) {
-        const contours = this._calculateContours(
+    public render(transitionDuration = 0, ease?: EasingFunction) {
+        const contours = this.calculateContours(
             this.fValues,
             this.xRange,
             this.yRange,
             this.options.thresholds
         );
-        const pathGenerator = this._createPathGenerator(
+        const pathGenerator = this.createPathGenerator(
             this.xRange,
             this.yRange
         );
@@ -581,44 +585,64 @@ export class ContourPrimitive extends Primitive {
     }
 }
 
+export interface ImagePrimitiveOptions {
+    width?: number | null,
+    coords?: [number, number] | null,
+    useCornerCoords?: boolean,
+    preserveAspectRatio?: string
+}
+
 export class ImagePrimitive extends Primitive {
-    constructor(manager, element, options) {
+
+    declare options: Required<PrimitiveConfig> & Required<ImagePrimitiveOptions>;
+
+    width: number | null;
+    coords: [number, number] | null;
+    useCornerCoords: boolean;
+    preserveAspectRatio: string;
+    
+    href!: string;
+    naturalWidth!: number;
+    naturalHeight!: number;
+    aspectRatio!: number;
+
+    isLoading: boolean;
+    isLoaded: boolean;
+    loadPromise!: Promise<unknown>;
+
+    constructor(
+            manager: PrimitiveManager, 
+            element: Element, 
+            options: Required<PrimitiveConfig> & Required<ImagePrimitiveOptions>
+        ) {
         super(manager, element, options);
-        this.type = 'image';
-        this.href = null;
 
-        this.naturalWidth = null;
-        this.naturalHeight = null;
-        this.aspectRatio = null;
-
-        this.useCornerCoords = options.useCornerCoords || false;
-        this.preserveAspectRatio =
-            options.preserveAspectRatio || 'xMidYMid meet';
+        this.useCornerCoords = options.useCornerCoords;
+        this.preserveAspectRatio = options.preserveAspectRatio;
 
         this.isLoaded = false;
         this.isLoading = false;
-        this.loadPromise = null;
 
-        this.coords = options.coords || null;
-        this.width = options.width || null;
+        this.width = options.width;
+        this.coords = options.coords;
     }
 
-    setSource(href) {
+    public setSource(href: string): ImagePrimitive {
         this.href = href;
         return this;
     }
 
-    setCoords(coords) {
+    public setCoords(coords: [number, number]): ImagePrimitive {
         this.coords = coords;
         return this;
     }
 
-    setWidth(width) {
+    public setWidth(width: number): ImagePrimitive {
         this.width = width;
         return this;
     }
 
-    loadImage(href) {
+    public loadImage(href: string): Promise<unknown> {
         if (this.isLoading || this.isLoaded) {
             return this.loadPromise;
         }
@@ -638,14 +662,6 @@ export class ImagePrimitive extends Primitive {
 
                 this.setSource(href).render();
 
-                // Call onLoad callback if provided
-                if (this.options.onLoad) {
-                    this.options.onLoad(this, {
-                        naturalWidth: this.naturalWidth,
-                        naturalHeight: this.naturalHeight,
-                    });
-                }
-
                 resolve({
                     naturalWidth: this.naturalWidth,
                     naturalHeight: this.naturalHeight,
@@ -655,12 +671,6 @@ export class ImagePrimitive extends Primitive {
             tempImg.onerror = (error) => {
                 this.isLoading = false;
                 console.error('Failed to load image:', href, error);
-
-                // Call onError callback if provided
-                if (this.options.onError) {
-                    this.options.onError(error);
-                }
-
                 reject(error);
             };
         });
@@ -668,7 +678,7 @@ export class ImagePrimitive extends Primitive {
         return this.loadPromise;
     }
 
-    _calculateDimensions() {
+    private calculateDimensions(): {width: number, height: number} {
         if (!this.naturalWidth || !this.naturalHeight) {
             return { width: 0, height: 0 };
         }
@@ -688,8 +698,8 @@ export class ImagePrimitive extends Primitive {
         return { width, height };
     }
 
-    _calculatePosition() {
-        const { width, height } = this._calculateDimensions();
+    private calculatePosition(): {x: number, y: number, width: number, height: number} {
+        const { width, height } = this.calculateDimensions();
         let x, y;
 
         if (this.coords) {
@@ -717,19 +727,19 @@ export class ImagePrimitive extends Primitive {
         return { x, y, width, height };
     }
 
-    render(transitionDuration = 0, ease = null) {
+    public render(transitionDuration = 0, ease?: EasingFunction): ElementOrTransition | null {
         // Only update if image is loaded
         if (!this.isLoaded || !this.naturalWidth || !this.naturalHeight) {
             return null;
         }
 
-        const { x, y, width, height } = this._calculatePosition();
+        const { x, y, width, height } = this.calculatePosition();
 
         const element = this.getElementWithTransition(
             this.element,
             transitionDuration,
             ease
-        );
+        ) as any;
 
         return element
             .attr('x', x)
@@ -740,12 +750,11 @@ export class ImagePrimitive extends Primitive {
             .attr('preserveAspectRatio', this.options.preserveAspectRatio);
     }
 
-    isReady() {
+    public isReady(): boolean {
         return this.isLoaded;
     }
 
-    // Method to wait for image to load
-    whenReady() {
+    public whenReady(): Promise<unknown> {
         return this.loadPromise || Promise.resolve();
     }
 }
