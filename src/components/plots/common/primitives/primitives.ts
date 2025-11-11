@@ -760,30 +760,40 @@ export class ImagePrimitive extends Primitive {
 }
 
 export class BatchPrimitive extends Primitive {
-    constructor(manager, element, options) {
+
+    dataPoints: Record<string, any>[];
+
+    xAccessor!: (d: Record<string, any>) => number | null | undefined;
+    yAccessor!: (d: Record<string, any>) => number | null | undefined;
+    keyAccessor!: (d: Record<string, any>, i: number) => number;
+
+    elementSelection: d3.Selection<null, unknown, null, undefined>;
+
+    constructor(
+        manager: PrimitiveManager, 
+        element: Element, 
+        options: Required<PrimitiveConfig>
+    ) {
         super(manager, element, options);
-        this.dataArray = null;
-        this.xAccessor = null;
-        this.yAccessor = null;
-        this.keyAccessor = null;
+        this.dataPoints = [];
         this.elementSelection = d3.select(null);
     }
 
-    setData(dataArray, keyAccessor = (d, i) => i) {
-        this.dataArray = dataArray;
+    public setData(dataPoints: Record<string, any>[], keyAccessor = (d: Record<string, any>, i: number) => i): BatchPrimitive {
+        this.dataPoints = dataPoints;
         this.keyAccessor = keyAccessor;
         return this;
     }
 
-    _performDataJoin(elementType, transitionDuration = 0, ease = null) {
-        if (!this.dataArray) {
+    protected performDataJoin(elementType: SVGElementType, transitionDuration = 0, ease?: EasingFunction): d3.Selection<any, unknown, null, undefined> {
+        if (!this.dataPoints) {
             this.elementSelection = d3.select(null);
             return d3.select(null);
         }
 
         const selection = this.element
-            .selectAll(`.${this.options.className}`)
-            .data(this.dataArray, this.keyAccessor);
+            .selectAll<d3.BaseType, Record<string, any>>(`.${this.options.className}`)
+            .data(this.dataPoints, this.keyAccessor);
 
         selection.exit().remove();
         const enter = selection.enter().append(elementType);
@@ -794,12 +804,12 @@ export class BatchPrimitive extends Primitive {
         return this.getElementWithTransition(merged, transitionDuration, ease);
     }
 
-    render(transitionDuration = 0) {
+    public render(transitionDuration = 0) {
         // To be implemented by subclasses
         throw new Error('apply method must be implemented by subclass');
     }
 
-    remove() {
+    public remove(): void {
         this.element.selectAll('*').remove();
         if (this.updateFunc) {
             const index = this.manager.BasePlot.updateFunctions.indexOf(
@@ -836,13 +846,13 @@ export class BatchPointsPrimitive extends BatchPrimitive {
         return this;
     }
 
-    render(transitionDuration = 0, ease = null) {
-        const finalSelection = this._performDataJoin(
+    render(transitionDuration = 0, ease?: EasingFunction) {
+        const finalSelection = this.performDataJoin(
             'path',
             transitionDuration,
             ease
         );
-        if (!this.dataArray || finalSelection.empty()) return;
+        if (!this.dataPoints || finalSelection.empty()) return;
 
         const symbolGenerator = d3
             .symbol()
@@ -882,13 +892,13 @@ export class BatchLinesPrimitive extends BatchPrimitive {
         return this;
     }
 
-    render(transitionDuration = 0, ease = null) {
-        const finalSelection = this._performDataJoin(
+    render(transitionDuration = 0, ease?: EasingFunction) {
+        const finalSelection = this.performDataJoin(
             'line',
             transitionDuration,
             ease
         );
-        if (!this.dataArray || finalSelection.empty()) return;
+        if (!this.dataPoints || finalSelection.empty()) return;
 
         // Add arrow markers similar to addLine
         let markerStart = null;
@@ -943,13 +953,13 @@ export class BatchRectanglesPrimitive extends BatchPrimitive {
         return this;
     }
 
-    render(transitionDuration = 0, ease = null) {
-        const finalSelection = this._performDataJoin(
+    render(transitionDuration = 0, ease?: EasingFunction) {
+        const finalSelection = this.performDataJoin(
             'rect',
             transitionDuration,
             ease
         );
-        if (!this.dataArray || finalSelection.empty()) return;
+        if (!this.dataPoints || finalSelection.empty()) return;
 
         return finalSelection
             .attr('fill', this.options.fill)
@@ -1006,13 +1016,13 @@ export class BatchTextPrimitive extends BatchPrimitive {
         return this;
     }
 
-    render(transitionDuration = 0, ease = null) {
-        const finalSelection = this._performDataJoin(
+    render(transitionDuration = 0, ease?: EasingFunction) {
+        const finalSelection = this.performDataJoin(
             'text',
             transitionDuration,
             ease
         );
-        if (!this.dataArray || finalSelection.empty()) return;
+        if (!this.dataPoints || finalSelection.empty()) return;
 
         return finalSelection
             .text((d) => (this.textAccessor ? this.textAccessor(d) : d))
@@ -1037,20 +1047,21 @@ export class BatchTextPrimitive extends BatchPrimitive {
     }
 }
 
+
+type SVGElementType = 'path' | 'line' | 'rect' | 'text' | 'image' | 'g';
+export type PrimitiveInfo = { isBatch: boolean; svgElementType: SVGElementType}
 type PrimitiveConstructor = new (manager: any, element: any, options: any) => Primitive;
 
-export type PrimitiveInfo = { isBatch: boolean; htmlElementType: string }
-
 export const PRIMITIVE_LOOKUP = new Map<PrimitiveConstructor, PrimitiveInfo>([
-    [PointPrimitive, { isBatch: false, htmlElementType: 'path' }],
-    [LinePrimitive, { isBatch: false, htmlElementType: 'line' }],
-    [RectanglePrimitive, { isBatch: false, htmlElementType: 'rect' }],
-    [TextPrimitive, { isBatch: false, htmlElementType: 'text' }],
-    [PathPrimitive, { isBatch: false, htmlElementType: 'path' }],
-    [ContourPrimitive, { isBatch: false, htmlElementType: 'g' }],
-    [ImagePrimitive, { isBatch: false, htmlElementType: 'image' }],
-    [BatchPointsPrimitive, { isBatch: true, htmlElementType: 'g' }],
-    [BatchLinesPrimitive, { isBatch: true, htmlElementType: 'g' }],
-    [BatchRectanglesPrimitive, { isBatch: true, htmlElementType: 'g' }],
-    [BatchTextPrimitive, { isBatch: true, htmlElementType: 'g' }],
+    [PointPrimitive, { isBatch: false, svgElementType: 'path'}],
+    [LinePrimitive, { isBatch: false, svgElementType: 'line' }],
+    [RectanglePrimitive, { isBatch: false, svgElementType: 'rect' }],
+    [TextPrimitive, { isBatch: false, svgElementType: 'text' }],
+    [PathPrimitive, { isBatch: false, svgElementType: 'path' }],
+    [ContourPrimitive, { isBatch: false, svgElementType: 'g' }],
+    [ImagePrimitive, { isBatch: false, svgElementType: 'image' }],
+    [BatchPointsPrimitive, { isBatch: true, svgElementType: 'g' }],
+    [BatchLinesPrimitive, { isBatch: true, svgElementType: 'g' }],
+    [BatchRectanglesPrimitive, { isBatch: true, svgElementType: 'g' }],
+    [BatchTextPrimitive, { isBatch: true, svgElementType: 'g' }],
 ]);

@@ -83,7 +83,7 @@ class PrimitiveManager {
 
     private addPrimitive<T extends new (...args: any[]) => Primitive>(
         primitiveClass: T,
-        config: any
+        config: Partial<ConstructorParameters<T>[2]>
     ): InstanceType<T> {
         const primitiveInfo = PRIMITIVE_LOOKUP.get(primitiveClass);
         if (!primitiveInfo) {
@@ -94,7 +94,7 @@ class PrimitiveManager {
             ...DEFAULT_PRIMITIVE_CONFIG,
             className: `primitive-${primitiveClass.name.replace('Primitive', '').toLowerCase()}`,
             ...config,
-        };
+        } as ConstructorParameters<T>[2];
 
         const layer = this.getLayer(options.layerName);
         const element = this.createSvgElement(primitiveClass, layer, options, primitiveInfo);
@@ -110,7 +110,7 @@ class PrimitiveManager {
     private createSvgElement<T extends new (...args: any[]) => Primitive>(
         primitiveClass: T, 
         layer: Layer, 
-        options: any,
+        options: ConstructorParameters<T>[2],
         primitiveInfo: PrimitiveInfo
     ): d3.Selection<d3.BaseType, unknown, null, undefined> {
         const isBatch = primitiveInfo.isBatch;
@@ -121,7 +121,7 @@ class PrimitiveManager {
         const elementType =
             primitiveClass instanceof TextPrimitive && options.latex
                 ? 'foreignObject'
-                : primitiveInfo.htmlElementType;
+                : primitiveInfo.svgElementType;
         const element = layer.append(elementType);
 
         element
@@ -132,7 +132,7 @@ class PrimitiveManager {
             element.attr('data-id', options.dataId);
         }
 
-        return element;
+        return element as unknown as d3.Selection<d3.BaseType, unknown, null, undefined>;
     }
 
     addPoint(x: number, y: number, options: PointPrimitiveOptions & PrimitiveConfig = {}): PointPrimitive {
@@ -312,7 +312,7 @@ class PrimitiveManager {
         return image;
     }
 
-    addPoints(dataArray, xAccessor, yAccessor, options = {}) {
+    addPoints(dataPoints, xAccessor, yAccessor, options = {}) {
         options = {
             className: 'primitive-batch-points',
             size: 64,
@@ -327,7 +327,7 @@ class PrimitiveManager {
         const points = this.addPrimitive(BatchPointsPrimitive, options);
 
         points
-            .setData(dataArray, options.keyAccessor)
+            .setData(dataPoints, options.keyAccessor)
             .setCoordinateAccessors(xAccessor, yAccessor)
             .render();
 
@@ -341,7 +341,7 @@ class PrimitiveManager {
     }
 
     addLines(
-        dataArray,
+        dataPoints,
         x1Accessor,
         y1Accessor,
         x2Accessor,
@@ -360,7 +360,7 @@ class PrimitiveManager {
         const lines = this.addPrimitive(BatchLinesPrimitive, options);
 
         lines
-            .setData(dataArray, options.keyAccessor)
+            .setData(dataPoints, options.keyAccessor)
             .setCoordinateAccessors(
                 x1Accessor,
                 y1Accessor,
@@ -379,7 +379,7 @@ class PrimitiveManager {
     }
 
     addRectangles(
-        dataArray,
+        dataPoints,
         x1Accessor,
         y1Accessor,
         x2Accessor,
@@ -398,7 +398,7 @@ class PrimitiveManager {
         const rectangles = this.addPrimitive(BatchRectanglesPrimitive, options);
 
         rectangles
-            .setData(dataArray, options.keyAccessor)
+            .setData(dataPoints, options.keyAccessor)
             .setCoordinateAccessors(
                 x1Accessor,
                 y1Accessor,
@@ -416,7 +416,7 @@ class PrimitiveManager {
         return rectangles;
     }
 
-    addTexts(dataArray, xAccessor, yAccessor, textAccessor, options = {}) {
+    addTexts(dataPoints, xAccessor, yAccessor, textAccessor, options = {}) {
         options = {
             className: 'primitive-batch-text',
             fontSize: 12,
@@ -432,7 +432,7 @@ class PrimitiveManager {
         const texts = this.addPrimitive(BatchTextPrimitive, options);
 
         texts
-            .setData(dataArray, options.keyAccessor)
+            .setData(dataPoints, options.keyAccessor)
             .setCoordinateAccessors(xAccessor, yAccessor)
             .setTextAccessor(textAccessor);
 
