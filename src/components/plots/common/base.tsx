@@ -50,7 +50,7 @@ interface PrimaryBasePlotProps {
     domainY?: [number, number];
 }
 
-type BasePlotProps = PrimaryBasePlotProps & PlotConfig;
+export type BasePlotProps = PrimaryBasePlotProps & PlotConfig;
 
 export function getPlotConfig(
     config?: Partial<PlotConfig>
@@ -141,7 +141,8 @@ class BasePlot extends Component<BasePlotProps> {
     }
 
     shouldInitializeChart(): boolean {
-        return this.props.data !== undefined && this.props.data.length > 0;
+        // return this.props.data !== undefined && this.props.data.length > 0;
+        return true;
     }
 
     initializeChart(): void {
@@ -215,36 +216,43 @@ class BasePlot extends Component<BasePlotProps> {
             this.props.data as Record<string, any>[]
         );
 
+        let domainX, domainY;
+
         // x domain configuration
         if (this.props.domainX) {
-            this.domain.x = this.props.domainX;
+            domainX = this.props.domainX;
         } else if (this.props.xClass) {
             const xClass = this.props.xClass;
             const paddingX = this.config.scaleConfig.logX
                 ? 0
                 : this.config.domainConfig.paddingX;
-            this.domain.x = this.domainManager.getDomain(
+            domainX = this.domainManager.getDomain(
                 (d) => d[xClass],
                 paddingX
             );
         } else {
-            this.domain.x = this.config.domainConfig.defaultDomainX;
+            domainX = this.config.domainConfig.defaultDomainX;
         }
 
         // y domain configuration
         if (this.props.domainY) {
-            this.domain.y = this.props.domainY;
+            domainY = this.props.domainY;
         } else if (this.props.yClass) {
             const yClass = this.props.yClass;
             const paddingY = this.config.scaleConfig.logY
                 ? 0
                 : this.config.domainConfig.paddingY;
-            this.domain.y = this.domainManager.getDomain(
+            domainY = this.domainManager.getDomain(
                 (d) => d[yClass],
                 paddingY
             );
         } else {
-            this.domain.y = this.config.domainConfig.defaultDomainY;
+            domainY = this.config.domainConfig.defaultDomainY;
+        }
+
+        this.domain = {
+            x: domainX,
+            y: domainY
         }
 
         this.onSetupDomain();
@@ -252,22 +260,22 @@ class BasePlot extends Component<BasePlotProps> {
 
     setupScales(): void {
         this.scaleManager = new ScaleManager(this.config.colorConfig);
-
-        this.scale.x = this.scaleManager.getScale(
-            this.domain.x,
-            [0, this.plotWidth],
-            this.config.scaleConfig.logX,
-            this.config.scaleConfig.formatNiceX
-        );
-
-        this.scale.y = this.scaleManager.getScale(
-            this.domain.y,
-            [this.plotHeight, 0],
-            this.config.scaleConfig.logY,
-            this.config.scaleConfig.formatNiceY
-        );
-
-        this.scale.color = this.scaleManager.getColorScale();
+        
+        this.scale = {
+            x: this.scaleManager.getScale(
+                this.domain.x,
+                [0, this.plotWidth],
+                this.config.scaleConfig.logX,
+                this.config.scaleConfig.formatNiceX
+            ),
+            y: this.scaleManager.getScale(
+                this.domain.y,
+                [this.plotHeight, 0],
+                this.config.scaleConfig.logY,
+                this.config.scaleConfig.formatNiceY
+            ),
+            color: this.scaleManager.getColorScale()
+        };
 
         this.onSetupScales();
     }

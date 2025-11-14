@@ -3,7 +3,7 @@ import * as d3 from 'd3';
 import PrimitiveManager from '@/components/plots/common/primitives/primitive-manager';
 import type BasePlot from '@/components/plots/common/base';
 import { isContinuousScale } from '@/components/plots/common/scale-manager';
-import { PrimitiveConfig } from '@/components/plots/common/config';
+import { PrimitiveConfig, BatchPrimitiveConfig, DataDrivenValue } from '@/components/plots/common/config';
 import { CoordinateSystem } from '@/components/plots/common/types';
 import { renderKatex } from '@/components/plots/common/utils';
 
@@ -14,13 +14,14 @@ type EasingFunction = ((t: number) => number);
 export type CoordinateAccessor = (d: Record<string, any>) => number | null | undefined;
 
 
-export class Primitive {
+export class Primitive<TConfig extends PrimitiveConfig<any, any, any, any> = PrimitiveConfig> {
     updateFunc: (() => void) | null;
+    declare options: Required<TConfig>;
 
     constructor(
         protected readonly manager: PrimitiveManager, 
         protected readonly element: Element, 
-        public options: Required<PrimitiveConfig>
+        options: Required<TConfig>
     ) {
         this.options = options;
         this.updateFunc = null;
@@ -760,7 +761,7 @@ export class ImagePrimitive extends Primitive {
     }
 }
 
-export class BatchPrimitive extends Primitive {
+export class BatchPrimitive extends Primitive<BatchPrimitiveConfig> {
 
     dataPoints: Record<string, any>[];
 
@@ -773,7 +774,7 @@ export class BatchPrimitive extends Primitive {
     constructor(
         manager: PrimitiveManager, 
         element: Element, 
-        options: Required<PrimitiveConfig>
+        options: Required<BatchPrimitiveConfig>
     ) {
         super(manager, element, options);
         this.dataPoints = [];
@@ -790,7 +791,7 @@ export class BatchPrimitive extends Primitive {
 		elementType: SVGElementType,
 		transitionDuration = 0,
 		ease?: EasingFunction
-	): d3.Selection<SVGPathElement | SVGLineElement | SVGRectElement | SVGTextElement | SVGImageElement | SVGGElement, Record<string, any>, d3.BaseType, unknown> | d3.Selection<null, unknown, null, undefined> | d3.Transition<SVGPathElement | SVGLineElement | SVGRectElement | SVGTextElement | SVGImageElement | SVGGElement, Record<string, any>, d3.BaseType, unknown> {
+	): d3.Selection<SVGPathElement | SVGLineElement | SVGRectElement | SVGTextElement | SVGImageElement | SVGGElement, Record<string, any>, d3.BaseType, unknown> | d3.Transition<SVGPathElement | SVGLineElement | SVGRectElement | SVGTextElement | SVGImageElement | SVGGElement, Record<string, any>, d3.BaseType, unknown> | d3.Selection<null, unknown, null, undefined>  {
         if (!this.dataPoints) {
             this.elementSelection = d3.select(null);
             return d3.select(null);
@@ -828,41 +829,37 @@ export class BatchPrimitive extends Primitive {
 }
 
 export interface BatchPointsPrimitiveOptions {
-    size?: number | ((d: Record<string, any>) => number)
-    symbolType?: d3.SymbolType | ((d: Record<string, any>) => d3.SymbolType)
-    fill?: string | ((d: Record<string, any>) => string)
-    stroke?: string | ((d: Record<string, any>) => string)
-    strokeWidth?: number | ((d: Record<string, any>) => number)
-    opacity?: number | ((d: Record<string, any>) => number)
-    keyAccessor?: (d: Record<string, any>, i: number) => number
+    size?: DataDrivenValue<number>;
+    symbolType?: DataDrivenValue<d3.SymbolType>;
+    keyAccessor?: (d: Record<string, any>, i: number) => number;
 }
 
 export class BatchPointsPrimitive extends BatchPrimitive {
 
-    size: number | ((d: Record<string, any>) => number);
-    symbolType: d3.SymbolType | ((d: Record<string, any>) => d3.SymbolType);
+    size: DataDrivenValue<number>;
+    symbolType: DataDrivenValue<d3.SymbolType>;
 
     xAccessor!: CoordinateAccessor;
     yAccessor!: CoordinateAccessor;
-
-    declare options: Required<PrimitiveConfig> & Required<BatchPointsPrimitiveOptions>;
+ 
+    declare options: Required<BatchPrimitiveConfig> & Required<BatchPointsPrimitiveOptions>;
 
     constructor(
         manager: PrimitiveManager, 
         element: Element, 
-        options: Required<PrimitiveConfig> & Required<BatchPointsPrimitiveOptions>
+        options: Required<BatchPrimitiveConfig> & Required<BatchPointsPrimitiveOptions>
     ) {
         super(manager, element, options);
         this.size = options.size;
         this.symbolType = options.symbolType;
     }
 
-    setSize(size: number | ((d: Record<string, any>) => number)): this {
+    setSize(size: DataDrivenValue<number>): this {
         this.size = size;
         return this;
     }
 
-    setSymbolType(symbolType: d3.SymbolType | ((d: Record<string, any>) => d3.SymbolType)): this {
+    setSymbolType(symbolType: DataDrivenValue<d3.SymbolType>): this {
         this.symbolType = symbolType;
         return this;
     }
@@ -883,6 +880,8 @@ export class BatchPointsPrimitive extends BatchPrimitive {
         ) as any;
 
         if (!this.dataPoints || finalSelection.empty()) return;
+
+        // console.log(this.dataPoints); // shows correct datapoints
 
         const symbolGenerator = d3.symbol();
         
@@ -908,6 +907,8 @@ export class BatchPointsPrimitive extends BatchPrimitive {
             .attr('transform', (d: Record<string, any>) => {
                 const x = this.xAccessor(d);
                 const y = this.yAccessor(d);
+
+                console.log(x, y);
                 
                 // Handle null/undefined coordinates
                 if (x == null || y == null || isNaN(x) || isNaN(y)) {
@@ -937,12 +938,12 @@ export class BatchLinesPrimitive extends BatchPrimitive {
     x2Accessor!: CoordinateAccessor;
     y2Accessor!: CoordinateAccessor;
 
-    declare options: Required<PrimitiveConfig> & Required<BatchLinesPrimitiveOptions>;
+    declare options: Required<BatchPrimitiveConfig> & Required<BatchLinesPrimitiveOptions>;
 
     constructor(
         manager: PrimitiveManager,
         element: Element,
-        options: Required<PrimitiveConfig> & Required<BatchLinesPrimitiveOptions>
+        options: Required<BatchPrimitiveConfig> & Required<BatchLinesPrimitiveOptions>
     ) {
         super(manager, element, options);
     }
@@ -970,19 +971,24 @@ export class BatchLinesPrimitive extends BatchPrimitive {
         if (!this.dataPoints || finalSelection.empty()) return;
 
         // Add arrow markers similar to addLine
+        // Note: Arrow markers only support constant colors, not data-driven functions
         let markerStart: string | null = null;
         let markerEnd: string | null = null;
 
+        const strokeColor = typeof this.options.stroke === 'function' 
+            ? 'currentColor' // Fallback for data-driven stroke
+            : this.options.stroke;
+
         if (this.options.arrow === 'start' || this.options.arrow === 'both') {
             const markerId = this.manager.createArrowMarker(
-                this.options.stroke,
+                strokeColor,
                 'start'
             );
             markerStart = `url(#${markerId})`;
         }
         if (this.options.arrow === 'end' || this.options.arrow === 'both') {
             const markerId = this.manager.createArrowMarker(
-                this.options.stroke,
+                strokeColor,
                 'end'
             );
             markerEnd = `url(#${markerId})`;
@@ -1042,12 +1048,12 @@ export class BatchRectanglesPrimitive extends BatchPrimitive {
     x2Accessor!: CoordinateAccessor;
     y2Accessor!: CoordinateAccessor;
 
-    declare options: Required<PrimitiveConfig> & Required<BatchRectanglesPrimitiveOptions>;
+    declare options: Required<BatchPrimitiveConfig> & Required<BatchRectanglesPrimitiveOptions>;
 
     constructor(
         manager: PrimitiveManager,
         element: Element,
-        options: Required<PrimitiveConfig> & Required<BatchRectanglesPrimitiveOptions>
+        options: Required<BatchPrimitiveConfig> & Required<BatchRectanglesPrimitiveOptions>
     ) {
         super(manager, element, options);
         if (options.x1Accessor) this.x1Accessor = options.x1Accessor;
@@ -1149,12 +1155,12 @@ export class BatchTextPrimitive extends BatchPrimitive {
     textAccessor?: (d: Record<string, any>) => string;
     angleAccessor?: (d: Record<string, any>) => number | null | undefined;
 
-    declare options: Required<PrimitiveConfig> & Required<BatchTextPrimitiveOptions>;
+    declare options: Required<BatchPrimitiveConfig> & Required<BatchTextPrimitiveOptions>;
 
     constructor(
         manager: PrimitiveManager,
         element: Element,
-        options: Required<PrimitiveConfig> & Required<BatchTextPrimitiveOptions>
+        options: Required<BatchPrimitiveConfig> & Required<BatchTextPrimitiveOptions>
     ) {
         super(manager, element, options);
         if (options.xAccessor) this.xAccessor = options.xAccessor;
@@ -1234,7 +1240,7 @@ export class BatchTextPrimitive extends BatchPrimitive {
 
 type SVGElementType = 'path' | 'line' | 'rect' | 'text' | 'image' | 'g';
 export type PrimitiveInfo = { isBatch: boolean; svgElementType: SVGElementType}
-type PrimitiveConstructor = new (manager: any, element: any, options: any) => Primitive;
+type PrimitiveConstructor = new (manager: any, element: any, options: any) => Primitive<any>;
 
 export const PRIMITIVE_LOOKUP = new Map<PrimitiveConstructor, PrimitiveInfo>([
     [PointPrimitive, { isBatch: false, svgElementType: 'path'}],

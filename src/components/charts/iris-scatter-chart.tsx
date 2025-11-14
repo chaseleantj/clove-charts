@@ -40,7 +40,6 @@ export default function IrisScatterChart() {
                     'https://raw.githubusercontent.com/uiuc-cse/data-fa14/gh-pages/data/iris.csv',
                     d3.autoType
                 ).then((data) => {
-                    console.log(data);
                     setIrisData(data as IrisData[]);
                 });
             } catch (error) {

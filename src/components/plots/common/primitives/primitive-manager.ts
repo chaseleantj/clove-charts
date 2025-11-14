@@ -29,7 +29,7 @@ import {
     PRIMITIVE_LOOKUP,
 } from '@/components/plots/common/primitives/primitives';
 import type { CoordinateAccessor } from '@/components/plots/common/primitives/primitives';
-import { DEFAULT_PRIMITIVE_CONFIG, PrimitiveConfig } from '@/components/plots/common/config';
+import { DEFAULT_PRIMITIVE_CONFIG, PrimitiveConfig, BatchPrimitiveConfig } from '@/components/plots/common/config';
 import { CoordinateSystem } from '@/components/plots/common/types';
 
 type Layer = d3.Selection<SVGGElement, unknown, null, undefined>;
@@ -42,7 +42,7 @@ interface LayerObject {
 
 class PrimitiveManager {
 
-    primitives: Map<string, Primitive>;
+    primitives: Map<string, Primitive<any>>;
     layerObjectMap: Map<string, LayerObject>;
     defaultLayer: d3.Selection<SVGGElement, unknown, null, undefined>;
 
@@ -86,7 +86,7 @@ class PrimitiveManager {
         });
     }
 
-    private addPrimitive<T extends new (...args: any[]) => Primitive>(
+    private addPrimitive<T extends new (...args: any[]) => Primitive<any>>(
         primitiveClass: T,
         config: Partial<ConstructorParameters<T>[2]>
     ): InstanceType<T> {
@@ -112,7 +112,7 @@ class PrimitiveManager {
         return primitive as InstanceType<T>;
     }
 
-    private createSvgElement<T extends new (...args: any[]) => Primitive>(
+    private createSvgElement<T extends new (...args: any[]) => Primitive<any>>(
         primitiveClass: T, 
         layer: Layer, 
         options: ConstructorParameters<T>[2],
@@ -321,7 +321,7 @@ class PrimitiveManager {
         dataPoints: Record<string, any>[], 
         xAccessor: CoordinateAccessor, 
         yAccessor: CoordinateAccessor, 
-        options: PrimitiveConfig & BatchPointsPrimitiveOptions = {}
+        options: BatchPrimitiveConfig & BatchPointsPrimitiveOptions = {}
     ): BatchPointsPrimitive {
         options = {
             size: 64,
@@ -354,7 +354,7 @@ class PrimitiveManager {
         y1Accessor: CoordinateAccessor,
         x2Accessor: CoordinateAccessor,
         y2Accessor: CoordinateAccessor,
-        options: PrimitiveConfig & BatchLinesPrimitiveOptions = {}
+        options: BatchPrimitiveConfig & BatchLinesPrimitiveOptions = {}
     ): BatchLinesPrimitive {
         options = {
             className: 'primitive-batch-lines',
@@ -392,7 +392,7 @@ class PrimitiveManager {
         y1Accessor: CoordinateAccessor,
         x2Accessor: CoordinateAccessor,
         y2Accessor: CoordinateAccessor,
-        options: PrimitiveConfig & BatchRectanglesPrimitiveOptions = {}
+        options: BatchPrimitiveConfig & BatchRectanglesPrimitiveOptions = {}
     ): BatchRectanglesPrimitive {
         options = {
             className: 'primitive-batch-rectangles',
@@ -429,7 +429,7 @@ class PrimitiveManager {
         xAccessor: CoordinateAccessor,
         yAccessor: CoordinateAccessor,
         textAccessor: (d: Record<string, any>) => string,
-        options: PrimitiveConfig & BatchTextPrimitiveOptions = {}
+        options: BatchPrimitiveConfig & BatchTextPrimitiveOptions = {}
     ): BatchTextPrimitive {
         options = {
             className: 'primitive-batch-text',
@@ -492,7 +492,7 @@ class PrimitiveManager {
         return markerId;
     }
 
-    getPrimitive(id: string): Primitive | undefined {
+    getPrimitive(id: string): Primitive<any> | undefined {
         return this.primitives.get(id);
     }
 

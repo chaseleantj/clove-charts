@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { RequiredAxisConfig } from '@/components/plots/common/config';
+import { AxisConfig } from '@/components/plots/common/config';
 
 class AxisManager {
     x!: d3.Selection<SVGGElement, unknown, null, undefined>;
@@ -15,7 +15,7 @@ class AxisManager {
         >,
         private readonly plotWidth: number,
         private readonly plotHeight: number,
-        private readonly axisConfig: RequiredAxisConfig
+        private readonly axisConfig: Required<AxisConfig>
     ) {
         this.plotArea = plotArea;
         this.plotWidth = plotWidth;

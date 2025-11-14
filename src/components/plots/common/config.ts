@@ -48,7 +48,7 @@ export interface AxisConfig {
     tickCount?: number;
     tickSize?: number;
     tickFontSize?: number;
-    tickFormat?: (domainValue: string, index: number) => string | null;
+    tickFormat?: (domainValue: string, index: number) => string;
     gridColor?: string;
 }
 
@@ -80,17 +80,31 @@ export interface ColorConfig {
     continuousColorScheme?: (t: number) => string;
 }
 
-export interface PrimitiveConfig {
-    fill?: string;
-    stroke?: string;
-    strokeWidth?: number;
+export interface PrimitiveConfig<
+    TFill = string,
+    TStroke = string,
+    TStrokeWidth = number,
+    TOpacity = number
+> {
+    fill?: TFill;
+    stroke?: TStroke;
+    strokeWidth?: TStrokeWidth;
     pointerEvents?: string;
     coordinateSystem?: CoordinateSystem;
     staticElement?: boolean;
     layerName?: string;
-    opacity?: number;
+    opacity?: TOpacity;
     className?: string;
 }
+
+export type DataDrivenValue<T> = T | ((d: Record<string, any>) => T);
+
+export type BatchPrimitiveConfig = PrimitiveConfig<
+    DataDrivenValue<string>,
+    DataDrivenValue<string>,
+    DataDrivenValue<number>,
+    DataDrivenValue<number>
+>;
 
 export interface PlotConfig {
     margin?: PlotMarginConfig;
