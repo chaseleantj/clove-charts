@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 
 import {
-    TickFormatFunction,
+    // TickFormatFunction,
     CoordinateSystem,
 } from '@/components/plots/common/types';
 
@@ -48,7 +48,7 @@ export interface AxisConfig {
     tickCount?: number;
     tickSize?: number;
     tickFontSize?: number;
-    tickFormat?: TickFormatFunction | null;
+    tickFormat?: (domainValue: string, index: number) => string | null;
     gridColor?: string;
 }
 

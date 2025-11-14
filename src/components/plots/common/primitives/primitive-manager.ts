@@ -18,12 +18,17 @@ import {
     ImagePrimitive,
     ImagePrimitiveOptions,
     BatchPointsPrimitive,
+    BatchPointsPrimitiveOptions,
     BatchLinesPrimitive,
+    BatchLinesPrimitiveOptions,
     BatchRectanglesPrimitive,
+    BatchRectanglesPrimitiveOptions,
     BatchTextPrimitive,
+    BatchTextPrimitiveOptions,
     PrimitiveInfo,
     PRIMITIVE_LOOKUP,
 } from '@/components/plots/common/primitives/primitives';
+import type { CoordinateAccessor } from '@/components/plots/common/primitives/primitives';
 import { DEFAULT_PRIMITIVE_CONFIG, PrimitiveConfig } from '@/components/plots/common/config';
 import { CoordinateSystem } from '@/components/plots/common/types';
 
@@ -312,19 +317,22 @@ class PrimitiveManager {
         return image;
     }
 
-    addPoints(dataPoints, xAccessor, yAccessor, options = {}) {
+    addPoints(
+        dataPoints: Record<string, any>[], 
+        xAccessor: CoordinateAccessor, 
+        yAccessor: CoordinateAccessor, 
+        options: PrimitiveConfig & BatchPointsPrimitiveOptions = {}
+    ): BatchPointsPrimitive {
         options = {
-            className: 'primitive-batch-points',
             size: 64,
-            // fill: DEFAULT_PRIMITIVE_CONFIG.fill,
             stroke: 'none',
             strokeWidth: 1,
             symbolType: d3.symbolCircle,
-            keyAccessor: (d, i) => i,
+            keyAccessor: (d: Record<string, any>, i: number) => i,
             ...options,
         };
 
-        const points = this.addPrimitive(BatchPointsPrimitive, options);
+        const points: BatchPointsPrimitive = this.addPrimitive(BatchPointsPrimitive, options);
 
         points
             .setData(dataPoints, options.keyAccessor)
@@ -341,23 +349,23 @@ class PrimitiveManager {
     }
 
     addLines(
-        dataPoints,
-        x1Accessor,
-        y1Accessor,
-        x2Accessor,
-        y2Accessor,
-        options = {}
-    ) {
+        dataPoints: Record<string, any>[],
+        x1Accessor: CoordinateAccessor,
+        y1Accessor: CoordinateAccessor,
+        x2Accessor: CoordinateAccessor,
+        y2Accessor: CoordinateAccessor,
+        options: PrimitiveConfig & BatchLinesPrimitiveOptions = {}
+    ): BatchLinesPrimitive {
         options = {
             className: 'primitive-batch-lines',
             // stroke: DEFAULT_PRIMITIVE_CONFIG.stroke,
             strokeWidth: 1.5,
-            keyAccessor: (d, i) => i,
+            keyAccessor: (d: Record<string, any>, i: number) => i,
             arrow: 'none',
             ...options,
         };
 
-        const lines = this.addPrimitive(BatchLinesPrimitive, options);
+        const lines: BatchLinesPrimitive = this.addPrimitive(BatchLinesPrimitive, options);
 
         lines
             .setData(dataPoints, options.keyAccessor)
@@ -379,23 +387,23 @@ class PrimitiveManager {
     }
 
     addRectangles(
-        dataPoints,
-        x1Accessor,
-        y1Accessor,
-        x2Accessor,
-        y2Accessor,
-        options = {}
-    ) {
+        dataPoints: Record<string, any>[],
+        x1Accessor: CoordinateAccessor,
+        y1Accessor: CoordinateAccessor,
+        x2Accessor: CoordinateAccessor,
+        y2Accessor: CoordinateAccessor,
+        options: PrimitiveConfig & BatchRectanglesPrimitiveOptions = {}
+    ): BatchRectanglesPrimitive {
         options = {
             className: 'primitive-batch-rectangles',
             fill: DEFAULT_PRIMITIVE_CONFIG.fill,
             stroke: 'none',
             strokeWidth: 1,
-            keyAccessor: (d, i) => i,
+            keyAccessor: (d: Record<string, any>, i: number) => i,
             ...options,
         };
 
-        const rectangles = this.addPrimitive(BatchRectanglesPrimitive, options);
+        const rectangles: BatchRectanglesPrimitive = this.addPrimitive(BatchRectanglesPrimitive, options);
 
         rectangles
             .setData(dataPoints, options.keyAccessor)
@@ -416,7 +424,13 @@ class PrimitiveManager {
         return rectangles;
     }
 
-    addTexts(dataPoints, xAccessor, yAccessor, textAccessor, options = {}) {
+    addTexts(
+        dataPoints: Record<string, any>[],
+        xAccessor: CoordinateAccessor,
+        yAccessor: CoordinateAccessor,
+        textAccessor: (d: Record<string, any>) => string,
+        options: PrimitiveConfig & BatchTextPrimitiveOptions = {}
+    ): BatchTextPrimitive {
         options = {
             className: 'primitive-batch-text',
             fontSize: 12,
@@ -424,12 +438,12 @@ class PrimitiveManager {
             fill: 'currentColor',
             anchor: 'middle',
             baseline: 'middle',
-            angleAccessor: null,
-            keyAccessor: (d, i) => i,
+            angleAccessor: undefined,
+            keyAccessor: (d: Record<string, any>, i: number) => i,
             ...options,
         };
 
-        const texts = this.addPrimitive(BatchTextPrimitive, options);
+        const texts: BatchTextPrimitive = this.addPrimitive(BatchTextPrimitive, options);
 
         texts
             .setData(dataPoints, options.keyAccessor)

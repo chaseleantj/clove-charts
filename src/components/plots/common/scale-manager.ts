@@ -1,6 +1,5 @@
 import * as d3 from 'd3';
 import { ColorConfig } from '@/components/plots/common/config';
-import { AnyDomain, AnyRange } from '@/components/plots/common/types';
 import {
     isDateTuple,
     isNumberTuple,
@@ -54,15 +53,15 @@ class ScaleManager {
     ): d3.ScaleLogarithmic<number, number>;
 
     getScale(
-        domain: AnyDomain,
-        range: AnyRange,
+        domain: string[] | [Date, Date] | [number, number],
+        range: string[] | [number, number],
         log?: boolean,
         formatNiceScales?: boolean
     ): AnyD3Scale;
 
     public getScale(
-        domain: AnyDomain,
-        range: AnyRange,
+        domain: string[] | [Date, Date] | [number, number],
+        range: string[] | [number, number],
         log = false,
         formatNiceScales = false
     ): AnyD3Scale {
@@ -109,7 +108,7 @@ class ScaleManager {
     ): d3.ScaleOrdinal<string, string>;
 
     public getColorScale(
-        domain?: AnyDomain,
+        domain?: string[] | [Date, Date] | [number, number],
         colorScheme?: readonly string[] | ((t: number) => string)
     ):
         | d3.ScaleSequential<string, never>
@@ -148,7 +147,7 @@ class ScaleManager {
 
     public setScaleDomain(
         scale: AnyD3Scale,
-        domain: AnyDomain,
+        domain: string[] | [Date, Date] | [number, number],
         formatNiceScales: boolean
     ) {
         if (isStringArray(domain)) {

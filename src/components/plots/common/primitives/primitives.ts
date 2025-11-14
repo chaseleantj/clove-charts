@@ -11,6 +11,7 @@ import { renderKatex } from '@/components/plots/common/utils';
 type Element = d3.Selection<d3.BaseType, unknown, null, undefined>;
 type ElementOrTransition = d3.Selection<d3.BaseType, unknown, null, undefined> | d3.Transition<d3.BaseType, unknown, null, undefined>;
 type EasingFunction = ((t: number) => number);
+export type CoordinateAccessor = (d: Record<string, any>) => number | null | undefined;
 
 
 export class Primitive {
@@ -39,7 +40,7 @@ export class Primitive {
     public convertX(x: number): number {
         if (this.options.coordinateSystem === CoordinateSystem.Pixel) {
             return x;
-        }
+        } 
         const scale = this.manager.BasePlot.scale.x;
         return isContinuousScale(scale) ? scale(x) : x;
     }
@@ -131,23 +132,23 @@ export class PointPrimitive extends Primitive {
         this.symbolType = options.symbolType;
     }
 
-    public setSize(size: number): PointPrimitive {
+    public setSize(size: number): this {
         this.size = size;
         return this;
     }
 
-    public setSymbolType(symbolType: d3.SymbolType): PointPrimitive {
+    public setSymbolType(symbolType: d3.SymbolType): this {
         this.symbolType = symbolType;
         return this;
     }
 
-    public setCoords(x: number, y: number): PointPrimitive {
+    public setCoords(x: number, y: number): this {
         this.x = x;
         this.y = y;
         return this;
     }
 
-    public render(transitionDuration = 0, ease?: EasingFunction): ElementOrTransition {
+    public render(transitionDuration = 0, ease?: EasingFunction) {
         // Cast to any due to TypeScript limitation: Selection and Transition both support
         // .attr() identically, but TypeScript can't properly infer overloads on union types
         const element = this.getElementWithTransition(
@@ -198,7 +199,7 @@ export class LinePrimitive extends Primitive {
         super(manager, element, options);
     }
 
-    public setCoords(x1: number, y1: number, x2: number, y2: number): LinePrimitive {
+    public setCoords(x1: number, y1: number, x2: number, y2: number): this {
         this.x1 = x1;
         this.y1 = y1;
         this.x2 = x2;
@@ -206,7 +207,7 @@ export class LinePrimitive extends Primitive {
         return this;
     }
 
-    public render(transitionDuration = 0, ease?: EasingFunction): ElementOrTransition {
+    public render(transitionDuration = 0, ease?: EasingFunction) {
         let markerStart = null;
         let markerEnd = null;
 
@@ -268,7 +269,7 @@ export class RectanglePrimitive extends Primitive {
         super(manager, element, options);
     }
 
-    public setCoords(x1: number, y1: number, x2: number, y2: number): RectanglePrimitive {
+    public setCoords(x1: number, y1: number, x2: number, y2: number): this {
         this.x1 = x1;
         this.y1 = y1;
         this.x2 = x2;
@@ -276,7 +277,7 @@ export class RectanglePrimitive extends Primitive {
         return this;
     }
 
-    public render(transitionDuration = 0, ease?: EasingFunction): ElementOrTransition {
+    public render(transitionDuration = 0, ease?: EasingFunction) {
         const element = this.getElementWithTransition(
             this.element,
             transitionDuration,
@@ -334,7 +335,7 @@ export class TextPrimitive extends Primitive {
         this.angle = options.angle;
     }
 
-    public setText(text: string): TextPrimitive {
+    public setText(text: string): this {
         this.text = text;
         if (!this.options.latex) {
             this.element.text(text);
@@ -342,18 +343,18 @@ export class TextPrimitive extends Primitive {
         return this;
     }
 
-    public setAngle(angle: number): TextPrimitive {
+    public setAngle(angle: number): this {
         this.angle = angle;
         return this;
     }
 
-    public setCoords(x: number, y: number): TextPrimitive {
+    public setCoords(x: number, y: number): this {
         this.x = x;
         this.y = y;
         return this;
     }
 
-    public render(duration = 0, ease?: EasingFunction): ElementOrTransition {
+    public render(duration = 0, ease?: EasingFunction) {
         let element = this.getElementWithTransition(
             this.element,
             duration,
@@ -405,8 +406,8 @@ export interface PathPrimitiveOptions {
 export class PathPrimitive extends Primitive {
 
     dataPoints: Record<string, any>[];
-    xAccessor!: (d: Record<string, any>) => number | null | undefined;
-    yAccessor!: (d: Record<string, any>) => number | null | undefined;
+    xAccessor!: CoordinateAccessor;
+    yAccessor!: CoordinateAccessor;
     declare options: Required<PrimitiveConfig> & Required<PathPrimitiveOptions>;
 
     constructor(
@@ -418,21 +419,21 @@ export class PathPrimitive extends Primitive {
         this.dataPoints = [];
     }
 
-    public setData(dataPoints: Record<string, any>[]): PathPrimitive {
+    public setData(dataPoints: Record<string, any>[]): this {
         this.dataPoints = dataPoints;
         return this;
     }
 
     public setCoordinateAccessors(
-        xAccessor: (d: Record<string, any>) => number | null | undefined, 
-        yAccessor: (d: Record<string, any>) => number | null | undefined
-    ): PathPrimitive {
+        xAccessor: CoordinateAccessor, 
+        yAccessor: CoordinateAccessor
+    ): this {
         this.xAccessor = xAccessor;
         this.yAccessor = yAccessor;
         return this;
     }
 
-    public render(transitionDuration = 0, ease?: EasingFunction): ElementOrTransition {
+    public render(transitionDuration = 0, ease?: EasingFunction) {
         const element = this.getElementWithTransition(
             this.element,
             transitionDuration,
@@ -507,7 +508,7 @@ export class ContourPrimitive extends Primitive {
             .thresholds(thresholds)(fValues);
     }
 
-    private createPathGenerator(xRange: number[], yRange: number[]) {
+    private createPathGenerator(xRange: number[], yRange: number[]): d3.GeoPath<any, d3.GeoPermissibleObjects> {
         const resolutionX = xRange.length;
         const resolutionY = yRange.length;
         const domainX = d3.extent<number>(xRange) as [number, number];
@@ -536,7 +537,7 @@ export class ContourPrimitive extends Primitive {
         );
     }
 
-    public setData(fValues: number[], xRange: number[], yRange: number[]) {
+    public setData(fValues: number[], xRange: number[], yRange: number[]): this {
         this.fValues = fValues;
         this.xRange = xRange;
         this.yRange = yRange;
@@ -627,17 +628,17 @@ export class ImagePrimitive extends Primitive {
         this.coords = options.coords;
     }
 
-    public setSource(href: string): ImagePrimitive {
+    public setSource(href: string): this {
         this.href = href;
         return this;
     }
 
-    public setCoords(coords: [number, number]): ImagePrimitive {
+    public setCoords(coords: [number, number]): this {
         this.coords = coords;
         return this;
     }
 
-    public setWidth(width: number): ImagePrimitive {
+    public setWidth(width: number): this {
         this.width = width;
         return this;
     }
@@ -727,7 +728,7 @@ export class ImagePrimitive extends Primitive {
         return { x, y, width, height };
     }
 
-    public render(transitionDuration = 0, ease?: EasingFunction): ElementOrTransition | null {
+    public render(transitionDuration = 0, ease?: EasingFunction) {
         // Only update if image is loaded
         if (!this.isLoaded || !this.naturalWidth || !this.naturalHeight) {
             return null;
@@ -763,11 +764,11 @@ export class BatchPrimitive extends Primitive {
 
     dataPoints: Record<string, any>[];
 
-    xAccessor!: (d: Record<string, any>) => number | null | undefined;
-    yAccessor!: (d: Record<string, any>) => number | null | undefined;
+    xAccessor!: CoordinateAccessor;
+    yAccessor!: CoordinateAccessor;
     keyAccessor!: (d: Record<string, any>, i: number) => number;
 
-    elementSelection: d3.Selection<null, unknown, null, undefined>;
+	elementSelection: d3.Selection<SVGPathElement | SVGLineElement | SVGRectElement | SVGTextElement | SVGImageElement | SVGGElement, Record<string, any>, d3.BaseType, unknown> | d3.Selection<null, unknown, null, undefined>;
 
     constructor(
         manager: PrimitiveManager, 
@@ -779,20 +780,24 @@ export class BatchPrimitive extends Primitive {
         this.elementSelection = d3.select(null);
     }
 
-    public setData(dataPoints: Record<string, any>[], keyAccessor = (d: Record<string, any>, i: number) => i): BatchPrimitive {
+    public setData(dataPoints: Record<string, any>[], keyAccessor = (d: Record<string, any>, i: number) => i): this {
         this.dataPoints = dataPoints;
         this.keyAccessor = keyAccessor;
         return this;
     }
 
-    protected performDataJoin(elementType: SVGElementType, transitionDuration = 0, ease?: EasingFunction): d3.Selection<any, unknown, null, undefined> {
+	protected performDataJoin(
+		elementType: SVGElementType,
+		transitionDuration = 0,
+		ease?: EasingFunction
+	): d3.Selection<SVGPathElement | SVGLineElement | SVGRectElement | SVGTextElement | SVGImageElement | SVGGElement, Record<string, any>, d3.BaseType, unknown> | d3.Selection<null, unknown, null, undefined> | d3.Transition<SVGPathElement | SVGLineElement | SVGRectElement | SVGTextElement | SVGImageElement | SVGGElement, Record<string, any>, d3.BaseType, unknown> {
         if (!this.dataPoints) {
             this.elementSelection = d3.select(null);
             return d3.select(null);
         }
 
-        const selection = this.element
-            .selectAll<d3.BaseType, Record<string, any>>(`.${this.options.className}`)
+		const selection = this.element
+			.selectAll<SVGPathElement | SVGLineElement | SVGRectElement | SVGTextElement | SVGImageElement | SVGGElement, Record<string, any>>(`.${this.options.className}`)
             .data(this.dataPoints, this.keyAccessor);
 
         selection.exit().remove();
@@ -801,7 +806,7 @@ export class BatchPrimitive extends Primitive {
 
         this.elementSelection = merged;
 
-        return this.getElementWithTransition(merged, transitionDuration, ease);
+		return this.getElementWithTransition(merged, transitionDuration, ease);
     }
 
     public render(transitionDuration = 0) {
@@ -822,25 +827,49 @@ export class BatchPrimitive extends Primitive {
     }
 }
 
+export interface BatchPointsPrimitiveOptions {
+    size?: number | ((d: Record<string, any>) => number)
+    symbolType?: d3.SymbolType | ((d: Record<string, any>) => d3.SymbolType)
+    fill?: string | ((d: Record<string, any>) => string)
+    stroke?: string | ((d: Record<string, any>) => string)
+    strokeWidth?: number | ((d: Record<string, any>) => number)
+    opacity?: number | ((d: Record<string, any>) => number)
+    keyAccessor?: (d: Record<string, any>, i: number) => number
+}
+
 export class BatchPointsPrimitive extends BatchPrimitive {
-    constructor(manager, element, options) {
+
+    size: number | ((d: Record<string, any>) => number);
+    symbolType: d3.SymbolType | ((d: Record<string, any>) => d3.SymbolType);
+
+    xAccessor!: CoordinateAccessor;
+    yAccessor!: CoordinateAccessor;
+
+    declare options: Required<PrimitiveConfig> & Required<BatchPointsPrimitiveOptions>;
+
+    constructor(
+        manager: PrimitiveManager, 
+        element: Element, 
+        options: Required<PrimitiveConfig> & Required<BatchPointsPrimitiveOptions>
+    ) {
         super(manager, element, options);
-        this.type = 'batch-points';
-        this.size = options.size || 64;
-        this.symbolType = options.symbolType || d3.symbolCircle;
+        this.size = options.size;
+        this.symbolType = options.symbolType;
     }
 
-    setSize(size) {
+    setSize(size: number | ((d: Record<string, any>) => number)): this {
         this.size = size;
         return this;
     }
 
-    setSymbolType(symbolType) {
+    setSymbolType(symbolType: d3.SymbolType | ((d: Record<string, any>) => d3.SymbolType)): this {
         this.symbolType = symbolType;
         return this;
     }
 
-    setCoordinateAccessors(xAccessor, yAccessor) {
+    setCoordinateAccessors(
+        xAccessor: CoordinateAccessor,
+        yAccessor: CoordinateAccessor): this {
         this.xAccessor = xAccessor;
         this.yAccessor = yAccessor;
         return this;
@@ -851,13 +880,23 @@ export class BatchPointsPrimitive extends BatchPrimitive {
             'path',
             transitionDuration,
             ease
-        );
+        ) as any;
+
         if (!this.dataPoints || finalSelection.empty()) return;
 
-        const symbolGenerator = d3
-            .symbol()
-            .type(this.symbolType)
-            .size(this.size);
+        const symbolGenerator = d3.symbol();
+        
+        if (typeof this.symbolType === 'function') {
+            symbolGenerator.type(this.symbolType as ((d: Record<string, any>) => d3.SymbolType));
+        } else {
+            symbolGenerator.type(this.symbolType as d3.SymbolType);
+        }
+        
+        if (typeof this.size === 'function') {
+            symbolGenerator.size(this.size as (d: Record<string, any>) => number);
+        } else {
+            symbolGenerator.size(this.size as number);
+        }
 
         return finalSelection
             .attr('d', symbolGenerator)
@@ -866,25 +905,54 @@ export class BatchPointsPrimitive extends BatchPrimitive {
             .attr('stroke-width', this.options.strokeWidth)
             .attr('opacity', this.options.opacity)
             .attr('class', this.options.className)
-            .attr(
-                'transform',
-                (d) =>
-                    `translate(${this.convertX(this.xAccessor(d))}, ${this.convertY(this.yAccessor(d))})`
-            );
+            .attr('transform', (d: Record<string, any>) => {
+                const x = this.xAccessor(d);
+                const y = this.yAccessor(d);
+                
+                // Handle null/undefined coordinates
+                if (x == null || y == null || isNaN(x) || isNaN(y)) {
+                    return null; // Hide invalid points
+                }
+                
+                return `translate(${this.convertX(x)}, ${this.convertY(y)})`;
+            });
     }
 }
 
+export interface BatchLinesPrimitiveOptions {
+    x1Accessor?: CoordinateAccessor;
+    y1Accessor?: CoordinateAccessor;
+    x2Accessor?: CoordinateAccessor;
+    y2Accessor?: CoordinateAccessor;
+    arrow?: 'start' | 'end' | 'both' | 'none';
+    strokeDashArray?: string;
+    strokeDashOffset?: number;
+    keyAccessor?: (d: Record<string, any>, i: number) => number;
+}
+
 export class BatchLinesPrimitive extends BatchPrimitive {
-    constructor(manager, element, options) {
+    
+    x1Accessor!: CoordinateAccessor;
+    y1Accessor!: CoordinateAccessor;
+    x2Accessor!: CoordinateAccessor;
+    y2Accessor!: CoordinateAccessor;
+
+    declare options: Required<PrimitiveConfig> & Required<BatchLinesPrimitiveOptions>;
+
+    constructor(
+        manager: PrimitiveManager,
+        element: Element,
+        options: Required<PrimitiveConfig> & Required<BatchLinesPrimitiveOptions>
+    ) {
         super(manager, element, options);
-        this.type = 'batch-lines';
-        this.x1Accessor = options.x1Accessor;
-        this.y1Accessor = options.y1Accessor;
-        this.x2Accessor = options.x2Accessor;
-        this.y2Accessor = options.y2Accessor;
     }
 
-    setCoordinateAccessors(x1Accessor, y1Accessor, x2Accessor, y2Accessor) {
+    setCoordinateAccessors(
+        x1Accessor: CoordinateAccessor,
+        y1Accessor: CoordinateAccessor,
+        x2Accessor: CoordinateAccessor,
+        y2Accessor: CoordinateAccessor
+    ): BatchLinesPrimitive {
         this.x1Accessor = x1Accessor;
         this.y1Accessor = y1Accessor;
         this.x2Accessor = x2Accessor;
@@ -897,12 +965,13 @@ export class BatchLinesPrimitive extends BatchPrimitive {
             'line',
             transitionDuration,
             ease
-        );
+        ) as any;
+        
         if (!this.dataPoints || finalSelection.empty()) return;
 
         // Add arrow markers similar to addLine
-        let markerStart = null;
-        let markerEnd = null;
+        let markerStart: string | null = null;
+        let markerEnd: string | null = null;
 
         if (this.options.arrow === 'start' || this.options.arrow === 'both') {
             const markerId = this.manager.createArrowMarker(
@@ -924,28 +993,75 @@ export class BatchLinesPrimitive extends BatchPrimitive {
             .attr('stroke-width', this.options.strokeWidth)
             .attr('stroke-dasharray', this.options.strokeDashArray)
             .attr('stroke-dashoffset', this.options.strokeDashOffset)
-            .attr('opacity', this.options.opacity)
+            .attr('opacity', (d: Record<string, any>) => {
+                const x1 = this.x1Accessor(d);
+                const y1 = this.y1Accessor(d);
+                const x2 = this.x2Accessor(d);
+                const y2 = this.y2Accessor(d);
+                // Hide lines with invalid coordinates
+                if (x1 == null || y1 == null || x2 == null || y2 == null ||
+                    isNaN(x1) || isNaN(y1) || isNaN(x2) || isNaN(y2)) {
+                    return 0;
+                }
+                return this.options.opacity;
+            })
             .attr('class', this.options.className)
             .attr('marker-start', markerStart)
             .attr('marker-end', markerEnd)
-            .attr('x1', (d) => this.convertX(this.x1Accessor(d)))
-            .attr('y1', (d) => this.convertY(this.y1Accessor(d)))
-            .attr('x2', (d) => this.convertX(this.x2Accessor(d)))
-            .attr('y2', (d) => this.convertY(this.y2Accessor(d)));
+            .attr('x1', (d: Record<string, any>) => {
+                const val = this.x1Accessor(d);
+                return val != null ? this.convertX(val) : 0;
+            })
+            .attr('y1', (d: Record<string, any>) => {
+                const val = this.y1Accessor(d);
+                return val != null ? this.convertY(val) : 0;
+            })
+            .attr('x2', (d: Record<string, any>) => {
+                const val = this.x2Accessor(d);
+                return val != null ? this.convertX(val) : 0;
+            })
+            .attr('y2', (d: Record<string, any>) => {
+                const val = this.y2Accessor(d);
+                return val != null ? this.convertY(val) : 0;
+            });
     }
 }
 
+export interface BatchRectanglesPrimitiveOptions {
+    x1Accessor?: CoordinateAccessor;
+    y1Accessor?: CoordinateAccessor;
+    x2Accessor?: CoordinateAccessor;
+    y2Accessor?: CoordinateAccessor;
+    keyAccessor?: (d: Record<string, any>, i: number) => number;
+}
+
 export class BatchRectanglesPrimitive extends BatchPrimitive {
-    constructor(manager, element, options) {
+    
+    x1Accessor!: CoordinateAccessor;
+    y1Accessor!: CoordinateAccessor;
+    x2Accessor!: CoordinateAccessor;
+    y2Accessor!: CoordinateAccessor;
+
+    declare options: Required<PrimitiveConfig> & Required<BatchRectanglesPrimitiveOptions>;
+
+    constructor(
+        manager: PrimitiveManager,
+        element: Element,
+        options: Required<PrimitiveConfig> & Required<BatchRectanglesPrimitiveOptions>
+    ) {
         super(manager, element, options);
-        this.type = 'batch-rectangles';
-        this.x1Accessor = options.x1Accessor;
-        this.y1Accessor = options.y1Accessor;
-        this.x2Accessor = options.x2Accessor;
-        this.y2Accessor = options.y2Accessor;
+        if (options.x1Accessor) this.x1Accessor = options.x1Accessor;
+        if (options.y1Accessor) this.y1Accessor = options.y1Accessor;
+        if (options.x2Accessor) this.x2Accessor = options.x2Accessor;
+        if (options.y2Accessor) this.y2Accessor = options.y2Accessor;
     }
 
-    setCoordinateAccessors(x1Accessor, y1Accessor, x2Accessor, y2Accessor) {
+    setCoordinateAccessors(
+        x1Accessor: CoordinateAccessor,
+        y1Accessor: CoordinateAccessor,
+        x2Accessor: CoordinateAccessor,
+        y2Accessor: CoordinateAccessor
+    ): this {
         this.x1Accessor = x1Accessor;
         this.y1Accessor = y1Accessor;
         this.x2Accessor = x2Accessor;
@@ -958,60 +1074,110 @@ export class BatchRectanglesPrimitive extends BatchPrimitive {
             'rect',
             transitionDuration,
             ease
-        );
+        ) as any;
+        
         if (!this.dataPoints || finalSelection.empty()) return;
 
         return finalSelection
             .attr('fill', this.options.fill)
             .attr('stroke', this.options.stroke)
             .attr('stroke-width', this.options.strokeWidth)
-            .attr('opacity', this.options.opacity)
+            .attr('opacity', (d: Record<string, any>) => {
+                const x1 = this.x1Accessor(d);
+                const y1 = this.y1Accessor(d);
+                const x2 = this.x2Accessor(d);
+                const y2 = this.y2Accessor(d);
+                // Hide rectangles with invalid coordinates
+                if (x1 == null || y1 == null || x2 == null || y2 == null ||
+                    isNaN(x1) || isNaN(y1) || isNaN(x2) || isNaN(y2)) {
+                    return 0;
+                }
+                return this.options.opacity;
+            })
             .attr('class', this.options.className)
-            .attr('x', (d) => {
-                const x1 = this.convertX(this.x1Accessor(d));
-                const x2 = this.convertX(this.x2Accessor(d));
+            .attr('x', (d: Record<string, any>) => {
+                const x1Val = this.x1Accessor(d);
+                const x2Val = this.x2Accessor(d);
+                if (x1Val == null || x2Val == null) return 0;
+                const x1 = this.convertX(x1Val);
+                const x2 = this.convertX(x2Val);
                 return Math.min(x1, x2);
             })
-            .attr('y', (d) => {
-                const y1 = this.convertY(this.y1Accessor(d));
-                const y2 = this.convertY(this.y2Accessor(d));
+            .attr('y', (d: Record<string, any>) => {
+                const y1Val = this.y1Accessor(d);
+                const y2Val = this.y2Accessor(d);
+                if (y1Val == null || y2Val == null) return 0;
+                const y1 = this.convertY(y1Val);
+                const y2 = this.convertY(y2Val);
                 return Math.min(y1, y2);
             })
-            .attr('width', (d) => {
-                const x1 = this.convertX(this.x1Accessor(d));
-                const x2 = this.convertX(this.x2Accessor(d));
+            .attr('width', (d: Record<string, any>) => {
+                const x1Val = this.x1Accessor(d);
+                const x2Val = this.x2Accessor(d);
+                if (x1Val == null || x2Val == null) return 0;
+                const x1 = this.convertX(x1Val);
+                const x2 = this.convertX(x2Val);
                 return Math.abs(x2 - x1);
             })
-            .attr('height', (d) => {
-                const y1 = this.convertY(this.y1Accessor(d));
-                const y2 = this.convertY(this.y2Accessor(d));
+            .attr('height', (d: Record<string, any>) => {
+                const y1Val = this.y1Accessor(d);
+                const y2Val = this.y2Accessor(d);
+                if (y1Val == null || y2Val == null) return 0;
+                const y1 = this.convertY(y1Val);
+                const y2 = this.convertY(y2Val);
                 return Math.abs(y2 - y1);
             });
     }
 }
 
+export interface BatchTextPrimitiveOptions {
+    xAccessor?: CoordinateAccessor;
+    yAccessor?: CoordinateAccessor;
+    textAccessor?: (d: Record<string, any>) => string;
+    angleAccessor?: (d: Record<string, any>) => number | null | undefined;
+    anchor?: string;
+    baseline?: string;
+    fontFamily?: string;
+    fontSize?: number;
+    keyAccessor?: (d: Record<string, any>, i: number) => number;
+}
+
 export class BatchTextPrimitive extends BatchPrimitive {
-    constructor(manager, element, options) {
+    
+    xAccessor!: CoordinateAccessor;
+    yAccessor!: CoordinateAccessor;
+    textAccessor?: (d: Record<string, any>) => string;
+    angleAccessor?: (d: Record<string, any>) => number | null | undefined;
+
+    declare options: Required<PrimitiveConfig> & Required<BatchTextPrimitiveOptions>;
+
+    constructor(
+        manager: PrimitiveManager,
+        element: Element,
+        options: Required<PrimitiveConfig> & Required<BatchTextPrimitiveOptions>
+    ) {
         super(manager, element, options);
-        this.type = 'batch-text';
-        this.xAccessor = options.xAccessor;
-        this.yAccessor = options.yAccessor;
-        this.textAccessor = options.textAccessor;
-        this.angleAccessor = options.angleAccessor;
+        if (options.xAccessor) this.xAccessor = options.xAccessor;
+        if (options.yAccessor) this.yAccessor = options.yAccessor;
+        if (options.textAccessor) this.textAccessor = options.textAccessor;
+        if (options.angleAccessor) this.angleAccessor = options.angleAccessor;
     }
 
-    setCoordinateAccessors(xAccessor, yAccessor) {
+    setCoordinateAccessors(
+        xAccessor: CoordinateAccessor,
+        yAccessor: CoordinateAccessor
+    ): this {
         this.xAccessor = xAccessor;
         this.yAccessor = yAccessor;
         return this;
     }
 
-    setTextAccessor(textAccessor) {
+    setTextAccessor(textAccessor: (d: Record<string, any>) => string): this {
         this.textAccessor = textAccessor;
         return this;
     }
 
-    setAngleAccessor(angleAccessor) {
+    setAngleAccessor(angleAccessor: (d: Record<string, any>) => number | null | undefined): this {
         this.angleAccessor = angleAccessor;
         return this;
     }
@@ -1021,25 +1187,43 @@ export class BatchTextPrimitive extends BatchPrimitive {
             'text',
             transitionDuration,
             ease
-        );
+        ) as any;
+        
         if (!this.dataPoints || finalSelection.empty()) return;
 
         return finalSelection
-            .text((d) => (this.textAccessor ? this.textAccessor(d) : d))
-            .attr('x', (d) => this.convertX(this.xAccessor(d)))
-            .attr('y', (d) => this.convertY(this.yAccessor(d)))
+            .text((d: Record<string, any>) => (this.textAccessor ? this.textAccessor(d) : d))
+            .attr('x', (d: Record<string, any>) => {
+                const val = this.xAccessor(d);
+                return val != null ? this.convertX(val) : 0;
+            })
+            .attr('y', (d: Record<string, any>) => {
+                const val = this.yAccessor(d);
+                return val != null ? this.convertY(val) : 0;
+            })
             .attr('text-anchor', this.options.anchor)
             .attr('dominant-baseline', this.options.baseline)
             .attr('font-family', this.options.fontFamily)
             .attr('font-size', this.options.fontSize)
             .attr('fill', this.options.fill)
-            .attr('opacity', this.options.opacity)
+            .attr('opacity', (d: Record<string, any>) => {
+                const x = this.xAccessor(d);
+                const y = this.yAccessor(d);
+                // Hide text with invalid coordinates
+                if (x == null || y == null || isNaN(x) || isNaN(y)) {
+                    return 0;
+                }
+                return this.options.opacity;
+            })
             .attr('class', this.options.className)
-            .attr('transform', (d) => {
+            .attr('transform', (d: Record<string, any>) => {
                 const angle = this.angleAccessor ? this.angleAccessor(d) : 0;
                 if (angle) {
-                    const x = this.convertX(this.xAccessor(d));
-                    const y = this.convertY(this.yAccessor(d));
+                    const xVal = this.xAccessor(d);
+                    const yVal = this.yAccessor(d);
+                    if (xVal == null || yVal == null) return null;
+                    const x = this.convertX(xVal);
+                    const y = this.convertY(yVal);
                     return `rotate(${angle}, ${x}, ${y})`;
                 }
                 return null;

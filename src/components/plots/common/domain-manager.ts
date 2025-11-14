@@ -1,11 +1,14 @@
 import * as d3 from 'd3';
-import { DataValue, DataAccessor } from '@/components/plots/common/types';
 import {
     isDateValue,
     isDefined,
     isNumberValue,
     isStringValue,
 } from '@/components/plots/common/type-guards';
+
+export type DataValue = string | number | Date | null | undefined;
+export type DataAccessor<T, R extends DataValue> = (d: T) => R;
+
 
 class DomainManager<T extends Record<string, any>> {
     constructor(private readonly data: T[]) {}

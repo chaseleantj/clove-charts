@@ -1,5 +1,3 @@
-import { AnyDomain } from '@/components/plots/common/types';
-
 export function isDefined<T>(value: T | null | undefined): value is T {
     return value !== null && value !== undefined;
 }
@@ -61,7 +59,7 @@ export function isDateTuple(value: unknown): value is [Date, Date] {
 }
 
 export function getDomainKind(
-    domain: AnyDomain
+    domain: string[] | [Date, Date] | [number, number]
 ): 'string' | 'number' | 'date' | 'unknown' {
     if (isStringArray(domain)) return 'string';
     if (isNumberTuple(domain)) return 'number';
