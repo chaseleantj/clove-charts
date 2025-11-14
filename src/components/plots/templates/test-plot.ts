@@ -1,9 +1,9 @@
 import * as d3 from 'd3';
-import BasePlot, {BasePlotProps} from '@/components/plots/common/base';
+import BasePlot, { BasePlotProps } from '@/components/plots/common/base';
 
 class BaseTestPlot extends BasePlot {
     constructor(props: BasePlotProps) {
-        console.log("test")
+        console.log('test');
         super(props);
     }
 

@@ -84,7 +84,7 @@ export interface PrimitiveConfig<
     TFill = string,
     TStroke = string,
     TStrokeWidth = number,
-    TOpacity = number
+    TOpacity = number,
 > {
     fill?: TFill;
     stroke?: TStroke;
@@ -234,5 +234,5 @@ export const DEFAULT_PRIMITIVE_CONFIG: Required<PrimitiveConfig> = {
     staticElement: false,
     layerName: 'default',
     opacity: 1,
-    className: 'primitive'
+    className: 'primitive',
 };

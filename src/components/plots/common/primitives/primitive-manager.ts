@@ -29,19 +29,22 @@ import {
     PRIMITIVE_LOOKUP,
 } from '@/components/plots/common/primitives/primitives';
 import type { CoordinateAccessor } from '@/components/plots/common/primitives/primitives';
-import { DEFAULT_PRIMITIVE_CONFIG, PrimitiveConfig, BatchPrimitiveConfig } from '@/components/plots/common/config';
+import {
+    DEFAULT_PRIMITIVE_CONFIG,
+    PrimitiveConfig,
+    BatchPrimitiveConfig,
+} from '@/components/plots/common/config';
 import { CoordinateSystem } from '@/components/plots/common/types';
 
 type Layer = d3.Selection<SVGGElement, unknown, null, undefined>;
 
 interface LayerObject {
-    layer: Layer,
-    zIndex: number,
-    primitiveIds: Set<string> // just stores the primitive ids
+    layer: Layer;
+    zIndex: number;
+    primitiveIds: Set<string>; // just stores the primitive ids
 }
 
 class PrimitiveManager {
-
     primitives: Map<string, Primitive<any>>;
     layerObjectMap: Map<string, LayerObject>;
     defaultLayer: d3.Selection<SVGGElement, unknown, null, undefined>;
@@ -102,7 +105,12 @@ class PrimitiveManager {
         } as ConstructorParameters<T>[2];
 
         const layer = this.getLayer(options.layerName);
-        const element = this.createSvgElement(primitiveClass, layer, options, primitiveInfo);
+        const element = this.createSvgElement(
+            primitiveClass,
+            layer,
+            options,
+            primitiveInfo
+        );
         const primitive = new primitiveClass(this, element, options);
 
         const id = options.dataId || `${primitiveClass.name}-${uuidv4()}`;
@@ -113,8 +121,8 @@ class PrimitiveManager {
     }
 
     private createSvgElement<T extends new (...args: any[]) => Primitive<any>>(
-        primitiveClass: T, 
-        layer: Layer, 
+        primitiveClass: T,
+        layer: Layer,
         options: ConstructorParameters<T>[2],
         primitiveInfo: PrimitiveInfo
     ): d3.Selection<d3.BaseType, unknown, null, undefined> {
@@ -137,10 +145,19 @@ class PrimitiveManager {
             element.attr('data-id', options.dataId);
         }
 
-        return element as unknown as d3.Selection<d3.BaseType, unknown, null, undefined>;
+        return element as unknown as d3.Selection<
+            d3.BaseType,
+            unknown,
+            null,
+            undefined
+        >;
     }
 
-    addPoint(x: number, y: number, options: PointPrimitiveOptions & PrimitiveConfig = {}): PointPrimitive {
+    addPoint(
+        x: number,
+        y: number,
+        options: PointPrimitiveOptions & PrimitiveConfig = {}
+    ): PointPrimitive {
         options = {
             size: 64,
             stroke: 'none',
@@ -163,7 +180,13 @@ class PrimitiveManager {
         return point;
     }
 
-    addLine(x1: number, y1: number, x2: number, y2: number, options: LinePrimitiveOptions & PrimitiveConfig = {}): LinePrimitive {
+    addLine(
+        x1: number,
+        y1: number,
+        x2: number,
+        y2: number,
+        options: LinePrimitiveOptions & PrimitiveConfig = {}
+    ): LinePrimitive {
         options = {
             strokeWidth: 1.5,
             arrow: 'none',
@@ -215,7 +238,13 @@ class PrimitiveManager {
         return path;
     }
 
-    addRectangle(x1: number, y1: number, x2: number, y2: number, options: PrimitiveConfig & RectanglePrimitiveOptions = {}): RectanglePrimitive {
+    addRectangle(
+        x1: number,
+        y1: number,
+        x2: number,
+        y2: number,
+        options: PrimitiveConfig & RectanglePrimitiveOptions = {}
+    ): RectanglePrimitive {
         options = {};
 
         const rect = this.addPrimitive(RectanglePrimitive, options);
@@ -233,7 +262,12 @@ class PrimitiveManager {
         return rect;
     }
 
-    addText(textContent: string, x: number, y: number, options: PrimitiveConfig & TextPrimitiveOptions = {}): TextPrimitive {
+    addText(
+        textContent: string,
+        x: number,
+        y: number,
+        options: PrimitiveConfig & TextPrimitiveOptions = {}
+    ): TextPrimitive {
         options = {
             fontSize: 12,
             fontFamily: null,
@@ -263,9 +297,9 @@ class PrimitiveManager {
     }
 
     addContour(
-        fValues: number[], 
-        xRange: number[], 
-        yRange: number[], 
+        fValues: number[],
+        xRange: number[],
+        yRange: number[],
         options: PrimitiveConfig & ContourPrimitiveOptions = {}
     ): ContourPrimitive {
         options = {
@@ -290,7 +324,10 @@ class PrimitiveManager {
         return contour;
     }
 
-    addImage(href: string, options: PrimitiveConfig & ImagePrimitiveOptions = {}): ImagePrimitive {
+    addImage(
+        href: string,
+        options: PrimitiveConfig & ImagePrimitiveOptions = {}
+    ): ImagePrimitive {
         options = {
             width: null,
             coords: null,
@@ -306,7 +343,9 @@ class PrimitiveManager {
             .then(() => {
                 if (image.options.coordinateSystem === CoordinateSystem.Data) {
                     image.createUpdateFunction(function () {
-                        image.render(this.config.themeConfig.transitionDuration);
+                        image.render(
+                            this.config.themeConfig.transitionDuration
+                        );
                     });
                 }
             })
@@ -318,9 +357,9 @@ class PrimitiveManager {
     }
 
     addPoints(
-        dataPoints: Record<string, any>[], 
-        xAccessor: CoordinateAccessor, 
-        yAccessor: CoordinateAccessor, 
+        dataPoints: Record<string, any>[],
+        xAccessor: CoordinateAccessor,
+        yAccessor: CoordinateAccessor,
         options: BatchPrimitiveConfig & BatchPointsPrimitiveOptions = {}
     ): BatchPointsPrimitive {
         options = {
@@ -332,7 +371,10 @@ class PrimitiveManager {
             ...options,
         };
 
-        const points: BatchPointsPrimitive = this.addPrimitive(BatchPointsPrimitive, options);
+        const points: BatchPointsPrimitive = this.addPrimitive(
+            BatchPointsPrimitive,
+            options
+        );
 
         points
             .setData(dataPoints, options.keyAccessor)
@@ -365,7 +407,10 @@ class PrimitiveManager {
             ...options,
         };
 
-        const lines: BatchLinesPrimitive = this.addPrimitive(BatchLinesPrimitive, options);
+        const lines: BatchLinesPrimitive = this.addPrimitive(
+            BatchLinesPrimitive,
+            options
+        );
 
         lines
             .setData(dataPoints, options.keyAccessor)
@@ -403,7 +448,10 @@ class PrimitiveManager {
             ...options,
         };
 
-        const rectangles: BatchRectanglesPrimitive = this.addPrimitive(BatchRectanglesPrimitive, options);
+        const rectangles: BatchRectanglesPrimitive = this.addPrimitive(
+            BatchRectanglesPrimitive,
+            options
+        );
 
         rectangles
             .setData(dataPoints, options.keyAccessor)
@@ -443,7 +491,10 @@ class PrimitiveManager {
             ...options,
         };
 
-        const texts: BatchTextPrimitive = this.addPrimitive(BatchTextPrimitive, options);
+        const texts: BatchTextPrimitive = this.addPrimitive(
+            BatchTextPrimitive,
+            options
+        );
 
         texts
             .setData(dataPoints, options.keyAccessor)
@@ -543,7 +594,9 @@ class PrimitiveManager {
         this.primitives.clear();
     }
 
-    getPrimitivesByType<T extends new (...args: any[]) => Primitive>(primitiveClass: T): InstanceType<T>[] {
+    getPrimitivesByType<T extends new (...args: any[]) => Primitive>(
+        primitiveClass: T
+    ): InstanceType<T>[] {
         return Array.from(this.primitives.values()).filter(
             (p) => p instanceof primitiveClass
         ) as InstanceType<T>[];

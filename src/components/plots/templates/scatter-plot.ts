@@ -16,8 +16,8 @@ interface ScatterPlotProps extends BasePlotProps {
 const DEFAULT_SCATTER_PLOT_CONFIG = {
     pointSize: 50,
     pointOpacity: 1,
-    colorByClass: null
-}
+    colorByClass: null,
+};
 
 interface ScatterPlotDomain {
     x: [number, number] | [Date, Date];
@@ -26,7 +26,6 @@ interface ScatterPlotDomain {
 }
 
 class BaseScatterPlot extends BasePlot {
-
     dataPoints!: BatchPointsPrimitive;
     declare domain: ScatterPlotDomain;
     declare props: ScatterPlotProps;
@@ -44,7 +43,9 @@ class BaseScatterPlot extends BasePlot {
             this.domain.color = this.domainManager.getDomain(
                 (d) => d[this.props.colorByClass as string]
             );
-            this.scale.color = this.scaleManager.getColorScale(this.domain.color);
+            this.scale.color = this.scaleManager.getColorScale(
+                this.domain.color
+            );
         } else {
             this.scale.color = this.scaleManager.getColorScale();
         }
@@ -55,8 +56,9 @@ class BaseScatterPlot extends BasePlot {
         console.log('X value:', this.props.data[0]?.[this.props.xClass]);
         console.log('Y value:', this.props.data[0]?.[this.props.yClass]);
 
-        const colorByClass = this.props.colorByClass 
-            ? (d: Record<string, any>) => this.scale.color(d[this.props.colorByClass!]) 
+        const colorByClass = this.props.colorByClass
+            ? (d: Record<string, any>) =>
+                  this.scale.color(d[this.props.colorByClass!])
             : this.config.colorConfig.defaultColor;
 
         this.dataPoints = this.primitives.addPoints(
@@ -66,8 +68,12 @@ class BaseScatterPlot extends BasePlot {
             {
                 symbolType: d3.symbolCircle,
                 fill: colorByClass,
-                size: this.props.pointSize ?? DEFAULT_SCATTER_PLOT_CONFIG.pointSize,
-                opacity: this.props.pointOpacity ?? DEFAULT_SCATTER_PLOT_CONFIG.pointOpacity,
+                size:
+                    this.props.pointSize ??
+                    DEFAULT_SCATTER_PLOT_CONFIG.pointSize,
+                opacity:
+                    this.props.pointOpacity ??
+                    DEFAULT_SCATTER_PLOT_CONFIG.pointOpacity,
                 layerName: 'points',
                 className: 'data-point',
                 pointerEvents: 'auto',
@@ -83,32 +89,34 @@ class BaseScatterPlot extends BasePlot {
     onSetupLegend() {
         if (!this.props.colorByClass) return;
 
-        this.legend.setTitle(this.config.legendConfig.title ?? this.props.colorByClass);
+        this.legend.setTitle(
+            this.config.legendConfig.title ?? this.props.colorByClass
+        );
 
         const domainKind = getDomainKind(this.domain.color);
         if (domainKind === 'string') {
-
-            const colorScale = this.scale.color as d3.ScaleOrdinal<string, string, never>
+            const colorScale = this.scale.color as d3.ScaleOrdinal<
+                string,
+                string,
+                never
+            >;
 
             this.legend.addCategoricalLegend();
             const classes = colorScale.domain();
             classes.forEach((cls: string) => {
-                this.legend.addCategoricalItem(
-                    'circle',
-                    colorScale(cls),
-                    cls
-                );
+                this.legend.addCategoricalItem('circle', colorScale(cls), cls);
             });
         } else if (domainKind === 'number' || domainKind === 'date') {
-
-            const colorScale = this.scale.color as d3.ScaleSequential<string, never>
+            const colorScale = this.scale.color as d3.ScaleSequential<
+                string,
+                never
+            >;
 
             this.legend.addContinuousLegend(colorScale);
         }
     }
 
     drawTooltip() {
-
         const displayClasses = this.props.colorByClass
             ? [this.props.xClass, this.props.yClass, this.props.colorByClass]
             : [this.props.xClass, this.props.yClass];
@@ -116,20 +124,36 @@ class BaseScatterPlot extends BasePlot {
         const tooltipDisplayClasses =
             this.config.tooltipConfig.tooltipClasses ?? displayClasses;
 
-        const elementSelection = this.dataPoints.elementSelection as d3.Selection<SVGPathElement | SVGLineElement | SVGRectElement | SVGTextElement | SVGImageElement | SVGGElement, Record<string, any>, d3.BaseType, unknown>;
+        const elementSelection = this.dataPoints
+            .elementSelection as d3.Selection<
+            | SVGPathElement
+            | SVGLineElement
+            | SVGRectElement
+            | SVGTextElement
+            | SVGImageElement
+            | SVGGElement,
+            Record<string, any>,
+            d3.BaseType,
+            unknown
+        >;
 
         elementSelection
             .on('mouseover', (event, d) => {
                 if (!this.brushManager || !this.brushManager.brushing) {
-
                     const symbolGenerator = d3
                         .symbol()
                         .type(d3.symbolCircle)
-                        .size(4 * (this.props.pointSize ?? DEFAULT_SCATTER_PLOT_CONFIG.pointSize));
+                        .size(
+                            4 *
+                                (this.props.pointSize ??
+                                    DEFAULT_SCATTER_PLOT_CONFIG.pointSize)
+                        );
 
                     d3.select(event.target)
                         .transition()
-                        .duration(this.config.themeConfig.transitionDuration / 4)
+                        .duration(
+                            this.config.themeConfig.transitionDuration / 4
+                        )
                         .attr('d', symbolGenerator);
 
                     this.tooltipManager.formatTooltip(d, tooltipDisplayClasses);
@@ -142,17 +166,24 @@ class BaseScatterPlot extends BasePlot {
                     const symbolGenerator = d3
                         .symbol()
                         .type(d3.symbolCircle)
-                        .size(this.props.pointSize ?? DEFAULT_SCATTER_PLOT_CONFIG.pointSize);
+                        .size(
+                            this.props.pointSize ??
+                                DEFAULT_SCATTER_PLOT_CONFIG.pointSize
+                        );
 
                     d3.select(event.target)
                         .transition()
-                        .duration(this.config.themeConfig.transitionDuration / 4)
+                        .duration(
+                            this.config.themeConfig.transitionDuration / 4
+                        )
                         .attr('d', symbolGenerator);
                     this.tooltipManager.hideTooltip();
                 }
             });
 
-        this.interactionSurface.on('click', () => this.tooltipManager.hideTooltip());
+        this.interactionSurface.on('click', () =>
+            this.tooltipManager.hideTooltip()
+        );
     }
 }
 
