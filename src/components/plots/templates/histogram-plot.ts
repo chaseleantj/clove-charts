@@ -3,7 +3,7 @@ import * as d3 from 'd3';
 import BasePlot, { BasePlotProps } from '@/components/plots/common/base-plot';
 import ScaleManager from '@/components/plots/common/scale-manager';
 
-interface HistogramPlotProps extends BasePlotProps {
+interface HistogramPlotProps extends Omit<BasePlotProps, 'yClass'> {
     data: Record<string, any>[];
     xClass: string;
     numBins?: number;

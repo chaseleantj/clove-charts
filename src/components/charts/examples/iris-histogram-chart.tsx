@@ -60,8 +60,6 @@ export default function IrisHistogramChart() {
                     data={irisData}
                     xClass="sepal_width"
                     numBins={10}
-                    // yClass="petal_length"
-                    // colorByClass="petal_width"
                     legendConfig={legendConfig}
                     tooltipConfig={tooltipConfig}
                     {...PLOT_CONFIG}
