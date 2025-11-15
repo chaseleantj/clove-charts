@@ -7,26 +7,52 @@ import {
     TooltipConfig,
 } from '@/components/plots/common/config';
 
-import styles from '@/components/plots/common/page.module.css';
+import styles from '@/components/charts/page.module.css';
 
 interface ChartLayoutProps {
     children: ReactNode;
-    caption?: ReactNode;
 }
 
-export function ChartLayout({ children, caption }: ChartLayoutProps) {
+export function ChartLayout({ children }: ChartLayoutProps) {
+    return <div className={styles.chart}>{children}</div>;
+}
+
+interface ChartHeaderProps {
+    children: ReactNode;
+}
+
+export function ChartHeader({ children }: ChartHeaderProps) {
+    return <div className={styles.header}>{children}</div>;
+}
+
+interface ChartPlotWrapperProps {
+    children: ReactNode;
+}
+
+export function ChartPlotWrapper({ children }: ChartPlotWrapperProps) {
     return (
-        <div className={styles.chart}>
-            <div className={styles.plotWrapper}>
-                <div className={styles.plot}>{children}</div>
-            </div>
-            {caption && (
-                <div className={styles.footer}>
-                    <div className={styles.captions}>
-                        {typeof caption === 'string' ? <p>{caption}</p> : caption}
-                    </div>
-                </div>
-            )}
+        <div className={styles.plotWrapper}>
+            <div className={styles.plot}>{children}</div>
+        </div>
+    );
+}
+
+interface ChartFooterProps {
+    children: ReactNode;
+}
+
+export function ChartFooter({ children }: ChartFooterProps) {
+    return <div className={styles.footer}>{children}</div>;
+}
+
+interface ChartCaptionsProps {
+    children: ReactNode;
+}
+
+export function ChartCaptions({ children }: ChartCaptionsProps) {
+    return (
+        <div className={styles.captions}>
+            {typeof children === 'string' ? <p>{children}</p> : children}
         </div>
     );
 }

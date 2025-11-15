@@ -6,8 +6,11 @@ import BaseHistogramPlot from '@/components/plots/templates/histogram-plot';
 import { PlotConfig } from '@/components/plots/common/config';
 import {
     ChartLayout,
+    ChartPlotWrapper,
     ChartLegend,
     ChartTooltip,
+    ChartFooter,
+    ChartCaptions,
     useChartLegend,
     useChartTooltip,
 } from '@/components/charts/chart-layout';
@@ -49,19 +52,24 @@ export default function IrisHistogramChart() {
     }, []);
 
     return (
-        <ChartLayout caption="A histogram plot of the iris dataset.">
-            <ChartLegend ref={legendRef} />
-            <ChartTooltip ref={tooltipRef} />
-            <BaseHistogramPlot
-                data={irisData}
-                xClass="sepal_width"
-                numBins={10}
-                // yClass="petal_length"
-                // colorByClass="petal_width"
-                legendConfig={legendConfig}
-                tooltipConfig={tooltipConfig}
-                {...PLOT_CONFIG}
-            />
+        <ChartLayout>
+            <ChartPlotWrapper>
+                <ChartLegend ref={legendRef} />
+                <ChartTooltip ref={tooltipRef} />
+                <BaseHistogramPlot
+                    data={irisData}
+                    xClass="sepal_width"
+                    numBins={10}
+                    // yClass="petal_length"
+                    // colorByClass="petal_width"
+                    legendConfig={legendConfig}
+                    tooltipConfig={tooltipConfig}
+                    {...PLOT_CONFIG}
+                />
+            </ChartPlotWrapper>
+            <ChartFooter>
+                <ChartCaptions>A histogram plot of the iris dataset.</ChartCaptions>
+            </ChartFooter>
         </ChartLayout>
     );
 }

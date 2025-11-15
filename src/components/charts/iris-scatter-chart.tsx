@@ -6,8 +6,11 @@ import BaseScatterPlot from '@/components/plots/templates/scatter-plot';
 import { PlotConfig } from '@/components/plots/common/config';
 import {
     ChartLayout,
+    ChartPlotWrapper,
     ChartLegend,
     ChartTooltip,
+    ChartFooter,
+    ChartCaptions,
     useChartLegend,
     useChartTooltip,
 } from '@/components/charts/chart-layout';
@@ -49,18 +52,26 @@ export default function IrisScatterChart() {
     }, []);
 
     return (
-        <ChartLayout caption="A scatter plot of the iris dataset. Hover over the points for more info.">
-            <ChartLegend ref={legendRef} />
-            <ChartTooltip ref={tooltipRef} />
-            <BaseScatterPlot
-                data={irisData}
-                xClass="sepal_width"
-                yClass="petal_length"
-                colorByClass="petal_width"
-                legendConfig={legendConfig}
-                tooltipConfig={tooltipConfig}
-                {...PLOT_CONFIG}
-            />
+        <ChartLayout>
+            <ChartPlotWrapper>
+                <ChartLegend ref={legendRef} />
+                <ChartTooltip ref={tooltipRef} />
+                <BaseScatterPlot
+                    data={irisData}
+                    xClass="sepal_width"
+                    yClass="petal_length"
+                    colorByClass="petal_width"
+                    legendConfig={legendConfig}
+                    tooltipConfig={tooltipConfig}
+                    {...PLOT_CONFIG}
+                />
+            </ChartPlotWrapper>
+            <ChartFooter>
+                <ChartCaptions>
+                    A scatter plot of the iris dataset. Hover over the points
+                    for more info.
+                </ChartCaptions>
+            </ChartFooter>
         </ChartLayout>
     );
 }
