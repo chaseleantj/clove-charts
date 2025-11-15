@@ -2,7 +2,7 @@ import * as d3 from 'd3';
 import styles from '@/components/charts/page.module.css';
 import { v4 as uuidv4 } from 'uuid';
 
-import { RequiredLegendConfig } from '@/components/plots/common/config';
+import { LegendConfig } from '@/components/plots/common/config';
 
 interface CategoricalItems {
     shape: string;
@@ -33,7 +33,7 @@ class LegendManager {
     categoricalSvg!: d3.Selection<SVGSVGElement, unknown, null, undefined>;
     categoricalGroup!: d3.Selection<SVGGElement, unknown, null, undefined>;
 
-    constructor(private readonly legendConfig: RequiredLegendConfig) {
+    constructor(private readonly legendConfig: Required<LegendConfig>) {
         this.legend = d3.select(this.legendConfig.legendRef.current!);
         this.gradientId = 'linear-gradient-' + uuidv4();
         this.categoricalItems = [];

@@ -134,6 +134,7 @@ export interface RequiredPlotConfig {
 
 const DEFAULT_FONT_SIZE = 14;
 const SMALL_FONT_SIZE = 12;
+const DEFAULT_COLOR = 'steelblue';
 
 export function DEFAULT_TICK_FORMAT(d: number | string | Date): string {
     // if (d instanceof Date) {
@@ -224,13 +225,13 @@ export const DEFAULT_TOOLTIP_CONFIG: Required<TooltipConfig> = {
 };
 
 export const DEFAULT_COLOR_CONFIG: Required<ColorConfig> = {
-    defaultColor: 'steelblue',
+    defaultColor: DEFAULT_COLOR,
     categoricalColorScheme: d3.schemeTableau10,
     continuousColorScheme: d3.interpolateViridis,
 };
 
 export const DEFAULT_PRIMITIVE_CONFIG: Required<PrimitiveConfig> = {
-    fill: 'currentColor',
+    fill: DEFAULT_COLOR,
     stroke: 'currentColor',
     strokeWidth: 1,
     pointerEvents: 'none',

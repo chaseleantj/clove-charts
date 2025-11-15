@@ -1,14 +1,14 @@
 import * as d3 from 'd3';
 import React from 'react';
 
-import { RequiredTooltipConfig } from '@/components/plots/common/config';
+import { TooltipConfig } from '@/components/plots/common/config';
 import { DEFAULT_TICK_FORMAT } from '@/components/plots/common/config';
 
 class TooltipManager {
     tooltip: d3.Selection<HTMLDivElement, unknown, null, undefined>;
 
     constructor(
-        private readonly tooltipConfig: RequiredTooltipConfig,
+        private readonly tooltipConfig: Required<TooltipConfig>,
         private readonly plotRef: React.RefObject<HTMLDivElement | null>
     ) {
         this.tooltip = d3.select(this.tooltipConfig.tooltipRef.current!);
