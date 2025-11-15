@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 
 import PrimitiveManager from '@/components/plots/common/primitives/primitive-manager';
-import type BasePlot from '@/components/plots/common/base';
+import type BasePlot from '@/components/plots/common/base-plot';
 import { isContinuousScale } from '@/components/plots/common/scale-manager';
 import {
     PrimitiveConfig,

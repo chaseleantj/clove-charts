@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 
-import BasePlot, { BasePlotProps } from '@/components/plots/common/base';
+import BasePlot, { BasePlotProps } from '@/components/plots/common/base-plot';
 import { BatchPointsPrimitive } from '@/components/plots/common/primitives/primitives';
 import { getDomainKind } from '@/components/plots/common/type-guards';
 

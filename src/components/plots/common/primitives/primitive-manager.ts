@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 import { v4 as uuidv4 } from 'uuid';
-import BasePlot from '@/components/plots/common/base';
+import BasePlot from '@/components/plots/common/base-plot';
 import {
     Primitive,
     PointPrimitive,
