@@ -29,6 +29,8 @@ export interface PlotMarginConfig {
 export interface DomainConfig {
     paddingX?: number;
     paddingY?: number;
+    domainX?: [number, number] | null;
+    domainY?: [number, number] | null;
     defaultDomainX?: [number, number];
     defaultDomainY?: [number, number];
 }
@@ -173,6 +175,8 @@ export const DEFAULT_PLOT_MARGIN: Required<PlotMarginConfig> = {
 export const DEFAULT_DOMAIN_CONFIG: Required<DomainConfig> = {
     paddingX: 0.05,
     paddingY: 0.05,
+    domainX: null,
+    domainY: null,
     defaultDomainX: [0, 1],
     defaultDomainY: [0, 1],
 };

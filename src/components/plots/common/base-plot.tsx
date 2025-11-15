@@ -46,8 +46,8 @@ interface PrimaryBasePlotProps {
     data?: Record<string, any>[];
     xClass?: string;
     yClass?: string;
-    domainX?: [number, number];
-    domainY?: [number, number];
+    // domainX?: [number, number];
+    // domainY?: [number, number];
 }
 
 export type BasePlotProps = PrimaryBasePlotProps & PlotConfig;
@@ -219,8 +219,8 @@ class BasePlot extends Component<BasePlotProps> {
         let domainX, domainY;
 
         // x domain configuration
-        if (this.props.domainX) {
-            domainX = this.props.domainX;
+        if (this.config.domainConfig.domainX) {
+            domainX = this.config.domainConfig.domainX;
         } else if (this.props.xClass) {
             const xClass = this.props.xClass;
             const paddingX = this.config.scaleConfig.logX
@@ -232,8 +232,8 @@ class BasePlot extends Component<BasePlotProps> {
         }
 
         // y domain configuration
-        if (this.props.domainY) {
-            domainY = this.props.domainY;
+        if (this.config.domainConfig.domainY) {
+            domainY = this.config.domainConfig.domainY;
         } else if (this.props.yClass) {
             const yClass = this.props.yClass;
             const paddingY = this.config.scaleConfig.logY
