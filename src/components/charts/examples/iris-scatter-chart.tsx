@@ -60,7 +60,7 @@ export default function IrisScatterChart() {
                     data={irisData}
                     xClass="sepal_width"
                     yClass="petal_length"
-                    colorByClass="petal_width"
+                    colorByClass="species"
                     legendConfig={legendConfig}
                     tooltipConfig={tooltipConfig}
                     {...PLOT_CONFIG}

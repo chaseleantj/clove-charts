@@ -23,6 +23,7 @@ class BaseTestPlot extends BasePlot {
         const text = this.primitives.addText('test', 3.5, 3, {
             fontSize: 12,
             fill: 'steelblue',
+            fontFamily: 'Times New Roman'
         });
 
         point
