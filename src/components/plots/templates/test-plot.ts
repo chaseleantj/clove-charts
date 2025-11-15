@@ -3,7 +3,6 @@ import BasePlot, { BasePlotProps } from '@/components/plots/common/base';
 
 class BaseTestPlot extends BasePlot {
     constructor(props: BasePlotProps) {
-        console.log('test');
         super(props);
     }
 

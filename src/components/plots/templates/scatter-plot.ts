@@ -8,8 +8,8 @@ interface ScatterPlotProps extends BasePlotProps {
     data: Record<string, any>[];
     xClass: string;
     yClass: string;
-    pointSize?: number;
-    pointOpacity?: number;
+    pointSize?: number | ((d: Record<string, any>) => number);
+    pointOpacity?: number | ((d: Record<string, any>) => number);
     colorByClass?: string | null;
 }
 
@@ -52,9 +52,6 @@ class BaseScatterPlot extends BasePlot {
     }
 
     renderElements() {
-        console.log('Sample data point:', this.props.data[0]);
-        console.log('X value:', this.props.data[0]?.[this.props.xClass]);
-        console.log('Y value:', this.props.data[0]?.[this.props.yClass]);
 
         const colorByClass = this.props.colorByClass
             ? (d: Record<string, any>) =>
@@ -140,14 +137,11 @@ class BaseScatterPlot extends BasePlot {
         elementSelection
             .on('mouseover', (event, d) => {
                 if (!this.brushManager || !this.brushManager.brushing) {
+                    const basePointSize = this.resolvePointSize(d);
                     const symbolGenerator = d3
                         .symbol()
                         .type(d3.symbolCircle)
-                        .size(
-                            4 *
-                                (this.props.pointSize ??
-                                    DEFAULT_SCATTER_PLOT_CONFIG.pointSize)
-                        );
+                        .size(4 * basePointSize);
 
                     d3.select(event.target)
                         .transition()
@@ -161,15 +155,13 @@ class BaseScatterPlot extends BasePlot {
                     this.tooltipManager.showTooltip();
                 }
             })
-            .on('mouseout', (event) => {
+            .on('mouseout', (event, d) => {
                 if (!this.brushManager || !this.brushManager.brushing) {
+                    const basePointSize = this.resolvePointSize(d);
                     const symbolGenerator = d3
                         .symbol()
                         .type(d3.symbolCircle)
-                        .size(
-                            this.props.pointSize ??
-                                DEFAULT_SCATTER_PLOT_CONFIG.pointSize
-                        );
+                        .size(basePointSize);
 
                     d3.select(event.target)
                         .transition()
@@ -184,6 +176,25 @@ class BaseScatterPlot extends BasePlot {
         this.interactionSurface.on('click', () =>
             this.tooltipManager.hideTooltip()
         );
+    }
+
+    private resolvePointSize(d?: Record<string, any>): number {
+        const defaultSize = DEFAULT_SCATTER_PLOT_CONFIG.pointSize;
+        const { pointSize } = this.props;
+
+        if (typeof pointSize === 'function') {
+            if (!d) return defaultSize;
+            const value = pointSize(d);
+            return typeof value === 'number' && Number.isFinite(value)
+                ? value
+                : defaultSize;
+        }
+
+        if (typeof pointSize === 'number' && Number.isFinite(pointSize)) {
+            return pointSize;
+        }
+
+        return defaultSize;
     }
 }
 

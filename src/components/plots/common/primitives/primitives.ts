@@ -972,8 +972,6 @@ export class BatchPointsPrimitive extends BatchPrimitive {
 
         if (!this.dataPoints || finalSelection.empty()) return;
 
-        // console.log(this.dataPoints); // shows correct datapoints
-
         const symbolGenerator = d3.symbol();
 
         if (typeof this.symbolType === 'function') {
@@ -1002,8 +1000,6 @@ export class BatchPointsPrimitive extends BatchPrimitive {
             .attr('transform', (d: Record<string, any>) => {
                 const x = this.xAccessor(d);
                 const y = this.yAccessor(d);
-
-                console.log(x, y);
 
                 // Handle null/undefined coordinates
                 if (x == null || y == null || isNaN(x) || isNaN(y)) {
