@@ -62,8 +62,8 @@ export interface LegendConfig {
         top: string;
         right: string;
     };
-    titleFontSize?: number;
-    fontSize?: number;
+    // titleFontSize?: number;
+    // fontSize?: number;
     categoricalItemHeight?: number;
     continuousBarWidth?: number;
     continuousBarLength?: number;
@@ -210,8 +210,6 @@ export const DEFAULT_LEGEND_CONFIG: Required<LegendConfig> = {
         top: '0%',
         right: '0%',
     },
-    titleFontSize: DEFAULT_FONT_SIZE,
-    fontSize: SMALL_FONT_SIZE,
     categoricalItemHeight: 20,
     continuousBarWidth: 20,
     continuousBarLength: 200,

@@ -56,8 +56,7 @@ class LegendManager {
         const newTitle = title ?? this.legendConfig.title;
         this.legendGroup
             .append('text')
-            .style('font-size', this.legendConfig.titleFontSize + 'px')
-            .style('margin-bottom', '5px')
+            .attr('class', styles.legendTitle)
             .html(newTitle);
     }
 
@@ -213,7 +212,6 @@ class LegendManager {
                     i * this.legendConfig.categoricalItemHeight +
                     this.legendConfig.categoricalItemHeight / 2
             )
-            .attr('font-size', this.legendConfig.fontSize)
             .attr('fill', 'currentColor')
             .attr('dominant-baseline', 'middle')
             .attr('text-anchor', 'start');

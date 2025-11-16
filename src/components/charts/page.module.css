@@ -12,7 +12,7 @@
     align-items: center;
     justify-content: space-evenly;
     gap: 0.75em;
-    background-color: light-dark(var(--black-alpha-5), var(--white-alpha-5));
+    /* background-color: light-dark(var(--black-alpha-5), var(--white-alpha-5)); */
 }
 
 .plot {
@@ -30,11 +30,17 @@
     width: fit-content;
     height: fit-content;
     max-width: 130px;
+    font-size: 12px;
 }
 
 .legendGroup {
     display: flex;
     flex-direction: column;
+}
+
+.legendTitle {
+    font-size: 14px;
+    margin-bottom: 5px;
 }
 
 .tooltip {
@@ -47,8 +53,8 @@
     font-size: 0.75em;
     padding: 0.5em;
     border-radius: 5px;
-    background-color: light-dark(var(--white-alpha-75), var(--black-alpha-75));
-    backdrop-filter: blur(2px);
+    /* background-color: light-dark(rgba(255, 255, 255, 0.75), rgba(0, 0, 0, 0.75)); */
+    backdrop-filter: blur(3px);
     pointer-events: none;
     z-index: 100;
     opacity: 0; /* Invisible when initialized */
@@ -61,7 +67,7 @@
 .captions {
     font-size: 0.75em;
     max-width: 400px;
-    color: light-dark(var(--black-alpha-50), var(--white-alpha-50));
+    /* color: light-dark(var(--black-alpha-50), var(--white-alpha-50)); */
     text-align: center;
     margin: auto;
 }
