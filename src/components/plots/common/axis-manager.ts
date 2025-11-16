@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 import { AxisConfig } from '@/components/plots/common/config';
-import styles from '@/components/plots/page.module.css';
+import styles from '@/components/page.module.css';
 
 class AxisManager {
     x!: d3.Selection<SVGGElement, unknown, null, undefined>;
@@ -91,7 +91,7 @@ class AxisManager {
             .append('g')
             .attr(
                 'transform',
-                `translate(${this.plotWidth / 2}, ${margin - this.axisConfig.labelOffset})`
+                `translate(${this.plotWidth / 2}, ${margin - this.axisConfig.labelOffsetX})`
             )
             .attr('class', styles.axisLabel)
             .append('text')
@@ -105,7 +105,7 @@ class AxisManager {
             .append('g')
             .attr(
                 'transform',
-                `translate(${-margin + this.axisConfig.labelOffset}, ${this.plotHeight / 2})`
+                `translate(${-margin + this.axisConfig.labelOffsetY}, ${this.plotHeight / 2})`
             )
             .attr('class', styles.axisLabel)
             .append('text')

@@ -1,8 +1,9 @@
 import * as d3 from 'd3';
 
-import {
-    CoordinateSystem,
-} from '@/components/plots/common/types';
+export const enum CoordinateSystem {
+    Data = 'data',
+    Pixel = 'pixel',
+}
 
 export interface ThemeConfig {
     transitionDuration?: number;
@@ -47,7 +48,8 @@ export interface AxisConfig {
     tickCount?: number;
     tickSize?: number;
     tickFormat?: (domainValue: string, index: number) => string;
-    labelOffset?: number;
+    labelOffsetX?: number;
+    labelOffsetY?: number;
 }
 
 export interface LegendConfig {
@@ -186,7 +188,8 @@ export const DEFAULT_AXIS_CONFIG: Required<AxisConfig> = {
     tickCount: 5,
     tickSize: 6,
     tickFormat: DEFAULT_TICK_FORMAT,
-    labelOffset: 12,
+    labelOffsetX: 6,
+    labelOffsetY: 12
 };
 
 export const DEFAULT_LEGEND_CONFIG: Required<LegendConfig> = {

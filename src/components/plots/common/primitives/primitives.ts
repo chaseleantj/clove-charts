@@ -8,7 +8,7 @@ import {
     BatchPrimitiveConfig,
     DataDrivenValue,
 } from '@/components/plots/common/config';
-import { CoordinateSystem } from '@/components/plots/common/types';
+import { CoordinateSystem } from '@/components/plots/common/config';
 import { renderKatex } from '@/components/plots/common/utils';
 
 type Element = d3.Selection<d3.BaseType, unknown, null, undefined>;

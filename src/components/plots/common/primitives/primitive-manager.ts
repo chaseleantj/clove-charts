@@ -34,7 +34,7 @@ import {
     PrimitiveConfig,
     BatchPrimitiveConfig,
 } from '@/components/plots/common/config';
-import { CoordinateSystem } from '@/components/plots/common/types';
+import { CoordinateSystem } from '@/components/plots/common/config';
 
 type Layer = d3.Selection<SVGGElement, unknown, null, undefined>;
 

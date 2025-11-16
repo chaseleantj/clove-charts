@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import styles from '@/components/charts/page.module.css';
+import styles from '@/components/page.module.css';
 import { v4 as uuidv4 } from 'uuid';
 
 import { LegendConfig } from '@/components/plots/common/config';

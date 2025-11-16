@@ -7,7 +7,7 @@ import {
     TooltipConfig,
 } from '@/components/plots/common/config';
 
-import styles from '@/components/charts/page.module.css';
+import styles from '@/components/page.module.css';
 
 interface ChartLayoutProps {
     children: ReactNode;
