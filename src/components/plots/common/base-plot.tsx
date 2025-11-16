@@ -300,8 +300,7 @@ class BasePlot extends Component<BasePlotProps> {
         if (xLabel) {
             this.axisManager.setXLabel(
                 xLabel,
-                this.config.margin.bottom,
-                this.config.themeConfig.fontSize
+                this.config.margin.bottom
             );
         }
 
@@ -313,8 +312,7 @@ class BasePlot extends Component<BasePlotProps> {
         if (yLabel) {
             this.axisManager.setYLabel(
                 yLabel,
-                this.config.margin.left,
-                this.config.themeConfig.fontSize
+                this.config.margin.left
             );
         }
 

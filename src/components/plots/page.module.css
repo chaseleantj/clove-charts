@@ -1,20 +1,31 @@
+/* Configurable classes */
+
+/* 
+
 .axes {
-    border: 1px solid black;
 }
 
-.x-axis {
-    border: 1px solid black;
+.xAxis {
 }
 
-.y-axis {
-    border: 1px solid black;
+.yAxis {
 }
 
-.axis-label {
-    border: 1px solid black;
+.axisLabel {
 }
 
 .grid {
-    border: 1px solid black;
+} 
+
+*/
+
+.axes text {
+    font-family: Geist, Arial, Helvetica, sans-serif;
+    font-size: 12px;
+}
+
+.grid {
+    color: gray;
+    opacity: 0.25;
 }
 

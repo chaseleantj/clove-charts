@@ -1,13 +1,10 @@
 import * as d3 from 'd3';
 
 import {
-    // TickFormatFunction,
     CoordinateSystem,
 } from '@/components/plots/common/types';
 
 export interface ThemeConfig {
-    fontSize?: number;
-    smallFontSize?: number;
     transitionDuration?: number;
     enableZoom?: boolean;
     zoomAreaThreshold?: number;
@@ -49,9 +46,8 @@ export interface AxisConfig {
     yLabel?: string | null;
     tickCount?: number;
     tickSize?: number;
-    tickFontSize?: number;
     tickFormat?: (domainValue: string, index: number) => string;
-    gridColor?: string;
+    labelOffset?: number;
 }
 
 export interface LegendConfig {
@@ -62,8 +58,6 @@ export interface LegendConfig {
         top: string;
         right: string;
     };
-    // titleFontSize?: number;
-    // fontSize?: number;
     categoricalItemHeight?: number;
     continuousBarWidth?: number;
     continuousBarLength?: number;
@@ -132,9 +126,6 @@ export interface RequiredPlotConfig {
     colorConfig: Required<ColorConfig>;
 }
 
-const DEFAULT_FONT_SIZE = 14;
-const SMALL_FONT_SIZE = 12;
-const DEFAULT_COLOR = 'steelblue';
 
 export function DEFAULT_TICK_FORMAT(d: number | string | Date): string {
     // if (d instanceof Date) {
@@ -153,8 +144,6 @@ export function DEFAULT_TICK_FORMAT(d: number | string | Date): string {
 }
 
 export const DEFAULT_THEME_CONFIG: Required<ThemeConfig> = {
-    fontSize: DEFAULT_FONT_SIZE,
-    smallFontSize: SMALL_FONT_SIZE,
     transitionDuration: 500,
     enableZoom: false,
     zoomAreaThreshold: 1000,
@@ -196,9 +185,8 @@ export const DEFAULT_AXIS_CONFIG: Required<AxisConfig> = {
     yLabel: null,
     tickCount: 5,
     tickSize: 6,
-    tickFontSize: SMALL_FONT_SIZE,
     tickFormat: DEFAULT_TICK_FORMAT,
-    gridColor: 'light-dark(rgba(0, 0, 0, 0.1), rgba(255, 255, 255, 0.1))',
+    labelOffset: 12,
 };
 
 export const DEFAULT_LEGEND_CONFIG: Required<LegendConfig> = {
@@ -223,13 +211,13 @@ export const DEFAULT_TOOLTIP_CONFIG: Required<TooltipConfig> = {
 };
 
 export const DEFAULT_COLOR_CONFIG: Required<ColorConfig> = {
-    defaultColor: DEFAULT_COLOR,
+    defaultColor: 'steelblue',
     categoricalColorScheme: d3.schemeTableau10,
     continuousColorScheme: d3.interpolateViridis,
 };
 
 export const DEFAULT_PRIMITIVE_CONFIG: Required<PrimitiveConfig> = {
-    fill: DEFAULT_COLOR,
+    fill: 'steelblue',
     stroke: 'currentColor',
     strokeWidth: 1,
     pointerEvents: 'none',

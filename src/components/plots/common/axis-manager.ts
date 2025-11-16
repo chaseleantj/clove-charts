@@ -1,5 +1,6 @@
 import * as d3 from 'd3';
 import { AxisConfig } from '@/components/plots/common/config';
+import styles from '@/components/plots/page.module.css';
 
 class AxisManager {
     x!: d3.Selection<SVGGElement, unknown, null, undefined>;
@@ -23,7 +24,7 @@ class AxisManager {
 
         this.axisGroup = this.plotArea
             .append('g')
-            .attr('class', 'axes')
+            .attr('class', styles.axes)
             .attr('overflow', 'visible');
     }
 
@@ -40,12 +41,9 @@ class AxisManager {
         this.x = this.axisGroup
             .append('g')
             .attr('transform', `translate(0, ${this.plotHeight})`)
-            .attr('class', `x-axis`)
+            .attr('class', styles.xAxis)
             .call(xAxis);
 
-        this.x
-            .selectAll('text')
-            .attr('font-size', this.axisConfig.tickFontSize);
     }
 
     setYAxis(scale: d3.AxisScale<string>) {
@@ -58,11 +56,8 @@ class AxisManager {
             yAxis = yAxis.tickFormat(this.axisConfig.tickFormat);
         }
 
-        this.y = this.axisGroup.append('g').attr('class', `y-axis`).call(yAxis);
+        this.y = this.axisGroup.append('g').attr('class', styles.yAxis).call(yAxis);
 
-        this.y
-            .selectAll('text')
-            .attr('font-size', this.axisConfig.tickFontSize);
     }
 
     setXGrid() {
@@ -71,8 +66,7 @@ class AxisManager {
                 .selectAll('.tick > line')
                 .filter((d, i, nodes) => i < nodes.length)
                 .clone()
-                .attr('class', 'grid')
-                .attr('stroke', this.axisConfig.gridColor)
+                .attr('class', styles.grid)
                 .attr('pointer-events', 'none')
                 .attr('y1', -this.plotHeight)
                 .attr('y2', 0)
@@ -85,39 +79,36 @@ class AxisManager {
                 .selectAll('.tick > line')
                 .filter((d, i, nodes) => i < nodes.length)
                 .clone()
-                .attr('class', 'grid')
-                .attr('stroke', this.axisConfig.gridColor)
+                .attr('class', styles.grid)
                 .attr('pointer-events', 'none')
                 .attr('x1', 0)
                 .attr('x2', this.plotWidth)
         );
     }
 
-    setXLabel(label: string, margin: number, fontSize = 12) {
+    setXLabel(label: string, margin: number) {
         this.x
             .append('g')
-            .attr('font-size', fontSize)
             .attr(
                 'transform',
-                `translate(${this.plotWidth / 2}, ${margin - fontSize / 2})`
+                `translate(${this.plotWidth / 2}, ${margin - this.axisConfig.labelOffset})`
             )
+            .attr('class', styles.axisLabel)
             .append('text')
-            .attr('class', 'axis-label')
             .attr('fill', 'currentColor')
             .attr('text-anchor', 'middle')
             .text(label);
     }
 
-    setYLabel(label: string | null, margin: number, fontSize = 12) {
+    setYLabel(label: string | null, margin: number) {
         this.y
             .append('g')
-            .attr('font-size', fontSize)
             .attr(
                 'transform',
-                `translate(${-margin + fontSize}, ${this.plotHeight / 2})`
+                `translate(${-margin + this.axisConfig.labelOffset}, ${this.plotHeight / 2})`
             )
+            .attr('class', styles.axisLabel)
             .append('text')
-            .attr('class', 'axis-label')
             .attr('fill', 'currentColor')
             .attr('text-anchor', 'middle')
             .attr('transform', 'rotate(-90)')
@@ -135,16 +126,6 @@ class AxisManager {
         }
 
         this.x.transition().duration(transitionDuration).call(xAxis);
-
-        this.x
-            .selectAll('text')
-            .filter(function () {
-                return (
-                    this instanceof Element &&
-                    !this.classList.contains('axis-label')
-                );
-            })
-            .attr('font-size', this.axisConfig.tickFontSize);
     }
 
     updateYAxis(scale: d3.AxisScale<string>, transitionDuration = 0) {
@@ -158,24 +139,14 @@ class AxisManager {
         }
 
         this.y.transition().duration(transitionDuration).call(yAxis);
-
-        this.y
-            .selectAll('text')
-            .filter(function () {
-                return (
-                    this instanceof Element &&
-                    !this.classList.contains('axis-label')
-                );
-            })
-            .attr('font-size', this.axisConfig.tickFontSize);
     }
 
     removeXGrid() {
-        this.x.call((g) => g.selectAll('.grid').remove());
+        this.x.call((g) => g.selectAll(`.${styles.grid}`).remove());
     }
 
     removeYGrid() {
-        this.y.call((g) => g.selectAll('.grid').remove());
+        this.y.call((g) => g.selectAll(`.${styles.grid}`).remove());
     }
 }
 
