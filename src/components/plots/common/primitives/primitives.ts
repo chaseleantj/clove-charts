@@ -40,7 +40,7 @@ export class Primitive<
         }
     }
 
-    public setStyles(styles = {}) {
+    public setStyles(styles: Partial<TConfig>) {
         this.options = { ...this.options, ...styles };
         return this;
     }
@@ -134,13 +134,9 @@ export interface PointPrimitiveOptions {
     // strokeWidth?: number;
 }
 
-export class PointPrimitive extends Primitive {
+export class PointPrimitive extends Primitive<PrimitiveConfig & PointPrimitiveOptions> {
     x?: number;
     y?: number;
-    size: number;
-    symbolType: d3.SymbolType;
-    declare options: Required<PrimitiveConfig> &
-        Required<PointPrimitiveOptions>;
 
     constructor(
         manager: PrimitiveManager,
@@ -148,18 +144,6 @@ export class PointPrimitive extends Primitive {
         options: Required<PrimitiveConfig> & Required<PointPrimitiveOptions>
     ) {
         super(manager, element, options);
-        this.size = options.size;
-        this.symbolType = options.symbolType;
-    }
-
-    public setSize(size: number): this {
-        this.size = size;
-        return this;
-    }
-
-    public setSymbolType(symbolType: d3.SymbolType): this {
-        this.symbolType = symbolType;
-        return this;
     }
 
     public setCoords(x: number, y: number): this {
@@ -179,8 +163,8 @@ export class PointPrimitive extends Primitive {
 
         const symbolGenerator = d3
             .symbol()
-            .type(this.symbolType)
-            .size(this.size);
+            .type(this.options.symbolType)
+            .size(this.options.size);
 
         return element
             .attr('d', symbolGenerator)
@@ -203,12 +187,11 @@ export interface LinePrimitiveOptions {
     strokeDashOffset?: number;
 }
 
-export class LinePrimitive extends Primitive {
+export class LinePrimitive extends Primitive<PrimitiveConfig & LinePrimitiveOptions> {
     x1?: number;
     y1?: number;
     x2?: number;
     y2?: number;
-    declare options: Required<PrimitiveConfig> & Required<LinePrimitiveOptions>;
 
     constructor(
         manager: PrimitiveManager,
@@ -272,13 +255,11 @@ export interface RectanglePrimitiveOptions {
     // strokeWidth?: number;
 }
 
-export class RectanglePrimitive extends Primitive {
+export class RectanglePrimitive extends Primitive<PrimitiveConfig & RectanglePrimitiveOptions> {
     x1?: number;
     y1?: number;
     x2?: number;
     y2?: number;
-    declare options: Required<PrimitiveConfig> &
-        Required<RectanglePrimitiveOptions>;
 
     constructor(
         manager: PrimitiveManager,
@@ -345,12 +326,11 @@ export interface TextPrimitiveOptions {
 }
 
 // Currently does not support animations with latex rendering
-export class TextPrimitive extends Primitive {
+export class TextPrimitive extends Primitive<PrimitiveConfig & TextPrimitiveOptions> {
     x?: number;
     y?: number;
     angle: number;
     text: string;
-    declare options: Required<PrimitiveConfig> & Required<TextPrimitiveOptions>;
 
     constructor(
         manager: PrimitiveManager,
@@ -434,11 +414,10 @@ export interface PathPrimitiveOptions {
     curve?: d3.CurveFactory | d3.CurveFactoryLineOnly;
 }
 
-export class PathPrimitive extends Primitive {
+export class PathPrimitive extends Primitive<PrimitiveConfig & PathPrimitiveOptions> {
     dataPoints: Record<string, any>[];
     xAccessor!: CoordinateAccessor;
     yAccessor!: CoordinateAccessor;
-    declare options: Required<PrimitiveConfig> & Required<PathPrimitiveOptions>;
 
     constructor(
         manager: PrimitiveManager,
@@ -503,12 +482,10 @@ export interface ContourPrimitiveOptions {
     colorScale?: d3.ScaleSequential<string, never> | ((t: number) => string);
 }
 
-export class ContourPrimitive extends Primitive {
+export class ContourPrimitive extends Primitive<PrimitiveConfig & ContourPrimitiveOptions> {
     fValues: number[];
     xRange: number[];
     yRange: number[];
-    declare options: Required<PrimitiveConfig> &
-        Required<ContourPrimitiveOptions>;
 
     constructor(
         manager: PrimitiveManager,
@@ -633,10 +610,7 @@ export interface ImagePrimitiveOptions {
     preserveAspectRatio?: string;
 }
 
-export class ImagePrimitive extends Primitive {
-    declare options: Required<PrimitiveConfig> &
-        Required<ImagePrimitiveOptions>;
-
+export class ImagePrimitive extends Primitive<PrimitiveConfig & ImagePrimitiveOptions> {
     width: number | null;
     coords: [number, number] | null;
     useCornerCoords: boolean;
@@ -805,7 +779,9 @@ export class ImagePrimitive extends Primitive {
     }
 }
 
-export class BatchPrimitive extends Primitive<BatchPrimitiveConfig> {
+export class BatchPrimitive<
+    TConfig extends BatchPrimitiveConfig = BatchPrimitiveConfig
+> extends Primitive<TConfig> {
     dataPoints: Record<string, any>[];
 
     xAccessor!: CoordinateAccessor;
@@ -829,7 +805,7 @@ export class BatchPrimitive extends Primitive<BatchPrimitiveConfig> {
     constructor(
         manager: PrimitiveManager,
         element: Element,
-        options: Required<BatchPrimitiveConfig>
+        options: Required<TConfig>
     ) {
         super(manager, element, options);
         this.dataPoints = [];
@@ -910,7 +886,7 @@ export class BatchPrimitive extends Primitive<BatchPrimitiveConfig> {
             const index = this.manager.BasePlot.updateFunctions.indexOf(
                 this.updateFunc
             );
-            if (index > -1) {
+            if (index >= -1) {
                 this.manager.BasePlot.updateFunctions.splice(index, 1);
             }
         }
@@ -923,15 +899,10 @@ export interface BatchPointsPrimitiveOptions {
     keyAccessor?: (d: Record<string, any>, i: number) => number;
 }
 
-export class BatchPointsPrimitive extends BatchPrimitive {
-    size: DataDrivenValue<number>;
-    symbolType: DataDrivenValue<d3.SymbolType>;
+export class BatchPointsPrimitive extends BatchPrimitive<BatchPrimitiveConfig & BatchPointsPrimitiveOptions> {
 
     xAccessor!: CoordinateAccessor;
     yAccessor!: CoordinateAccessor;
-
-    declare options: Required<BatchPrimitiveConfig> &
-        Required<BatchPointsPrimitiveOptions>;
 
     constructor(
         manager: PrimitiveManager,
@@ -940,18 +911,6 @@ export class BatchPointsPrimitive extends BatchPrimitive {
             Required<BatchPointsPrimitiveOptions>
     ) {
         super(manager, element, options);
-        this.size = options.size;
-        this.symbolType = options.symbolType;
-    }
-
-    setSize(size: DataDrivenValue<number>): this {
-        this.size = size;
-        return this;
-    }
-
-    setSymbolType(symbolType: DataDrivenValue<d3.SymbolType>): this {
-        this.symbolType = symbolType;
-        return this;
     }
 
     setCoordinateAccessors(
@@ -974,20 +933,20 @@ export class BatchPointsPrimitive extends BatchPrimitive {
 
         const symbolGenerator = d3.symbol();
 
-        if (typeof this.symbolType === 'function') {
+        if (typeof this.options.symbolType === 'function') {
             symbolGenerator.type(
-                this.symbolType as (d: Record<string, any>) => d3.SymbolType
+                this.options.symbolType as (d: Record<string, any>) => d3.SymbolType
             );
         } else {
-            symbolGenerator.type(this.symbolType as d3.SymbolType);
+            symbolGenerator.type(this.options.symbolType as d3.SymbolType);
         }
 
-        if (typeof this.size === 'function') {
+        if (typeof this.options.size === 'function') {
             symbolGenerator.size(
-                this.size as (d: Record<string, any>) => number
+                this.options.size as (d: Record<string, any>) => number
             );
         } else {
-            symbolGenerator.size(this.size as number);
+            symbolGenerator.size(this.options.size as number);
         }
 
         return finalSelection
@@ -1022,14 +981,11 @@ export interface BatchLinesPrimitiveOptions {
     keyAccessor?: (d: Record<string, any>, i: number) => number;
 }
 
-export class BatchLinesPrimitive extends BatchPrimitive {
+export class BatchLinesPrimitive extends BatchPrimitive<BatchPrimitiveConfig & BatchLinesPrimitiveOptions> {
     x1Accessor!: CoordinateAccessor;
     y1Accessor!: CoordinateAccessor;
     x2Accessor!: CoordinateAccessor;
     y2Accessor!: CoordinateAccessor;
-
-    declare options: Required<BatchPrimitiveConfig> &
-        Required<BatchLinesPrimitiveOptions>;
 
     constructor(
         manager: PrimitiveManager,
@@ -1139,14 +1095,11 @@ export interface BatchRectanglesPrimitiveOptions {
     keyAccessor?: (d: Record<string, any>, i: number) => number;
 }
 
-export class BatchRectanglesPrimitive extends BatchPrimitive {
+export class BatchRectanglesPrimitive extends BatchPrimitive<BatchPrimitiveConfig & BatchRectanglesPrimitiveOptions> {
     x1Accessor!: CoordinateAccessor;
     y1Accessor!: CoordinateAccessor;
     x2Accessor!: CoordinateAccessor;
     y2Accessor!: CoordinateAccessor;
-
-    declare options: Required<BatchPrimitiveConfig> &
-        Required<BatchRectanglesPrimitiveOptions>;
 
     constructor(
         manager: PrimitiveManager,
@@ -1255,14 +1208,11 @@ export interface BatchTextPrimitiveOptions {
     keyAccessor?: (d: Record<string, any>, i: number) => number;
 }
 
-export class BatchTextPrimitive extends BatchPrimitive {
+export class BatchTextPrimitive extends BatchPrimitive<BatchPrimitiveConfig & BatchTextPrimitiveOptions> {
     xAccessor!: CoordinateAccessor;
     yAccessor!: CoordinateAccessor;
     textAccessor?: (d: Record<string, any>) => string;
     angleAccessor?: (d: Record<string, any>) => number | null | undefined;
-
-    declare options: Required<BatchPrimitiveConfig> &
-        Required<BatchTextPrimitiveOptions>;
 
     constructor(
         manager: PrimitiveManager,

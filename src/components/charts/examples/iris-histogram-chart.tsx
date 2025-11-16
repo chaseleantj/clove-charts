@@ -26,7 +26,6 @@ interface IrisData {
 const PLOT_CONFIG: PlotConfig = {
     themeConfig: { enableZoom: false },
     axisConfig: { xLabel: 'Sepal width (cm)', yLabel: 'Frequency' },
-    margin: { right: 55 },
 };
 
 export default function IrisHistogramChart() {

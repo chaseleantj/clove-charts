@@ -26,7 +26,7 @@ interface IrisData {
 const PLOT_CONFIG: PlotConfig = {
     themeConfig: { enableZoom: true },
     axisConfig: { xLabel: 'Sepal width (cm)', yLabel: 'Petal length (cm)' },
-    margin: { right: 55 },
+    margin: { right: 80 },
 };
 
 export default function IrisScatterChart() {

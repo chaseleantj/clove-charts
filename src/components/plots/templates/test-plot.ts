@@ -27,8 +27,8 @@ class BaseTestPlot extends BasePlot {
         });
 
         point
-            .setSize(200)
             .setStyles({
+                size: 200,
                 fill: 'red',
                 stroke: 'black',
             })

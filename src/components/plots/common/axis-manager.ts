@@ -86,7 +86,7 @@ class AxisManager {
         );
     }
 
-    setXLabel(label: string, margin: number) {
+    setXLabel(label: string | null, margin: number) {
         this.x
             .append('g')
             .attr(
