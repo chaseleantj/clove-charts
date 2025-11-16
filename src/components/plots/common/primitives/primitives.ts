@@ -124,6 +124,14 @@ export class Primitive<
         this.element.style('opacity', 0);
         return this;
     }
+
+    public attachEvent<K extends keyof SVGElementEventMap>(
+        event: K,
+        handler: (event: SVGElementEventMap[K]) => void
+    ): this {
+        this.element.on(event, handler);
+        return this;
+    }
 }
 
 export interface PointPrimitiveOptions {
@@ -891,6 +899,14 @@ export class BatchPrimitive<
             }
         }
     }
+
+    public attachEvent<K extends keyof SVGElementEventMap>(
+        event: K,
+        handler: (event: SVGElementEventMap[K], d: Record<string, any>) => void
+    ): this {
+        this.elementSelection.on(event, handler);
+        return this;
+    }
 }
 
 export interface BatchPointsPrimitiveOptions {
@@ -1310,7 +1326,7 @@ type PrimitiveConstructor = new (
     options: any
 ) => Primitive<any>;
 
-export const PRIMITIVE_LOOKUP = new Map<PrimitiveConstructor, PrimitiveInfo>([
+export const PrimitiveInfoMap = new Map<PrimitiveConstructor, PrimitiveInfo>([
     [PointPrimitive, { isBatch: false, svgElementType: 'path' }],
     [LinePrimitive, { isBatch: false, svgElementType: 'line' }],
     [RectanglePrimitive, { isBatch: false, svgElementType: 'rect' }],

@@ -121,21 +121,8 @@ class BaseScatterPlot extends BasePlot {
         const tooltipDisplayClasses =
             this.config.tooltipConfig.tooltipClasses ?? displayClasses;
 
-        const elementSelection = this.dataPoints
-            .elementSelection as d3.Selection<
-            | SVGPathElement
-            | SVGLineElement
-            | SVGRectElement
-            | SVGTextElement
-            | SVGImageElement
-            | SVGGElement,
-            Record<string, any>,
-            d3.BaseType,
-            unknown
-        >;
-
-        elementSelection
-            .on('mouseover', (event, d) => {
+        this.dataPoints
+            .attachEvent('mouseover', (event, d) => {
                 if (!this.brushManager || !this.brushManager.brushing) {
                     const basePointSize = this.resolvePointSize(d);
                     const symbolGenerator = d3
@@ -143,7 +130,7 @@ class BaseScatterPlot extends BasePlot {
                         .type(d3.symbolCircle)
                         .size(4 * basePointSize);
 
-                    d3.select(event.target)
+                    d3.select(event.currentTarget as SVGPathElement)
                         .transition()
                         .duration(
                             this.config.themeConfig.transitionDuration / 4
@@ -155,7 +142,7 @@ class BaseScatterPlot extends BasePlot {
                     this.tooltipManager.showTooltip();
                 }
             })
-            .on('mouseout', (event, d) => {
+            .attachEvent('mouseout', (event, d) => {
                 if (!this.brushManager || !this.brushManager.brushing) {
                     const basePointSize = this.resolvePointSize(d);
                     const symbolGenerator = d3
@@ -163,7 +150,7 @@ class BaseScatterPlot extends BasePlot {
                         .type(d3.symbolCircle)
                         .size(basePointSize);
 
-                    d3.select(event.target)
+                    d3.select(event.currentTarget as SVGPathElement)
                         .transition()
                         .duration(
                             this.config.themeConfig.transitionDuration / 4
@@ -172,6 +159,45 @@ class BaseScatterPlot extends BasePlot {
                     this.tooltipManager.hideTooltip();
                 }
             });
+
+        // elementSelection
+        //     .on('mouseover', (event, d) => {
+        //         if (!this.brushManager || !this.brushManager.brushing) {
+        //             const basePointSize = this.resolvePointSize(d);
+        //             const symbolGenerator = d3
+        //                 .symbol()
+        //                 .type(d3.symbolCircle)
+        //                 .size(4 * basePointSize);
+
+        //             d3.select(event.target)
+        //                 .transition()
+        //                 .duration(
+        //                     this.config.themeConfig.transitionDuration / 4
+        //                 )
+        //                 .attr('d', symbolGenerator);
+
+        //             this.tooltipManager.formatTooltip(d, tooltipDisplayClasses);
+        //             this.tooltipManager.positionTooltip(event);
+        //             this.tooltipManager.showTooltip();
+        //         }
+        //     })
+        //     .on('mouseout', (event, d) => {
+        //         if (!this.brushManager || !this.brushManager.brushing) {
+        //             const basePointSize = this.resolvePointSize(d);
+        //             const symbolGenerator = d3
+        //                 .symbol()
+        //                 .type(d3.symbolCircle)
+        //                 .size(basePointSize);
+
+        //             d3.select(event.target)
+        //                 .transition()
+        //                 .duration(
+        //                     this.config.themeConfig.transitionDuration / 4
+        //                 )
+        //                 .attr('d', symbolGenerator);
+        //             this.tooltipManager.hideTooltip();
+        //         }
+        //     });
 
         this.interactionSurface.on('click', () =>
             this.tooltipManager.hideTooltip()

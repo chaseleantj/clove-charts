@@ -87,11 +87,13 @@ export interface PrimitiveConfig<
     fill?: TFill;
     stroke?: TStroke;
     strokeWidth?: TStrokeWidth;
-    pointerEvents?: string;
+    opacity?: TOpacity;
     coordinateSystem?: CoordinateSystem;
+
+    // these properties cannot be changed after initialization
+    pointerEvents?: 'auto' | 'none';
     staticElement?: boolean;
     layerName?: string;
-    opacity?: TOpacity;
     className?: string;
 }
 
@@ -223,10 +225,10 @@ export const DEFAULT_PRIMITIVE_CONFIG: Required<PrimitiveConfig> = {
     fill: 'steelblue',
     stroke: 'currentColor',
     strokeWidth: 1,
-    pointerEvents: 'none',
+    opacity: 1,
     coordinateSystem: CoordinateSystem.Data,
+    pointerEvents: 'none',
     staticElement: false,
     layerName: 'default',
-    opacity: 1,
     className: 'primitive',
 };

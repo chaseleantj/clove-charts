@@ -18,6 +18,7 @@ class BaseTestPlot extends BasePlot {
 
         const point = this.primitives.addPoint(3, 3, {
             symbolType: d3.symbolTriangle,
+            // pointerEvents: 'auto',
         });
 
         const text = this.primitives.addText('test', 3.5, 3, {
@@ -26,24 +27,35 @@ class BaseTestPlot extends BasePlot {
             fontFamily: 'Times New Roman'
         });
 
-        point
-            .setStyles({
-                size: 200,
-                fill: 'red',
-                stroke: 'black',
-            })
-            .setCoords(2, 6)
-            .render(4000, d3.easeCubicIn)
-            .end()
-            .then(() => {
-                point.setCoords(4, 7).render(4000, d3.easeCubicOut);
-            });
+        // point
+        //     .setStyles({
+        //         size: 200,
+        //         fill: 'red',
+        //         stroke: 'black',
+        //         pointerEvents: 'auto'
+        //     })
+        //     .setCoords(2, 6)
+        //     .render(4000, d3.easeCubicIn)
+        //     .end()
+        //     .then(() => {
+        //         point.setCoords(4, 7).render(4000, d3.easeCubicOut);
+        //     });
 
         line.setCoords(4, 2, 3, 7).render(5000);
         text.setCoords(4, 5)
             .setAngle(30)
             .setStyles({ fontSize: 30 })
             .render(5000);
+
+        point.setStyles({
+            pointerEvents: 'auto'
+        })
+
+        point.attachEvent("mouseover", (event) => {
+                point.setStyles({
+                    size: 1000,
+                }).render(1000)
+            })
     }
 }
 

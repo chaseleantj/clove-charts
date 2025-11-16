@@ -579,6 +579,11 @@ class BasePlot extends Component<BasePlotProps> {
         this.setupAxes();
         this.setupBrush();
         this.setupInteractionSurface();
+
+        // Ensure that the primitives are in front (have the highest z-index for interactivity)
+        if (this.primitives) {
+            this.primitives.sortLayers();
+        }
     }
 
     renderPhase(): void {

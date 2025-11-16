@@ -26,7 +26,7 @@ import {
     BatchTextPrimitive,
     BatchTextPrimitiveOptions,
     PrimitiveInfo,
-    PRIMITIVE_LOOKUP,
+    PrimitiveInfoMap,
 } from '@/components/plots/common/primitives/primitives';
 import type { CoordinateAccessor } from '@/components/plots/common/primitives/primitives';
 import {
@@ -93,7 +93,7 @@ class PrimitiveManager {
         primitiveClass: T,
         config: Partial<ConstructorParameters<T>[2]>
     ): InstanceType<T> {
-        const primitiveInfo = PRIMITIVE_LOOKUP.get(primitiveClass);
+        const primitiveInfo = PrimitiveInfoMap.get(primitiveClass);
         if (!primitiveInfo) {
             throw new Error(`Unknown primitive class: ${primitiveClass.name}`);
         }
