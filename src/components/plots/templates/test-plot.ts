@@ -18,7 +18,7 @@ class BaseTestPlot extends BasePlot {
 
         const point = this.primitives.addPoint(3, 3, {
             symbolType: d3.symbolTriangle,
-            // pointerEvents: 'auto',
+            pointerEvents: 'auto',
         });
 
         const text = this.primitives.addText('test', 3.5, 3, {
@@ -48,7 +48,7 @@ class BaseTestPlot extends BasePlot {
             .render(5000);
 
         point.setStyles({
-            pointerEvents: 'auto'
+            fill: 'green'
         })
 
         point.attachEvent("mouseover", (event) => {

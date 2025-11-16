@@ -4,6 +4,7 @@ import PrimitiveManager from '@/components/plots/common/primitives/primitive-man
 import type BasePlot from '@/components/plots/common/base-plot';
 import { isContinuousScale } from '@/components/plots/common/scale-manager';
 import {
+    ImmutablePrimitiveConfig,
     PrimitiveConfig,
     BatchPrimitiveConfig,
     DataDrivenValue,
@@ -40,7 +41,7 @@ export class Primitive<
         }
     }
 
-    public setStyles(styles: Partial<TConfig>) {
+    public setStyles(styles: Partial<Omit<TConfig, keyof ImmutablePrimitiveConfig>>) {
         this.options = { ...this.options, ...styles };
         return this;
     }
@@ -86,6 +87,15 @@ export class Primitive<
         return element;
     }
 
+    protected applyCommonStyles(element: any): any {
+        return element
+            .attr('fill', this.options.fill)
+            .attr('stroke', this.options.stroke)
+            .attr('stroke-width', this.options.strokeWidth)
+            .attr('opacity', this.options.opacity)
+            .attr('pointer-events', this.options.pointerEvents);
+    }
+
     public createUpdateFunction(
         updateCallback: (this: BasePlot) => void
     ): this {
@@ -129,6 +139,7 @@ export class Primitive<
         event: K,
         handler: (event: SVGElementEventMap[K]) => void
     ): this {
+        // TODO: if pointer-events is 'none', automatically change it to 'auto' when an event is attached
         this.element.on(event, handler);
         return this;
     }
@@ -161,8 +172,6 @@ export class PointPrimitive extends Primitive<PrimitiveConfig & PointPrimitiveOp
     }
 
     public render(transitionDuration = 0, ease?: EasingFunction) {
-        // Cast to any due to TypeScript limitation: Selection and Transition both support
-        // .attr() identically, but TypeScript can't properly infer overloads on union types
         const element = this.getElementWithTransition(
             this.element,
             transitionDuration,
@@ -174,12 +183,8 @@ export class PointPrimitive extends Primitive<PrimitiveConfig & PointPrimitiveOp
             .type(this.options.symbolType)
             .size(this.options.size);
 
-        return element
+        return this.applyCommonStyles(element)
             .attr('d', symbolGenerator)
-            .attr('fill', this.options.fill)
-            .attr('stroke', this.options.stroke)
-            .attr('stroke-width', this.options.strokeWidth)
-            .attr('opacity', this.options.opacity)
             .attr(
                 'transform',
                 `translate(${this.convertX(this.x!)}, ${this.convertY(this.y!)})`
@@ -242,16 +247,13 @@ export class LinePrimitive extends Primitive<PrimitiveConfig & LinePrimitiveOpti
             ease
         ) as any;
 
-        return element
+        return this.applyCommonStyles(element)
             .attr('x1', this.convertX(this.x1!))
             .attr('y1', this.convertY(this.y1!))
             .attr('x2', this.convertX(this.x2!))
             .attr('y2', this.convertY(this.y2!))
             .attr('marker-start', markerStart)
             .attr('marker-end', markerEnd)
-            .attr('opacity', this.options.opacity)
-            .attr('stroke', this.options.stroke)
-            .attr('stroke-width', this.options.strokeWidth)
             .attr('stroke-dasharray', this.options.strokeDashArray)
             .attr('stroke-dashoffset', this.options.strokeDashOffset);
     }
@@ -302,15 +304,11 @@ export class RectanglePrimitive extends Primitive<PrimitiveConfig & RectanglePri
         const rectWidth = Math.abs(scaledX2 - scaledX1);
         const rectHeight = Math.abs(scaledY2 - scaledY1);
 
-        return element
+        return this.applyCommonStyles(element)
             .attr('x', rectX)
             .attr('y', rectY)
             .attr('width', rectWidth)
-            .attr('height', rectHeight)
-            .attr('fill', this.options.fill)
-            .attr('stroke', this.options.stroke)
-            .attr('stroke-width', this.options.strokeWidth)
-            .attr('opacity', this.options.opacity);
+            .attr('height', rectHeight);
     }
 }
 
@@ -384,8 +382,6 @@ export class TextPrimitive extends Primitive<PrimitiveConfig & TextPrimitiveOpti
             element = this.renderPlainText(element, x, y);
         }
 
-        element.attr('opacity', this.options.opacity);
-
         return element;
     }
 
@@ -394,14 +390,13 @@ export class TextPrimitive extends Primitive<PrimitiveConfig & TextPrimitiveOpti
         x: number,
         y: number
     ): ElementOrTransition {
-        element
+        this.applyCommonStyles(element)
             .attr('x', x)
             .attr('y', y)
             .attr('font-size', this.options.fontSize)
             .attr('font-family', this.options.fontFamily)
             .attr('text-anchor', this.options.anchor)
             .attr('dominant-baseline', this.options.baseline)
-            .attr('fill', this.options.fill)
             .text(this.text);
 
         if (this.angle) {
@@ -474,11 +469,7 @@ export class PathPrimitive extends Primitive<PrimitiveConfig & PathPrimitiveOpti
             })
             .curve(this.options.curve);
 
-        return element
-            .attr('fill', this.options.fill)
-            .attr('opacity', this.options.opacity)
-            .attr('stroke', this.options.stroke)
-            .attr('stroke-width', this.options.strokeWidth)
+        return this.applyCommonStyles(element)
             .attr('stroke-dasharray', this.options.strokeDashArray)
             .attr('stroke-dashoffset', this.options.strokeDashOffset)
             .attr('d', lineGenerator(this.dataPoints));
@@ -597,10 +588,7 @@ export class ContourPrimitive extends Primitive<PrimitiveConfig & ContourPrimiti
             ease
         ) as any;
 
-        return finalSelection
-            .attr('stroke', this.options.stroke)
-            .attr('stroke-width', this.options.strokeWidth)
-            .attr('opacity', this.options.opacity)
+        return this.applyCommonStyles(finalSelection)
             .attr('fill', (d: { value: number }) =>
                 this.options.colorScale
                     ? this.options.colorScale(d.value)
@@ -829,6 +817,12 @@ export class BatchPrimitive<
         return this;
     }
 
+    protected applyCommonStyles(element: any): any {
+        return super
+            .applyCommonStyles(element)
+            .attr('class', this.options.className);
+    }
+
     protected performDataJoin(
         elementType: SVGElementType,
         transitionDuration = 0,
@@ -965,20 +959,14 @@ export class BatchPointsPrimitive extends BatchPrimitive<BatchPrimitiveConfig & 
             symbolGenerator.size(this.options.size as number);
         }
 
-        return finalSelection
+        return this.applyCommonStyles(finalSelection)
             .attr('d', symbolGenerator)
-            .attr('fill', this.options.fill)
-            .attr('stroke', this.options.stroke)
-            .attr('stroke-width', this.options.strokeWidth)
-            .attr('opacity', this.options.opacity)
-            .attr('class', this.options.className)
             .attr('transform', (d: Record<string, any>) => {
                 const x = this.xAccessor(d);
                 const y = this.yAccessor(d);
 
-                // Handle null/undefined coordinates
                 if (x == null || y == null || isNaN(x) || isNaN(y)) {
-                    return null; // Hide invalid points
+                    return null;
                 }
 
                 return `translate(${this.convertX(x)}, ${this.convertY(y)})`;
@@ -1034,14 +1022,12 @@ export class BatchLinesPrimitive extends BatchPrimitive<BatchPrimitiveConfig & B
 
         if (!this.dataPoints || finalSelection.empty()) return;
 
-        // Add arrow markers similar to addLine
-        // Note: Arrow markers only support constant colors, not data-driven functions
         let markerStart: string | null = null;
         let markerEnd: string | null = null;
 
         const strokeColor =
             typeof this.options.stroke === 'function'
-                ? 'currentColor' // Fallback for data-driven stroke
+                ? 'currentColor'
                 : this.options.stroke;
 
         if (this.options.arrow === 'start' || this.options.arrow === 'both') {
@@ -1056,9 +1042,7 @@ export class BatchLinesPrimitive extends BatchPrimitive<BatchPrimitiveConfig & B
             markerEnd = `url(#${markerId})`;
         }
 
-        return finalSelection
-            .attr('stroke', this.options.stroke)
-            .attr('stroke-width', this.options.strokeWidth)
+        return this.applyCommonStyles(finalSelection)
             .attr('stroke-dasharray', this.options.strokeDashArray)
             .attr('stroke-dashoffset', this.options.strokeDashOffset)
             .attr('opacity', (d: Record<string, any>) => {
@@ -1081,7 +1065,6 @@ export class BatchLinesPrimitive extends BatchPrimitive<BatchPrimitiveConfig & B
                 }
                 return this.options.opacity;
             })
-            .attr('class', this.options.className)
             .attr('marker-start', markerStart)
             .attr('marker-end', markerEnd)
             .attr('x1', (d: Record<string, any>) => {
@@ -1152,16 +1135,12 @@ export class BatchRectanglesPrimitive extends BatchPrimitive<BatchPrimitiveConfi
 
         if (!this.dataPoints || finalSelection.empty()) return;
 
-        return finalSelection
-            .attr('fill', this.options.fill)
-            .attr('stroke', this.options.stroke)
-            .attr('stroke-width', this.options.strokeWidth)
+        return this.applyCommonStyles(finalSelection)
             .attr('opacity', (d: Record<string, any>) => {
                 const x1 = this.x1Accessor(d);
                 const y1 = this.y1Accessor(d);
                 const x2 = this.x2Accessor(d);
                 const y2 = this.y2Accessor(d);
-                // Hide rectangles with invalid coordinates
                 if (
                     x1 == null ||
                     y1 == null ||
@@ -1176,7 +1155,6 @@ export class BatchRectanglesPrimitive extends BatchPrimitive<BatchPrimitiveConfi
                 }
                 return this.options.opacity;
             })
-            .attr('class', this.options.className)
             .attr('x', (d: Record<string, any>) => {
                 const x1Val = this.x1Accessor(d);
                 const x2Val = this.x2Accessor(d);
@@ -1273,7 +1251,7 @@ export class BatchTextPrimitive extends BatchPrimitive<BatchPrimitiveConfig & Ba
 
         if (!this.dataPoints || finalSelection.empty()) return;
 
-        return finalSelection
+        return this.applyCommonStyles(finalSelection)
             .text((d: Record<string, any>) =>
                 this.textAccessor ? this.textAccessor(d) : d
             )
@@ -1289,7 +1267,6 @@ export class BatchTextPrimitive extends BatchPrimitive<BatchPrimitiveConfig & Ba
             .attr('dominant-baseline', this.options.baseline)
             .attr('font-family', this.options.fontFamily)
             .attr('font-size', this.options.fontSize)
-            .attr('fill', this.options.fill)
             .attr('opacity', (d: Record<string, any>) => {
                 const x = this.xAccessor(d);
                 const y = this.yAccessor(d);
@@ -1299,7 +1276,6 @@ export class BatchTextPrimitive extends BatchPrimitive<BatchPrimitiveConfig & Ba
                 }
                 return this.options.opacity;
             })
-            .attr('class', this.options.className)
             .attr('transform', (d: Record<string, any>) => {
                 const angle = this.angleAccessor ? this.angleAccessor(d) : 0;
                 if (angle) {

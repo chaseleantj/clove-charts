@@ -274,6 +274,7 @@ class PrimitiveManager {
             anchor: 'middle',
             baseline: 'middle',
             angle: 0,
+            stroke: 'none',
             latex: false,
             ...options,
         };

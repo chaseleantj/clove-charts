@@ -78,7 +78,15 @@ export interface ColorConfig {
     continuousColorScheme?: (t: number) => string;
 }
 
-export interface PrimitiveConfig<
+export interface ImmutablePrimitiveConfig {
+    // these properties cannot be changed after primitive initialization
+    pointerEvents?: 'all' | 'auto' | 'none';
+    staticElement?: boolean;
+    layerName?: string;
+    className?: string;
+}
+
+export interface MutablePrimitiveConfig<
     TFill = string,
     TStroke = string,
     TStrokeWidth = number,
@@ -89,13 +97,14 @@ export interface PrimitiveConfig<
     strokeWidth?: TStrokeWidth;
     opacity?: TOpacity;
     coordinateSystem?: CoordinateSystem;
-
-    // these properties cannot be changed after initialization
-    pointerEvents?: 'auto' | 'none';
-    staticElement?: boolean;
-    layerName?: string;
-    className?: string;
 }
+
+export type PrimitiveConfig<
+    TFill = string,
+    TStroke = string,
+    TStrokeWidth = number,
+    TOpacity = number
+> = ImmutablePrimitiveConfig & MutablePrimitiveConfig<TFill, TStroke, TStrokeWidth, TOpacity>;
 
 export type DataDrivenValue<T> = T | ((d: Record<string, any>) => T);
 
