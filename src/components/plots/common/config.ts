@@ -1,10 +1,5 @@
 import * as d3 from 'd3';
 
-export const enum CoordinateSystem {
-    Data = 'data',
-    Pixel = 'pixel',
-}
-
 export interface ThemeConfig {
     transitionDuration?: number;
     enableZoom?: boolean;
@@ -80,23 +75,23 @@ export interface ColorConfig {
 
 export interface ImmutablePrimitiveConfig {
     // these properties cannot be changed after primitive initialization
-    pointerEvents?: 'all' | 'auto' | 'none';
     staticElement?: boolean;
     layerName?: string;
     className?: string;
 }
 
 export interface MutablePrimitiveConfig<
-    TFill = string,
-    TStroke = string,
-    TStrokeWidth = number,
-    TOpacity = number,
+TFill = string,
+TStroke = string,
+TStrokeWidth = number,
+TOpacity = number,
 > {
     fill?: TFill;
     stroke?: TStroke;
     strokeWidth?: TStrokeWidth;
     opacity?: TOpacity;
-    coordinateSystem?: CoordinateSystem;
+    coordinateSystem?: 'data' | 'pixel';
+    pointerEvents?: 'all' | 'auto' | 'none';
 }
 
 export type PrimitiveConfig<
@@ -235,7 +230,7 @@ export const DEFAULT_PRIMITIVE_CONFIG: Required<PrimitiveConfig> = {
     stroke: 'currentColor',
     strokeWidth: 1,
     opacity: 1,
-    coordinateSystem: CoordinateSystem.Data,
+    coordinateSystem: 'data',
     pointerEvents: 'none',
     staticElement: false,
     layerName: 'default',

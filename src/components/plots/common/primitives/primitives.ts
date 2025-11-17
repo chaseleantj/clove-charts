@@ -9,7 +9,6 @@ import {
     BatchPrimitiveConfig,
     DataDrivenValue,
 } from '@/components/plots/common/config';
-import { CoordinateSystem } from '@/components/plots/common/config';
 import { renderKatex } from '@/components/plots/common/utils';
 
 type Element = d3.Selection<d3.BaseType, unknown, null, undefined>;
@@ -36,7 +35,7 @@ export class Primitive<
         this.updateFunc = null;
 
         // Force elements to be static when using pixel coordinates
-        if (this.options.coordinateSystem === CoordinateSystem.Pixel) {
+        if (this.options.coordinateSystem === 'pixel') {
             this.options.staticElement = true;
         }
     }
@@ -48,7 +47,7 @@ export class Primitive<
 
     // Converts coordinates based on coordinate system
     public convertX(x: number): number {
-        if (this.options.coordinateSystem === CoordinateSystem.Pixel) {
+        if (this.options.coordinateSystem === 'pixel') {
             return x;
         }
         const scale = this.manager.BasePlot.scale.x;
@@ -56,7 +55,7 @@ export class Primitive<
     }
 
     public convertY(y: number): number {
-        if (this.options.coordinateSystem === CoordinateSystem.Pixel) {
+        if (this.options.coordinateSystem === 'pixel') {
             return y;
         }
         const scale = this.manager.BasePlot.scale.y;
@@ -139,7 +138,11 @@ export class Primitive<
         event: K,
         handler: (event: SVGElementEventMap[K]) => void
     ): this {
-        // TODO: if pointer-events is 'none', automatically change it to 'auto' when an event is attached
+        // pointerEvents cannot be none for events to be triggered
+        if (this.options.pointerEvents === 'none') {
+            this.options.pointerEvents = 'auto';
+            this.element.attr('pointer-events', 'auto');
+        }
         this.element.on(event, handler);
         return this;
     }
@@ -898,6 +901,10 @@ export class BatchPrimitive<
         event: K,
         handler: (event: SVGElementEventMap[K], d: Record<string, any>) => void
     ): this {
+        if (this.options.pointerEvents === 'none') {
+            this.options.pointerEvents = 'auto';
+            this.elementSelection.attr('pointer-events', 'auto');
+        }
         this.elementSelection.on(event, handler);
         return this;
     }

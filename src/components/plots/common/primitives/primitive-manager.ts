@@ -34,7 +34,6 @@ import {
     PrimitiveConfig,
     BatchPrimitiveConfig,
 } from '@/components/plots/common/config';
-import { CoordinateSystem } from '@/components/plots/common/config';
 
 type Layer = d3.Selection<SVGGElement, unknown, null, undefined>;
 
@@ -169,7 +168,7 @@ class PrimitiveManager {
 
         point.setCoords(x, y).render();
 
-        if (point.options.coordinateSystem === CoordinateSystem.Data) {
+        if (point.options.coordinateSystem === 'data') {
             point.createUpdateFunction(function () {
                 point
                     .setCoords(point.x!, point.y!)
@@ -197,7 +196,7 @@ class PrimitiveManager {
 
         line.setCoords(x1, y1, x2, y2).render();
 
-        if (line.options.coordinateSystem === CoordinateSystem.Data) {
+        if (line.options.coordinateSystem === 'data') {
             line.createUpdateFunction(function () {
                 line.setCoords(line.x1!, line.y1!, line.x2!, line.y2!).render(
                     this.config.themeConfig.transitionDuration
@@ -227,7 +226,7 @@ class PrimitiveManager {
             .setCoordinateAccessors(xAccessor, yAccessor)
             .render();
 
-        if (path.options.coordinateSystem === CoordinateSystem.Data) {
+        if (path.options.coordinateSystem === 'data') {
             path.createUpdateFunction(function () {
                 path.setData(dataPoints)
                     .setCoordinateAccessors(xAccessor, yAccessor)
@@ -251,7 +250,7 @@ class PrimitiveManager {
 
         rect.setCoords(x1, y1, x2, y2).render();
 
-        if (rect.options.coordinateSystem === CoordinateSystem.Data) {
+        if (rect.options.coordinateSystem === 'data') {
             rect.createUpdateFunction(function () {
                 rect.setCoords(rect.x1!, rect.y1!, rect.x2!, rect.y2!).render(
                     this.config.themeConfig.transitionDuration
@@ -286,7 +285,7 @@ class PrimitiveManager {
             .setAngle(options.angle!)
             .render();
 
-        if (text.options.coordinateSystem === CoordinateSystem.Data) {
+        if (text.options.coordinateSystem === 'data') {
             text.createUpdateFunction(function () {
                 text.setCoords(text.x!, text.y!)
                     .setAngle(text.angle)
@@ -314,7 +313,7 @@ class PrimitiveManager {
 
         contour.setData(fValues, xRange, yRange).render();
 
-        if (contour.options.coordinateSystem === CoordinateSystem.Data) {
+        if (contour.options.coordinateSystem === 'data') {
             contour.createUpdateFunction(function () {
                 contour
                     .setData(contour.fValues, contour.xRange, contour.yRange)
@@ -342,7 +341,7 @@ class PrimitiveManager {
         image
             .loadImage(href)
             .then(() => {
-                if (image.options.coordinateSystem === CoordinateSystem.Data) {
+                if (image.options.coordinateSystem === 'data') {
                     image.createUpdateFunction(function () {
                         image.render(
                             this.config.themeConfig.transitionDuration
@@ -382,7 +381,7 @@ class PrimitiveManager {
             .setCoordinateAccessors(xAccessor, yAccessor)
             .render();
 
-        if (points.options.coordinateSystem === CoordinateSystem.Data) {
+        if (points.options.coordinateSystem === 'data') {
             points.createUpdateFunction(function () {
                 points.render(this.config.themeConfig.transitionDuration);
             });
@@ -423,7 +422,7 @@ class PrimitiveManager {
             )
             .render();
 
-        if (lines.options.coordinateSystem === CoordinateSystem.Data) {
+        if (lines.options.coordinateSystem === 'data') {
             lines.createUpdateFunction(function () {
                 lines.render(this.config.themeConfig.transitionDuration);
             });
@@ -464,7 +463,7 @@ class PrimitiveManager {
             )
             .render();
 
-        if (rectangles.options.coordinateSystem === CoordinateSystem.Data) {
+        if (rectangles.options.coordinateSystem === 'data') {
             rectangles.createUpdateFunction(function () {
                 rectangles.render(this.config.themeConfig.transitionDuration);
             });
@@ -508,7 +507,7 @@ class PrimitiveManager {
 
         texts.render();
 
-        if (texts.options.coordinateSystem === CoordinateSystem.Data) {
+        if (texts.options.coordinateSystem === 'data') {
             texts.createUpdateFunction(function () {
                 texts.render(this.config.themeConfig.transitionDuration);
             });

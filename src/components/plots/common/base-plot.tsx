@@ -26,7 +26,6 @@ import {
     DEFAULT_TOOLTIP_CONFIG,
     DEFAULT_COLOR_CONFIG,
 } from '@/components/plots/common/config';
-import { CoordinateSystem } from '@/components/plots/common/config';
 
 interface Domain {
     x: [number, number] | [Date, Date] | string[];
@@ -487,10 +486,10 @@ class BasePlot extends Component<BasePlotProps> {
 
     getEventCoords(
         event: Event,
-        coordinateSystem = CoordinateSystem.Pixel
+        coordinateSystem = 'pixel'
     ): [number, number] {
         const [x, y] = d3.pointer(event, this.plot.node());
-        if (coordinateSystem === CoordinateSystem.Data) {
+        if (coordinateSystem === 'data') {
             if (
                 !isContinuousScale(this.scale.x) ||
                 !isContinuousScale(this.scale.y)
