@@ -115,7 +115,6 @@ class BaseContourPlot extends BasePlot {
         //   }
         // )
 
-        this.onRenderComplete();
     }
 
     onSetupLegend() {

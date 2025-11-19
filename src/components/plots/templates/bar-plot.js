@@ -115,7 +115,6 @@ class BaseBarPlot extends BasePlot {
             }
         );
 
-        this.onRenderComplete();
     }
 }
 

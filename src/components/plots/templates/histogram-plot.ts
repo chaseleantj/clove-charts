@@ -125,7 +125,6 @@ class BaseHistogramPlot extends BasePlot {
                 className: 'histogram-bar',
             }
         );
-        this.onRenderComplete();
     }
 }
 

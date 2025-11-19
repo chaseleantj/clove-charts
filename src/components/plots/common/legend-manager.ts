@@ -4,16 +4,38 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { LegendConfig } from '@/components/plots/common/config';
 
-interface CategoricalItems {
-    shape: string;
-    color: string;
-    text: string;
+interface PointStyles extends CommonCategoricalStyles {
+    size?: number;
+    symbolType?: d3.SymbolType;
+}
+interface LineStyles extends CommonCategoricalStyles {}
+interface RectStyles extends CommonCategoricalStyles {}
+
+interface CommonCategoricalStyles {
+    opacity?: number;
+    fill?: string;
+    stroke?: string;
+    strokeWidth?: number;
+    strokeDashArray?: string;
+}
+
+// Map type T to the corresponding styles interface
+type StyleForType<T extends 'point' | 'line' | 'rect'> = 
+    T extends 'point' ? PointStyles
+    : T extends 'line' ? LineStyles
+    : T extends 'rect' ? RectStyles
+    : never;
+
+interface CategoricalItem<T extends 'point' | 'line' | 'rect'> {
+    type: T;
+    label: string;
+    styles: StyleForType<T>;
 }
 
 class LegendManager {
     legend: d3.Selection<HTMLDivElement, unknown, null, undefined>;
     gradientId: string;
-    categoricalItems: CategoricalItems[];
+    categoricalItems: CategoricalItem<any>[];
 
     legendGroup: d3.Selection<HTMLDivElement, unknown, null, undefined>;
     continuousContainer!: d3.Selection<
@@ -133,36 +155,19 @@ class LegendManager {
         this.categoricalGroup = this.categoricalSvg.append('g');
     }
 
-    public addCategoricalItem(shape: string, color: string, text: string) {
-        const item = { shape, color, text };
-        this.categoricalItems.push(item);
+    public addCategoricalItem<T extends 'point' | 'line' | 'rect'>(
+        type: T,
+        label: string,
+        styles: StyleForType<T>
+    ) {
+        this.categoricalItems.push({ type, label, styles });
         this.renderCategoricalLegend();
     }
 
     public renderCategoricalLegend() {
         this.categoricalGroup.selectAll('*').remove();
 
-        // Map shape names to d3 symbol types
-        const getSymbolType = (shape: string) => {
-            switch (shape) {
-                case 'circle':
-                    return d3.symbolCircle;
-                case 'square':
-                    return d3.symbolSquare;
-                case 'triangle':
-                    return d3.symbolTriangle;
-                case 'diamond':
-                    return d3.symbolDiamond;
-                case 'star':
-                    return d3.symbolStar;
-                case 'cross':
-                    return d3.symbolCross;
-                default:
-                    return d3.symbolCircle;
-            }
-        };
-
-        // Render symbols using d3.symbol
+        // Render symbols
         this.categoricalGroup
             .selectAll('.legend-symbols')
             .data(this.categoricalItems)
@@ -173,29 +178,46 @@ class LegendManager {
                     this.legendConfig.categoricalItemHeight / 2;
                 const group = this.categoricalGroup.append('g');
 
-                if (d.shape === 'line') {
-                    // Keep line as is since d3.symbol doesn't have a line type
+                const commonStyles = d.styles as CommonCategoricalStyles;
+                const pointStyles = d.styles as PointStyles;
+                const lineStyles = d.styles as LineStyles;
+
+                if (d.type === 'line') {
                     group
                         .append('line')
                         .attr('x1', 2)
                         .attr('x2', 18)
                         .attr('y1', y)
                         .attr('y2', y)
-                        .attr('stroke', d.color)
-                        .attr('stroke-width', 3);
-                } else {
-                    // Use d3.symbol for other shapes
-                    const symbolType = getSymbolType(d.shape);
+                        .attr('stroke', commonStyles.stroke || 'currentColor')
+                        .attr('stroke-width', lineStyles.strokeWidth || 1.5)
+                        .attr('stroke-dasharray', lineStyles.strokeDashArray || '')
+                        .attr('opacity', commonStyles.opacity ?? 1);
+                } else if (d.type === 'point') {
                     const symbolGenerator = d3
                         .symbol()
-                        .type(symbolType)
-                        .size(64);
+                        .type(pointStyles.symbolType || d3.symbolCircle)
+                        .size(pointStyles.size || 64);
 
                     group
                         .append('path')
                         .attr('d', symbolGenerator)
                         .attr('transform', `translate(10, ${y})`)
-                        .style('fill', d.color);
+                        .attr('fill', commonStyles.fill || 'currentColor')
+                        .attr('stroke', commonStyles.stroke || 'none')
+                        .attr('stroke-width', commonStyles.strokeWidth || 1)
+                        .attr('opacity', commonStyles.opacity ?? 1);
+                } else if (d.type === 'rect') {
+                    group
+                        .append('rect')
+                        .attr('x', 2)
+                        .attr('y', y - 6)
+                        .attr('width', 16)
+                        .attr('height', 12)
+                        .attr('fill', commonStyles.fill || 'currentColor')
+                        .attr('stroke', commonStyles.stroke || 'none')
+                        .attr('stroke-width', commonStyles.strokeWidth || 1)
+                        .attr('opacity', commonStyles.opacity ?? 1);
                 }
             });
 
@@ -204,7 +226,7 @@ class LegendManager {
             .data(this.categoricalItems)
             .enter()
             .append('text')
-            .text((d) => d.text)
+            .text((d) => d.label)
             .attr('x', 25)
             .attr(
                 'y',

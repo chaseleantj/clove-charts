@@ -68,7 +68,6 @@ class BaseLinePlot extends BasePlot {
             // }).render(10000);
         }
 
-        this.onRenderComplete();
     }
 
     onSetupDomain() {

@@ -80,7 +80,6 @@ class BaseMatrixPlot extends BasePlot {
             );
         }
 
-        this.onRenderComplete();
     }
 
     onSetupLegend() {

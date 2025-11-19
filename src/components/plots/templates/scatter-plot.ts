@@ -77,7 +77,6 @@ class BaseScatterPlot extends BasePlot {
         if (this.config.tooltipConfig.tooltipRef.current) {
             this.drawTooltip();
         }
-        this.onRenderComplete();
     }
 
     onSetupLegend() {
@@ -98,7 +97,10 @@ class BaseScatterPlot extends BasePlot {
             this.legend.addCategoricalLegend();
             const classes = colorScale.domain();
             classes.forEach((cls: string) => {
-                this.legend.addCategoricalItem('circle', colorScale(cls), cls);
+                this.legend.addCategoricalItem('point', cls, {
+                    symbolType: d3.symbolCircle,
+                    fill: colorScale(cls),
+                });
             });
         } else if (domainKind === 'number' || domainKind === 'date') {
             const colorScale = this.scale.color as d3.ScaleSequential<
