@@ -60,8 +60,8 @@ class BaseScatterPlot extends BasePlot {
 
         this.dataPoints = this.primitives.addPoints(
             this.props.data,
-            (d) => d[this.props.xClass],
-            (d) => d[this.props.yClass],
+            d => d[this.props.xClass],
+            d => d[this.props.yClass],
             {
                 symbolType: d3.symbolCircle,
                 fill: colorByClass,
@@ -74,41 +74,30 @@ class BaseScatterPlot extends BasePlot {
             }
         );
 
-        if (this.config.tooltipConfig.tooltipRef.current) {
-            this.drawTooltip();
-        }
     }
 
     onSetupLegend() {
-        if (!this.props.colorByClass) return;
+        const { colorByClass } = this.props;
+        if (!colorByClass) return;
 
-        this.legend.setTitle(
-            this.config.legendConfig.title ?? this.props.colorByClass
-        );
+        this.legend.setTitle(this.config.legendConfig.title ?? colorByClass);
 
         const domainKind = getDomainKind(this.domain.color);
-        if (domainKind === 'string') {
-            const colorScale = this.scale.color as d3.ScaleOrdinal<
-                string,
-                string,
-                never
-            >;
+        const colorScale = this.scale.color;
 
+        if (domainKind === 'string') {
             this.legend.addCategoricalLegend();
-            const classes = colorScale.domain();
-            classes.forEach((cls: string) => {
+            const scale = colorScale as d3.ScaleOrdinal<string, string>;
+            scale.domain().forEach((cls) => {
                 this.legend.addCategoricalItem('point', cls, {
                     symbolType: d3.symbolCircle,
-                    fill: colorScale(cls),
+                    fill: scale(cls),
                 });
             });
         } else if (domainKind === 'number' || domainKind === 'date') {
-            const colorScale = this.scale.color as d3.ScaleSequential<
-                string,
-                never
-            >;
-
-            this.legend.addContinuousLegend(colorScale);
+            this.legend.addContinuousLegend(
+                colorScale as d3.ScaleSequential<string, never>
+            );
         }
     }
 
@@ -120,22 +109,32 @@ class BaseScatterPlot extends BasePlot {
         const tooltipDisplayClasses =
             this.config.tooltipConfig.tooltipClasses ?? displayClasses;
 
+        const getPointSize = (d: Record<string, any>) => {
+            const { size } = this.dataPoints.options;
+            return typeof size === 'number' ? size : size(d);
+        };
+
+        const animatePoint = (
+            target: SVGPathElement,
+            sizeMultiplier: number,
+            d: Record<string, any>
+        ) => {
+            const size = getPointSize(d) * sizeMultiplier;
+            const symbolGenerator = d3
+                .symbol()
+                .type(d3.symbolCircle)
+                .size(size);
+
+            d3.select(target)
+                .transition()
+                .duration(this.config.themeConfig.transitionDuration / 4)
+                .attr('d', symbolGenerator);
+        };
+
         this.dataPoints
             .attachEvent('mouseover', (event, d) => {
                 if (!this.brushManager || !this.brushManager.brushing) {
-                    const basePointSize = this.resolvePointSize(d);
-                    const symbolGenerator = d3
-                        .symbol()
-                        .type(d3.symbolCircle)
-                        .size(4 * basePointSize);
-
-                    d3.select(event.currentTarget as SVGPathElement)
-                        .transition()
-                        .duration(
-                            this.config.themeConfig.transitionDuration / 4
-                        )
-                        .attr('d', symbolGenerator);
-
+                    animatePoint(event.currentTarget as SVGPathElement, 4, d);
                     this.tooltipManager.formatTooltip(d, tooltipDisplayClasses);
                     this.tooltipManager.positionTooltip(event);
                     this.tooltipManager.showTooltip();
@@ -143,18 +142,7 @@ class BaseScatterPlot extends BasePlot {
             })
             .attachEvent('mouseout', (event, d) => {
                 if (!this.brushManager || !this.brushManager.brushing) {
-                    const basePointSize = this.resolvePointSize(d);
-                    const symbolGenerator = d3
-                        .symbol()
-                        .type(d3.symbolCircle)
-                        .size(basePointSize);
-
-                    d3.select(event.currentTarget as SVGPathElement)
-                        .transition()
-                        .duration(
-                            this.config.themeConfig.transitionDuration / 4
-                        )
-                        .attr('d', symbolGenerator);
+                    animatePoint(event.currentTarget as SVGPathElement, 1, d);
                     this.tooltipManager.hideTooltip();
                 }
             });
@@ -162,25 +150,6 @@ class BaseScatterPlot extends BasePlot {
         this.interactionSurface.on('click', () =>
             this.tooltipManager.hideTooltip()
         );
-    }
-
-    private resolvePointSize(d?: Record<string, any>): number {
-        const defaultSize = DEFAULT_SCATTER_PLOT_CONFIG.pointSize;
-        const { pointSize } = this.props;
-
-        if (typeof pointSize === 'function') {
-            if (!d) return defaultSize;
-            const value = pointSize(d);
-            return typeof value === 'number' && Number.isFinite(value)
-                ? value
-                : defaultSize;
-        }
-
-        if (typeof pointSize === 'number' && Number.isFinite(pointSize)) {
-            return pointSize;
-        }
-
-        return defaultSize;
     }
 }
 

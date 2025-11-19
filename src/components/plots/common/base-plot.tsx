@@ -548,6 +548,12 @@ class BasePlot extends Component<BasePlotProps> {
         );
     }
 
+    renderTooltip(): void {
+        if (this.config.tooltipConfig.tooltipRef.current) {
+            this.drawTooltip();
+        }
+    }
+
     renderElements(): void {
         console.warn(
             'renderElements() is not implemented! Override this method in your chart subclass.'
@@ -589,6 +595,7 @@ class BasePlot extends Component<BasePlotProps> {
         this.setupLegend();
         this.setupTooltip();
         this.renderElements();
+        this.renderTooltip();
         this.onRenderComplete();
     }
 
