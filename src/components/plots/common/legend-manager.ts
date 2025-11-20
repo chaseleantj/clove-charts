@@ -3,6 +3,7 @@ import styles from '@/components/page.module.css';
 import { v4 as uuidv4 } from 'uuid';
 
 import { LegendConfig } from '@/components/plots/common/config';
+import { getDomainKind } from '@/components/plots/common/type-guards';
 
 interface PointStyles extends CommonCategoricalStyles {
     size?: number;
@@ -80,6 +81,38 @@ class LegendManager {
             .append('text')
             .attr('class', styles.legendTitle)
             .html(newTitle);
+    }
+
+    public addLegend<T extends 'point' | 'line' | 'rect'>(
+        scale:
+            | d3.ScaleOrdinal<string, string>
+            | d3.ScaleSequential<string, never>,
+        type: T,
+        options: StyleForType<T> = {} as StyleForType<T>
+    ) {
+        const domain = scale.domain();
+        const domainKind = getDomainKind(domain as any);
+
+        if (domainKind === 'string') {
+            this.addCategoricalLegend();
+            const ordinalScale = scale as d3.ScaleOrdinal<string, string>;
+            ordinalScale.domain().forEach((cls) => {
+                const color = ordinalScale(cls);
+                const itemStyles = { ...options } as any;
+
+                if (type === 'line') {
+                    if (!itemStyles.stroke) itemStyles.stroke = color;
+                } else {
+                    if (!itemStyles.fill) itemStyles.fill = color;
+                }
+
+                this.addCategoricalItem(type, cls, itemStyles);
+            });
+        } else if (domainKind === 'number' || domainKind === 'date') {
+            this.addContinuousLegend(
+                scale as d3.ScaleSequential<string, never>
+            );
+        }
     }
 
     public addContinuousLegend(colorScale: d3.ScaleSequential<string, never>) {

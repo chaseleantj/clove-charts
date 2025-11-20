@@ -27,26 +27,20 @@ import {
     DEFAULT_COLOR_CONFIG,
 } from '@/components/plots/common/config';
 
-interface Domain {
+export interface Domain {
     x: [number, number] | [Date, Date] | string[];
     y: [number, number] | [Date, Date] | string[];
 }
 
-interface Scale {
+export interface Scale {
     x: AnyD3Scale;
     y: AnyD3Scale;
-    color:
-        | d3.ScaleSequential<string, never>
-        | d3.ScaleOrdinal<string, string>
-        | (() => string);
 }
 
 interface PrimaryBasePlotProps {
     data?: Record<string, any>[];
     xClass?: string;
     yClass?: string;
-    // domainX?: [number, number];
-    // domainY?: [number, number];
 }
 
 export type BasePlotProps = PrimaryBasePlotProps & PlotConfig;
@@ -267,7 +261,7 @@ class BasePlot extends Component<BasePlotProps> {
                 this.config.scaleConfig.logY,
                 this.config.scaleConfig.formatNiceY
             ),
-            color: this.scaleManager.getColorScale(),
+            // color: this.scaleManager.getColorScale(),
         };
 
         this.onSetupScales();

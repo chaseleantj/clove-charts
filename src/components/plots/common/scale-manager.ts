@@ -100,7 +100,7 @@ class ScaleManager {
     getColorScale(
         domain?: [number, number] | [Date, Date],
         colorScheme?: (t: number) => string
-    ): d3.ScaleSequential<string, never> | (() => string);
+    ): d3.ScaleSequential<string, never> | string;
 
     getColorScale(
         domain?: string[],
@@ -113,8 +113,8 @@ class ScaleManager {
     ):
         | d3.ScaleSequential<string, never>
         | d3.ScaleOrdinal<string, string>
-        | (() => string) {
-        const defaultScale = () => this.colorConfig.defaultColor;
+        | string {
+        const defaultScale = this.colorConfig.defaultColor;
 
         if (!domain) return defaultScale;
 

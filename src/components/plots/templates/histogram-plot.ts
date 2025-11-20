@@ -89,7 +89,6 @@ class BaseHistogramPlot extends BasePlot {
         this.scale = {
             x: scaleX,
             y: scaleY,
-            color: this.scaleManager.getColorScale()
         }
 
         this.onSetupScales();

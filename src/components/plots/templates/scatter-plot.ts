@@ -1,9 +1,7 @@
 import * as d3 from 'd3';
 
-import BasePlot, { BasePlotProps } from '@/components/plots/common/base-plot';
+import BasePlot, { BasePlotProps, Scale } from '@/components/plots/common/base-plot';
 import { BatchPointsPrimitive } from '@/components/plots/common/primitives/primitives';
-import { getDomainKind } from '@/components/plots/common/type-guards';
-
 interface ScatterPlotProps extends BasePlotProps {
     data: Record<string, any>[];
     xClass: string;
@@ -13,21 +11,29 @@ interface ScatterPlotProps extends BasePlotProps {
     colorByClass?: string | null;
 }
 
-const DEFAULT_SCATTER_PLOT_CONFIG = {
-    pointSize: 50,
-    pointOpacity: 1,
-    colorByClass: null,
-};
-
 interface ScatterPlotDomain {
     x: [number, number] | [Date, Date];
     y: [number, number] | [Date, Date];
     color: [number, number] | [Date, Date] | string[];
 }
 
+interface ScatterPlotScale extends Scale {
+    color: d3.ScaleSequential<string, never>
+        | d3.ScaleOrdinal<string, string>
+        | string
+}
+
+const DEFAULT_SCATTER_PLOT_CONFIG = {
+    pointSize: 50,
+    pointOpacity: 1,
+    colorByClass: null,
+};
+
 class BaseScatterPlot extends BasePlot {
+
     dataPoints!: BatchPointsPrimitive;
     declare domain: ScatterPlotDomain;
+    declare scale: ScatterPlotScale;
     declare props: ScatterPlotProps;
 
     constructor(props: ScatterPlotProps) {
@@ -46,17 +52,11 @@ class BaseScatterPlot extends BasePlot {
             this.scale.color = this.scaleManager.getColorScale(
                 this.domain.color
             );
-        } else {
-            this.scale.color = this.scaleManager.getColorScale();
-        }
+        } 
+
     }
 
     renderElements() {
-
-        const colorByClass = this.props.colorByClass
-            ? (d: Record<string, any>) =>
-                  this.scale.color(d[this.props.colorByClass!])
-            : this.config.colorConfig.defaultColor;
 
         this.dataPoints = this.primitives.addPoints(
             this.props.data,
@@ -64,7 +64,8 @@ class BaseScatterPlot extends BasePlot {
             d => d[this.props.yClass],
             {
                 symbolType: d3.symbolCircle,
-                fill: colorByClass,
+                fill: d => typeof this.scale.color === 'function' ? this.scale.color(d[this.props.colorByClass!]) 
+                : this.scale.color,
                 size:
                     this.props.pointSize ??
                     DEFAULT_SCATTER_PLOT_CONFIG.pointSize,
@@ -77,27 +78,14 @@ class BaseScatterPlot extends BasePlot {
     }
 
     onSetupLegend() {
-        const { colorByClass } = this.props;
-        if (!colorByClass) return;
+        if (!this.props.colorByClass) return;
 
-        this.legend.setTitle(this.config.legendConfig.title ?? colorByClass);
+        this.legend.setTitle(this.config.legendConfig.title ?? this.props.colorByClass);
 
-        const domainKind = getDomainKind(this.domain.color);
-        const colorScale = this.scale.color;
-
-        if (domainKind === 'string') {
-            this.legend.addCategoricalLegend();
-            const scale = colorScale as d3.ScaleOrdinal<string, string>;
-            scale.domain().forEach((cls) => {
-                this.legend.addCategoricalItem('point', cls, {
-                    symbolType: d3.symbolCircle,
-                    fill: scale(cls),
-                });
+        if (typeof this.scale.color !== 'string') {
+            this.legend.addLegend(this.scale.color, 'point', {
+                symbolType: d3.symbolCircle,
             });
-        } else if (domainKind === 'number' || domainKind === 'date') {
-            this.legend.addContinuousLegend(
-                colorScale as d3.ScaleSequential<string, never>
-            );
         }
     }
 
