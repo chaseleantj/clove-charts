@@ -11,16 +11,15 @@ import {
 } from '@/components/plots/common/config';
 import { renderKatex } from '@/components/plots/common/utils';
 
-type Element = d3.Selection<d3.BaseType, unknown, null, undefined>;
-type ElementOrTransition =
-    | d3.Selection<d3.BaseType, unknown, null, undefined>
-    | d3.Transition<d3.BaseType, unknown, null, undefined>;
+type Element = d3.Selection<any, any, any, any>;
+type Transition = d3.Transition<any, any, any, any>;
+
 type EasingFunction = (t: number) => number;
 export type CoordinateAccessor = (
     d: Record<string, any>
 ) => number | null | undefined;
 
-export class Primitive<
+export abstract class Primitive<
     TConfig extends PrimitiveConfig<any, any, any, any> = PrimitiveConfig,
 > {
     updateFunc: (() => void) | null;
@@ -81,19 +80,30 @@ export class Primitive<
             if (ease) {
                 transitionElement = transitionElement.ease(ease);
             }
-            return transitionElement;
+            return transitionElement as unknown as d3.Transition<
+                GElement,
+                Datum,
+                PElement,
+                PDatum
+            >;
         }
         return element;
     }
 
-    protected applyCommonStyles(element: any): any {
-        return element
+    protected applyCommonStyles<
+        T extends Element | Transition
+    >(element: T): T {
+        return (element as any)
             .attr('fill', this.options.fill)
             .attr('stroke', this.options.stroke)
             .attr('stroke-width', this.options.strokeWidth)
             .attr('opacity', this.options.opacity)
-            .attr('pointer-events', this.options.pointerEvents);
+            .attr('pointer-events', this.options.pointerEvents) as T;
     }
+
+
+    public abstract render(transitionDuration: number, ease?: EasingFunction): Transition;
+    public abstract render(transitionDuration?: 0): Element;
 
     public createUpdateFunction(
         updateCallback: (this: BasePlot) => void
@@ -174,19 +184,21 @@ export class PointPrimitive extends Primitive<PrimitiveConfig & PointPrimitiveOp
         return this;
     }
 
+    public render(transitionDuration: number, ease?: EasingFunction): Transition;
+    public render(transitionDuration?: 0): Element;
     public render(transitionDuration = 0, ease?: EasingFunction) {
         const element = this.getElementWithTransition(
             this.element,
             transitionDuration,
             ease
-        ) as any;
+        );
 
         const symbolGenerator = d3
             .symbol()
             .type(this.options.symbolType)
             .size(this.options.size);
 
-        return this.applyCommonStyles(element)
+        return (this.applyCommonStyles(element) as any)
             .attr('d', symbolGenerator)
             .attr(
                 'transform',
@@ -225,6 +237,8 @@ export class LinePrimitive extends Primitive<PrimitiveConfig & LinePrimitiveOpti
         return this;
     }
 
+    public render(transitionDuration: number, ease?: EasingFunction): Transition;
+    public render(transitionDuration?: 0): Element;
     public render(transitionDuration = 0, ease?: EasingFunction) {
         let markerStart = null;
         let markerEnd = null;
@@ -248,9 +262,9 @@ export class LinePrimitive extends Primitive<PrimitiveConfig & LinePrimitiveOpti
             this.element,
             transitionDuration,
             ease
-        ) as any;
+        );
 
-        return this.applyCommonStyles(element)
+        return (this.applyCommonStyles(element) as any)
             .attr('x1', this.convertX(this.x1!))
             .attr('y1', this.convertY(this.y1!))
             .attr('x2', this.convertX(this.x2!))
@@ -290,12 +304,14 @@ export class RectanglePrimitive extends Primitive<PrimitiveConfig & RectanglePri
         return this;
     }
 
+    public render(transitionDuration: number, ease?: EasingFunction): Transition;
+    public render(transitionDuration?: 0): Element;
     public render(transitionDuration = 0, ease?: EasingFunction) {
         const element = this.getElementWithTransition(
             this.element,
             transitionDuration,
             ease
-        ) as any;
+        );
 
         const scaledX1 = this.convertX(this.x1!);
         const scaledY1 = this.convertY(this.y1!);
@@ -307,7 +323,7 @@ export class RectanglePrimitive extends Primitive<PrimitiveConfig & RectanglePri
         const rectWidth = Math.abs(scaledX2 - scaledX1);
         const rectHeight = Math.abs(scaledY2 - scaledY1);
 
-        return this.applyCommonStyles(element)
+        return (this.applyCommonStyles(element) as any)
             .attr('x', rectX)
             .attr('y', rectY)
             .attr('width', rectWidth)
@@ -370,17 +386,19 @@ export class TextPrimitive extends Primitive<PrimitiveConfig & TextPrimitiveOpti
         return this;
     }
 
+    public render(transitionDuration: number, ease?: EasingFunction): Transition;
+    public render(transitionDuration?: 0): Element;
     public render(duration = 0, ease?: EasingFunction) {
         let element = this.getElementWithTransition(
             this.element,
             duration,
             ease
-        ) as any;
+        );
         const x = this.convertX(this.x!);
         const y = this.convertY(this.y!);
 
         if (this.options.latex) {
-            element = this.renderKatex(element, x, y);
+            element = this.renderMath(element, x, y);
         } else {
             element = this.renderPlainText(element, x, y);
         }
@@ -388,12 +406,12 @@ export class TextPrimitive extends Primitive<PrimitiveConfig & TextPrimitiveOpti
         return element;
     }
 
-    private renderPlainText(
-        element: any,
+    private renderPlainText<T extends Element | Transition>(
+        element: T,
         x: number,
         y: number
-    ): ElementOrTransition {
-        this.applyCommonStyles(element)
+    ): T {
+        (this.applyCommonStyles(element) as any)
             .attr('x', x)
             .attr('y', y)
             .attr('font-size', this.options.fontSize)
@@ -409,8 +427,8 @@ export class TextPrimitive extends Primitive<PrimitiveConfig & TextPrimitiveOpti
         return element;
     }
 
-    private renderKatex(element: any, x: number, y: number): any {
-        return renderKatex(this.text, element, x, y, this.angle);
+    private renderMath<T extends Element | Transition>(element: T, x: number, y: number): T {
+        return renderKatex(this.text, element as any, x, y, this.angle) as unknown as T;
     }
 }
 
@@ -448,12 +466,14 @@ export class PathPrimitive extends Primitive<PrimitiveConfig & PathPrimitiveOpti
         return this;
     }
 
+    public render(transitionDuration: number, ease?: EasingFunction): Transition;
+    public render(transitionDuration?: 0): Element;
     public render(transitionDuration = 0, ease?: EasingFunction) {
         const element = this.getElementWithTransition(
             this.element,
             transitionDuration,
             ease
-        ) as any;
+        );
 
         const lineGenerator = d3
             .line<Record<string, any>>()
@@ -472,7 +492,7 @@ export class PathPrimitive extends Primitive<PrimitiveConfig & PathPrimitiveOpti
             })
             .curve(this.options.curve);
 
-        return this.applyCommonStyles(element)
+        return (this.applyCommonStyles(element) as any)
             .attr('stroke-dasharray', this.options.strokeDashArray)
             .attr('stroke-dashoffset', this.options.strokeDashOffset)
             .attr('d', lineGenerator(this.dataPoints));
@@ -560,6 +580,8 @@ export class ContourPrimitive extends Primitive<PrimitiveConfig & ContourPrimiti
         return this;
     }
 
+    public render(transitionDuration: number, ease?: EasingFunction): Transition;
+    public render(transitionDuration?: 0): Element;
     public render(transitionDuration = 0, ease?: EasingFunction) {
         const contours = this.calculateContours(
             this.fValues,
@@ -589,9 +611,9 @@ export class ContourPrimitive extends Primitive<PrimitiveConfig & ContourPrimiti
             merged,
             transitionDuration,
             ease
-        ) as any;
+        );
 
-        return this.applyCommonStyles(finalSelection)
+        return (this.applyCommonStyles(finalSelection) as any)
             .attr('fill', (d: { value: number }) =>
                 this.options.colorScale
                     ? this.options.colorScale(d.value)
@@ -746,10 +768,12 @@ export class ImagePrimitive extends Primitive<PrimitiveConfig & ImagePrimitiveOp
         return { x, y, width, height };
     }
 
+    public render(transitionDuration: number, ease?: EasingFunction): Transition;
+    public render(transitionDuration?: 0): Element;
     public render(transitionDuration = 0, ease?: EasingFunction) {
         // Only update if image is loaded
         if (!this.isLoaded || !this.naturalWidth || !this.naturalHeight) {
-            return null;
+            return d3.select(null) as any;
         }
 
         const { x, y, width, height } = this.calculatePosition();
@@ -758,9 +782,9 @@ export class ImagePrimitive extends Primitive<PrimitiveConfig & ImagePrimitiveOp
             this.element,
             transitionDuration,
             ease
-        ) as any;
+        );
 
-        return element
+        return (element as any)
             .attr('x', x)
             .attr('y', y)
             .attr('width', width)
@@ -778,7 +802,7 @@ export class ImagePrimitive extends Primitive<PrimitiveConfig & ImagePrimitiveOp
     }
 }
 
-export class BatchPrimitive<
+export abstract class BatchPrimitive<
     TConfig extends BatchPrimitiveConfig = BatchPrimitiveConfig
 > extends Primitive<TConfig> {
     dataPoints: Record<string, any>[];
@@ -820,9 +844,9 @@ export class BatchPrimitive<
         return this;
     }
 
-    protected applyCommonStyles(element: any): any {
-        return super
-            .applyCommonStyles(element)
+    protected applyCommonStyles<T extends Element | Transition>(element: T): T {
+        return (super
+            .applyCommonStyles(element) as any)
             .attr('class', this.options.className);
     }
 
@@ -880,10 +904,8 @@ export class BatchPrimitive<
         return this.getElementWithTransition(merged, transitionDuration, ease);
     }
 
-    public render(transitionDuration = 0) {
-        // To be implemented by subclasses
-        throw new Error('apply method must be implemented by subclass');
-    }
+    public abstract render(transitionDuration: number, ease?: EasingFunction): Transition;
+    public abstract render(transitionDuration?: 0): Element;
 
     public remove(): void {
         this.element.selectAll('*').remove();
@@ -939,14 +961,16 @@ export class BatchPointsPrimitive extends BatchPrimitive<BatchPrimitiveConfig & 
         return this;
     }
 
-    render(transitionDuration = 0, ease?: EasingFunction) {
+    public render(transitionDuration: number, ease?: EasingFunction): Transition;
+    public render(transitionDuration?: 0): Element;
+    public render(transitionDuration = 0, ease?: EasingFunction) {
         const finalSelection = this.performDataJoin(
             'path',
             transitionDuration,
             ease
-        ) as any;
+        );
 
-        if (!this.dataPoints || finalSelection.empty()) return;
+        if (!this.dataPoints || finalSelection.empty()) return d3.select(null);
 
         const symbolGenerator = d3.symbol();
 
@@ -966,7 +990,7 @@ export class BatchPointsPrimitive extends BatchPrimitive<BatchPrimitiveConfig & 
             symbolGenerator.size(this.options.size as number);
         }
 
-        return this.applyCommonStyles(finalSelection)
+        return (this.applyCommonStyles(finalSelection) as any)
             .attr('d', symbolGenerator)
             .attr('transform', (d: Record<string, any>) => {
                 const x = this.xAccessor(d);
@@ -1020,14 +1044,16 @@ export class BatchLinesPrimitive extends BatchPrimitive<BatchPrimitiveConfig & B
         return this;
     }
 
-    render(transitionDuration = 0, ease?: EasingFunction) {
+    public render(transitionDuration: number, ease?: EasingFunction): Transition;
+    public render(transitionDuration?: 0): Element;
+    public render(transitionDuration = 0, ease?: EasingFunction) {
         const finalSelection = this.performDataJoin(
             'line',
             transitionDuration,
             ease
-        ) as any;
+        );
 
-        if (!this.dataPoints || finalSelection.empty()) return;
+        if (!this.dataPoints || finalSelection.empty()) return d3.select(null) as any;
 
         let markerStart: string | null = null;
         let markerEnd: string | null = null;
@@ -1049,7 +1075,7 @@ export class BatchLinesPrimitive extends BatchPrimitive<BatchPrimitiveConfig & B
             markerEnd = `url(#${markerId})`;
         }
 
-        return this.applyCommonStyles(finalSelection)
+        return (this.applyCommonStyles(finalSelection) as any)
             .attr('stroke-dasharray', this.options.strokeDashArray)
             .attr('stroke-dashoffset', this.options.strokeDashOffset)
             .attr('opacity', (d: Record<string, any>) => {
@@ -1133,16 +1159,18 @@ export class BatchRectanglesPrimitive extends BatchPrimitive<BatchPrimitiveConfi
         return this;
     }
 
-    render(transitionDuration = 0, ease?: EasingFunction) {
+    public render(transitionDuration: number, ease?: EasingFunction): Transition;
+    public render(transitionDuration?: 0): Element;
+    public render(transitionDuration = 0, ease?: EasingFunction) {
         const finalSelection = this.performDataJoin(
             'rect',
             transitionDuration,
             ease
-        ) as any;
+        );
 
-        if (!this.dataPoints || finalSelection.empty()) return;
+        if (!this.dataPoints || finalSelection.empty()) return d3.select(null);
 
-        return this.applyCommonStyles(finalSelection)
+        return (this.applyCommonStyles(finalSelection) as any)
             .attr('opacity', (d: Record<string, any>) => {
                 const x1 = this.x1Accessor(d);
                 const y1 = this.y1Accessor(d);
@@ -1249,16 +1277,18 @@ export class BatchTextPrimitive extends BatchPrimitive<BatchPrimitiveConfig & Ba
         return this;
     }
 
-    render(transitionDuration = 0, ease?: EasingFunction) {
+    public render(transitionDuration: number, ease?: EasingFunction): Transition;
+    public render(transitionDuration?: 0): Element;
+    public render(transitionDuration = 0, ease?: EasingFunction) {
         const finalSelection = this.performDataJoin(
             'text',
             transitionDuration,
             ease
-        ) as any;
+        );
 
-        if (!this.dataPoints || finalSelection.empty()) return;
+        if (!this.dataPoints || finalSelection.empty()) return d3.select(null);
 
-        return this.applyCommonStyles(finalSelection)
+        return (this.applyCommonStyles(finalSelection) as any)
             .text((d: Record<string, any>) =>
                 this.textAccessor ? this.textAccessor(d) : d
             )
