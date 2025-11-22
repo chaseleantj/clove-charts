@@ -206,7 +206,7 @@ export const DEFAULT_LEGEND_CONFIG: Required<LegendConfig> = {
     maxHeight: null, // automatically set to plotHeight otherwise
     absolutePositions: {
         // position: absolute; top: 0%; right: 0%;
-        top: '20px',
+        top: '14px',
         right: '0%',
     },
     categoricalItemHeight: 20,
