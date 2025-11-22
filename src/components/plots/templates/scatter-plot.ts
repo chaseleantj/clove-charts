@@ -1,9 +1,15 @@
 import * as d3 from 'd3';
 
-import BasePlot, { BasePlotProps, Scale } from '@/components/plots/common/base-plot';
+import BasePlot, {
+    BasePlotProps,
+    Scale,
+} from '@/components/plots/common/base-plot';
 import { RequiredPlotConfig } from '@/components/plots/common/config';
 import { BatchPointsPrimitive } from '@/components/plots/common/primitives/primitives';
-import { isContinuousScale, D3Scale } from '@/components/plots/common/scale-manager';
+import {
+    isContinuousScale,
+    D3Scale,
+} from '@/components/plots/common/scale-manager';
 
 export interface ScatterPlotConfig {
     pointSize: number | ((d: Record<string, any>) => number);
@@ -11,7 +17,9 @@ export interface ScatterPlotConfig {
     colorByClass: string | null;
 }
 
-export interface ScatterPlotProps extends BasePlotProps, Partial<ScatterPlotConfig> {
+export interface ScatterPlotProps
+    extends BasePlotProps,
+        Partial<ScatterPlotConfig> {
     data: Record<string, any>[];
     xClass: string;
     yClass: string;
@@ -24,9 +32,10 @@ interface ScatterPlotDomain {
 }
 
 interface ScatterPlotScale extends Scale {
-    color: d3.ScaleSequential<string, never>
+    color:
+        | d3.ScaleSequential<string, never>
         | d3.ScaleOrdinal<string, string>
-        | string
+        | string;
 }
 
 export const DEFAULT_SCATTER_PLOT_CONFIG: Partial<ScatterPlotConfig> = {
@@ -40,23 +49,26 @@ export function getScatterPlotConfig(
 ): ScatterPlotConfig {
     return {
         pointSize: props.pointSize ?? DEFAULT_SCATTER_PLOT_CONFIG.pointSize!,
-        colorByClass: props.colorByClass ?? DEFAULT_SCATTER_PLOT_CONFIG.colorByClass!,
+        colorByClass:
+            props.colorByClass ?? DEFAULT_SCATTER_PLOT_CONFIG.colorByClass!,
         pointOpacity: props.pointOpacity ?? themeConfig.opacity,
     };
 }
 
 class BaseScatterPlot extends BasePlot {
-
     dataPoints!: BatchPointsPrimitive;
     declare domain: ScatterPlotDomain;
     declare scale: ScatterPlotScale;
     declare props: ScatterPlotProps;
-    
+
     scatterPlotConfig!: ScatterPlotConfig;
 
     constructor(props: ScatterPlotProps) {
         super(props);
-        this.scatterPlotConfig = getScatterPlotConfig(props, this.config.themeConfig);
+        this.scatterPlotConfig = getScatterPlotConfig(
+            props,
+            this.config.themeConfig
+        );
     }
 
     shouldInitializeChart(): boolean {
@@ -71,7 +83,7 @@ class BaseScatterPlot extends BasePlot {
             this.scale.color = this.scaleManager.getColorScale(
                 this.domain.color
             );
-        } 
+        }
     }
 
     private getCoordinateAccessor(key: string, scale: D3Scale) {
@@ -97,10 +109,14 @@ class BaseScatterPlot extends BasePlot {
             this.getCoordinateAccessor(this.props.yClass, this.scale.y),
             {
                 symbolType: d3.symbolCircle,
-                fill: d => typeof this.scale.color === 'function' ? this.scale.color(d[this.scatterPlotConfig.colorByClass!]) 
-                : this.scale.color,
+                fill: (d) =>
+                    typeof this.scale.color === 'function'
+                        ? this.scale.color(
+                              d[this.scatterPlotConfig.colorByClass!]
+                          )
+                        : this.scale.color,
                 size: this.scatterPlotConfig.pointSize,
-                opacity: this.scatterPlotConfig.pointOpacity
+                opacity: this.scatterPlotConfig.pointOpacity,
             }
         );
     }
@@ -108,7 +124,10 @@ class BaseScatterPlot extends BasePlot {
     onSetupLegend() {
         if (!this.scatterPlotConfig.colorByClass) return;
 
-        this.legend.setTitle(this.config.legendConfig.title ?? this.scatterPlotConfig.colorByClass);
+        this.legend.setTitle(
+            this.config.legendConfig.title ??
+                this.scatterPlotConfig.colorByClass
+        );
 
         if (typeof this.scale.color !== 'string') {
             this.legend.addLegend(this.scale.color, 'point', {
@@ -119,7 +138,11 @@ class BaseScatterPlot extends BasePlot {
 
     drawTooltip() {
         const displayClasses = this.scatterPlotConfig.colorByClass
-            ? [this.props.xClass, this.props.yClass, this.scatterPlotConfig.colorByClass]
+            ? [
+                  this.props.xClass,
+                  this.props.yClass,
+                  this.scatterPlotConfig.colorByClass,
+              ]
             : [this.props.xClass, this.props.yClass];
 
         const tooltipDisplayClasses =

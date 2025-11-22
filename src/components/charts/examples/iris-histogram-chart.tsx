@@ -65,7 +65,9 @@ export default function IrisHistogramChart() {
                 />
             </ChartPlotWrapper>
             <ChartFooter>
-                <ChartCaptions>A histogram plot of the iris dataset.</ChartCaptions>
+                <ChartCaptions>
+                    A histogram plot of the iris dataset.
+                </ChartCaptions>
             </ChartFooter>
         </ChartLayout>
     );

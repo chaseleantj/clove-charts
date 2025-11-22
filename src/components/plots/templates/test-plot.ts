@@ -23,7 +23,7 @@ class BaseTestPlot extends BasePlot {
         const text = this.primitives.addText('test', 3.5, 3, {
             fontSize: 12,
             fill: 'steelblue',
-            fontFamily: 'Times New Roman'
+            fontFamily: 'Times New Roman',
         });
 
         // point
@@ -48,13 +48,15 @@ class BaseTestPlot extends BasePlot {
 
         point.setStyles({
             fill: 'green',
-        })
+        });
 
-        point.attachEvent("mouseover", (event) => {
-                point.setStyles({
+        point.attachEvent('mouseover', (event) => {
+            point
+                .setStyles({
                     size: 1000,
-                }).render(1000)
-            })
+                })
+                .render(1000);
+        });
     }
 }
 

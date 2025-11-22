@@ -82,10 +82,10 @@ export interface ImmutablePrimitiveConfig {
 }
 
 export interface MutablePrimitiveConfig<
-TFill = string,
-TStroke = string,
-TStrokeWidth = number,
-TOpacity = number,
+    TFill = string,
+    TStroke = string,
+    TStrokeWidth = number,
+    TOpacity = number,
 > {
     fill?: TFill;
     stroke?: TStroke;
@@ -99,8 +99,9 @@ export type PrimitiveConfig<
     TFill = string,
     TStroke = string,
     TStrokeWidth = number,
-    TOpacity = number
-> = ImmutablePrimitiveConfig & MutablePrimitiveConfig<TFill, TStroke, TStrokeWidth, TOpacity>;
+    TOpacity = number,
+> = ImmutablePrimitiveConfig &
+    MutablePrimitiveConfig<TFill, TStroke, TStrokeWidth, TOpacity>;
 
 export type DataDrivenValue<T> = T | ((d: Record<string, any>) => T);
 
@@ -134,7 +135,6 @@ export interface RequiredPlotConfig {
     tooltipConfig: Required<TooltipConfig>;
     colorConfig: Required<ColorConfig>;
 }
-
 
 export function DEFAULT_TICK_FORMAT(d: number | string | Date): string {
     // if (d instanceof Date) {
@@ -197,7 +197,7 @@ export const DEFAULT_AXIS_CONFIG: Required<AxisConfig> = {
     tickSize: 6,
     tickFormat: DEFAULT_TICK_FORMAT,
     labelOffsetX: 6,
-    labelOffsetY: 12
+    labelOffsetY: 12,
 };
 
 export const DEFAULT_LEGEND_CONFIG: Required<LegendConfig> = {

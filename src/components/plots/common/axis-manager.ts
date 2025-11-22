@@ -43,7 +43,6 @@ class AxisManager {
             .attr('transform', `translate(0, ${this.plotHeight})`)
             .attr('class', styles.xAxis)
             .call(xAxis);
-
     }
 
     setYAxis(scale: d3.AxisScale<string>) {
@@ -56,8 +55,10 @@ class AxisManager {
             yAxis = yAxis.tickFormat(this.axisConfig.tickFormat);
         }
 
-        this.y = this.axisGroup.append('g').attr('class', styles.yAxis).call(yAxis);
-
+        this.y = this.axisGroup
+            .append('g')
+            .attr('class', styles.yAxis)
+            .call(yAxis);
     }
 
     setXGrid() {

@@ -41,7 +41,6 @@ class BaseImagePlot extends BasePlot {
             //   .render(3000)
             // });
         });
-
     }
 }
 

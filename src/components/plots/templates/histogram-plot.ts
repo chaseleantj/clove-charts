@@ -8,7 +8,9 @@ export interface HistogramPlotConfig {
     barOpacity: number;
 }
 
-interface HistogramPlotProps extends Omit<BasePlotProps, 'yClass'>, Partial<HistogramPlotConfig> {
+interface HistogramPlotProps
+    extends Omit<BasePlotProps, 'yClass'>,
+        Partial<HistogramPlotConfig> {
     data: Record<string, any>[];
     xClass: string;
 }
@@ -21,10 +23,9 @@ interface HistogramPlotDomain {
 export const DEFAULT_HISTOGRAM_PLOT_CONFIG: HistogramPlotConfig = {
     numBins: 20,
     barOpacity: 1,
-}
+};
 
 class BaseHistogramPlot extends BasePlot {
-
     bins!: d3.Bin<number, number>[];
     declare domain: HistogramPlotDomain;
     declare props: HistogramPlotProps;
@@ -36,7 +37,8 @@ class BaseHistogramPlot extends BasePlot {
         this.bins = [];
         this.histogramPlotConfig = {
             numBins: props.numBins ?? DEFAULT_HISTOGRAM_PLOT_CONFIG.numBins,
-            barOpacity: props.barOpacity ?? DEFAULT_HISTOGRAM_PLOT_CONFIG.barOpacity,
+            barOpacity:
+                props.barOpacity ?? DEFAULT_HISTOGRAM_PLOT_CONFIG.barOpacity,
         };
     }
 
@@ -74,9 +76,9 @@ class BaseHistogramPlot extends BasePlot {
 
         const data: number[] = this.props.data.map((d: Record<string, any>) => {
             return this.config.scaleConfig.logX
-            ? Math.log10(d[this.props.xClass])
-            : d[this.props.xClass]
-        })
+                ? Math.log10(d[this.props.xClass])
+                : d[this.props.xClass];
+        });
 
         this.bins = histogramGenerator(data);
 
@@ -95,7 +97,7 @@ class BaseHistogramPlot extends BasePlot {
         this.scale = {
             x: scaleX,
             y: scaleY,
-        }
+        };
 
         this.onSetupScales();
     }

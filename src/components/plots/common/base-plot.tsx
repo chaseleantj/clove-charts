@@ -291,10 +291,7 @@ class BasePlot extends Component<BasePlotProps> {
                 : this.config.axisConfig.xLabel;
 
         if (xLabel) {
-            this.axisManager.setXLabel(
-                xLabel,
-                this.config.margin.bottom
-            );
+            this.axisManager.setXLabel(xLabel, this.config.margin.bottom);
         }
 
         const yLabel =
@@ -303,10 +300,7 @@ class BasePlot extends Component<BasePlotProps> {
                 : this.config.axisConfig.yLabel;
 
         if (yLabel) {
-            this.axisManager.setYLabel(
-                yLabel,
-                this.config.margin.left
-            );
+            this.axisManager.setYLabel(yLabel, this.config.margin.left);
         }
 
         this.addUpdateFunction(() => {
@@ -478,10 +472,7 @@ class BasePlot extends Component<BasePlotProps> {
         }
     }
 
-    getEventCoords(
-        event: Event,
-        coordinateSystem = 'pixel'
-    ): [number, number] {
+    getEventCoords(event: Event, coordinateSystem = 'pixel'): [number, number] {
         const [x, y] = d3.pointer(event, this.plot.node());
         if (coordinateSystem === 'data') {
             if (

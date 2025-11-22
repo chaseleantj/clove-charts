@@ -2,10 +2,7 @@
 
 import { ReactNode, forwardRef, useMemo, useRef } from 'react';
 
-import {
-    LegendConfig,
-    TooltipConfig,
-} from '@/components/plots/common/config';
+import { LegendConfig, TooltipConfig } from '@/components/plots/common/config';
 
 import styles from '@/components/page.module.css';
 
@@ -57,19 +54,17 @@ export function ChartCaptions({ children }: ChartCaptionsProps) {
     );
 }
 
-export const ChartLegend = forwardRef<HTMLDivElement>(function ChartLegend(
-    _,
-    ref
-) {
-    return <div ref={ref} className={styles.legend}></div>;
-});
+export const ChartLegend = forwardRef<HTMLDivElement>(
+    function ChartLegend(_, ref) {
+        return <div ref={ref} className={styles.legend}></div>;
+    }
+);
 
-export const ChartTooltip = forwardRef<HTMLDivElement>(function ChartTooltip(
-    _,
-    ref
-) {
-    return <div ref={ref} className={styles.tooltip}></div>;
-});
+export const ChartTooltip = forwardRef<HTMLDivElement>(
+    function ChartTooltip(_, ref) {
+        return <div ref={ref} className={styles.tooltip}></div>;
+    }
+);
 
 type LegendOverrides = Omit<LegendConfig, 'legendRef'>;
 type TooltipOverrides = Omit<TooltipConfig, 'tooltipRef'>;
@@ -115,4 +110,3 @@ export function useChartTooltip(
 
     return { tooltipRef, tooltipConfig };
 }
-

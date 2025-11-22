@@ -79,7 +79,6 @@ class BaseMatrixPlot extends BasePlot {
                 }
             );
         }
-
     }
 
     onSetupLegend() {

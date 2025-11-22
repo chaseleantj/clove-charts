@@ -6,12 +6,12 @@ import TestContourChart from '@/components/charts/examples/test-contour-chart';
 
 export default function Home() {
     return (
-            <main>
-                {/* <BaseChart /> */}
-                <TestContourChart />
-                <IrisBarChart />
-                <IrisScatterChart />
-                <IrisHistogramChart />
-            </main>
+        <main>
+            {/* <BaseChart /> */}
+            <TestContourChart />
+            <IrisBarChart />
+            <IrisScatterChart />
+            <IrisHistogramChart />
+        </main>
     );
 }

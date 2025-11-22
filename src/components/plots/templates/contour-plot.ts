@@ -1,6 +1,9 @@
 import * as d3 from 'd3';
 
-import BasePlot, { BasePlotProps, Scale } from '@/components/plots/common/base-plot';
+import BasePlot, {
+    BasePlotProps,
+    Scale,
+} from '@/components/plots/common/base-plot';
 import { linspace } from '@/components/plots/common/utils';
 
 export interface ContourPlotConfig {
@@ -12,7 +15,9 @@ export interface ContourPlotConfig {
     shadeContour: boolean;
 }
 
-export interface ContourPlotProps extends BasePlotProps, Partial<ContourPlotConfig> {
+export interface ContourPlotProps
+    extends BasePlotProps,
+        Partial<ContourPlotConfig> {
     func: (x: number, y: number) => number;
 }
 
@@ -34,15 +39,19 @@ export const DEFAULT_CONTOUR_PLOT_CONFIG: Omit<ContourPlotConfig, 'func'> = {
 };
 
 export function getContourPlotConfig(
-    props: ContourPlotProps,
+    props: ContourPlotProps
 ): ContourPlotConfig {
     return {
         func: props.func,
-        resolutionX: props.resolutionX ?? DEFAULT_CONTOUR_PLOT_CONFIG.resolutionX,
-        resolutionY: props.resolutionY ?? DEFAULT_CONTOUR_PLOT_CONFIG.resolutionY,
+        resolutionX:
+            props.resolutionX ?? DEFAULT_CONTOUR_PLOT_CONFIG.resolutionX,
+        resolutionY:
+            props.resolutionY ?? DEFAULT_CONTOUR_PLOT_CONFIG.resolutionY,
         thresholds: props.thresholds ?? DEFAULT_CONTOUR_PLOT_CONFIG.thresholds,
-        strokeColor: props.strokeColor ?? DEFAULT_CONTOUR_PLOT_CONFIG.strokeColor,
-        shadeContour: props.shadeContour ?? DEFAULT_CONTOUR_PLOT_CONFIG.shadeContour,
+        strokeColor:
+            props.strokeColor ?? DEFAULT_CONTOUR_PLOT_CONFIG.strokeColor,
+        shadeContour:
+            props.shadeContour ?? DEFAULT_CONTOUR_PLOT_CONFIG.shadeContour,
     };
 }
 
@@ -52,7 +61,7 @@ class BaseContourPlot extends BasePlot {
     declare props: ContourPlotProps;
 
     contourPlotConfig!: ContourPlotConfig;
-    
+
     fValues!: number[];
     xRange!: number[];
     yRange!: number[];
@@ -67,8 +76,12 @@ class BaseContourPlot extends BasePlot {
 
     onSetupScales() {
         // Calculate padding equal to one threshold step
-        const xPadding = (this.domain.x[1] - this.domain.x[0]) / this.contourPlotConfig.thresholds;
-        const yPadding = (this.domain.y[1] - this.domain.y[0]) / this.contourPlotConfig.thresholds;
+        const xPadding =
+            (this.domain.x[1] - this.domain.x[0]) /
+            this.contourPlotConfig.thresholds;
+        const yPadding =
+            (this.domain.y[1] - this.domain.y[0]) /
+            this.contourPlotConfig.thresholds;
 
         // Generate grid points with padding to avoid rendering artifacts at the edges
         this.xRange = linspace(
@@ -85,7 +98,9 @@ class BaseContourPlot extends BasePlot {
         this.fValues = [];
         for (let j = 0; j < this.contourPlotConfig.resolutionY; j++) {
             for (let i = 0; i < this.contourPlotConfig.resolutionX; i++) {
-                this.fValues.push(this.contourPlotConfig.func(this.xRange[i], this.yRange[j]));
+                this.fValues.push(
+                    this.contourPlotConfig.func(this.xRange[i], this.yRange[j])
+                );
             }
         }
 
@@ -101,24 +116,20 @@ class BaseContourPlot extends BasePlot {
     }
 
     renderElements() {
-        this.primitives.addContour(
-            this.fValues,
-            this.xRange,
-            this.yRange,
-            {
-                colorScale: this.scale.color,
-                thresholds: this.contourPlotConfig.thresholds,
-                stroke: this.contourPlotConfig.strokeColor,
-            }
-        );
+        this.primitives.addContour(this.fValues, this.xRange, this.yRange, {
+            colorScale: this.scale.color,
+            thresholds: this.contourPlotConfig.thresholds,
+            stroke: this.contourPlotConfig.strokeColor,
+        });
     }
 
     onSetupLegend() {
         if (this.contourPlotConfig.shadeContour) {
-            this.legend.addContinuousLegend(this.scale.color as d3.ScaleSequential<string, never>);
+            this.legend.addContinuousLegend(
+                this.scale.color as d3.ScaleSequential<string, never>
+            );
         }
     }
 }
 
 export default BaseContourPlot;
-

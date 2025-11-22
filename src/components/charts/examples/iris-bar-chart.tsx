@@ -23,12 +23,14 @@ const PLOT_CONFIG: PlotConfig = {
 
 export default function IrisBarChart() {
     const [irisData, setIrisData] = useState<IrisData[]>([]);
-    const irisSpeciesCounts = useMemo(() => 
-        Array.from(
-            d3.group(irisData, d => d.species),
-            ([species, items]) => ({ species, count: items.length })
-        )
-    , [irisData]);
+    const irisSpeciesCounts = useMemo(
+        () =>
+            Array.from(
+                d3.group(irisData, (d) => d.species),
+                ([species, items]) => ({ species, count: items.length })
+            ),
+        [irisData]
+    );
 
     useEffect(() => {
         async function fetchData(): Promise<void> {

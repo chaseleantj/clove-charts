@@ -26,7 +26,7 @@ interface IrisData {
 const PLOT_CONFIG: PlotConfig = {
     themeConfig: { enableZoom: true },
     // scaleConfig: {logY: true},
-    axisConfig: { xLabel: 'Sepal width (cm)', yLabel: 'Petal length (cm)'},
+    axisConfig: { xLabel: 'Sepal width (cm)', yLabel: 'Petal length (cm)' },
     margin: { right: 80 },
 };
 

@@ -18,15 +18,15 @@ import {
 const PLOT_CONFIG: PlotConfig = {
     themeConfig: { enableZoom: true },
     domainConfig: { domainX: [-1.0, 1.0], domainY: [-1.0, 1.0] },
-    colorConfig: {continuousColorScheme: d3.interpolateRdYlBu},
+    colorConfig: { continuousColorScheme: d3.interpolateRdYlBu },
     // axisConfig: {tickCount: 10},
     // scaleConfig: {logY: true},
-    margin: {right: 80}
+    margin: { right: 80 },
 };
 
 export default function TestContourChart() {
     const f = useCallback((x: number, y: number) => {
-        return Math.cos(5 * x * y) + Math.sin(5 * x + y)
+        return Math.cos(5 * x * y) + Math.sin(5 * x + y);
     }, []);
     const { legendRef, legendConfig } = useChartLegend();
     const { tooltipRef, tooltipConfig } = useChartTooltip();

@@ -21,11 +21,13 @@ interface CommonCategoricalStyles {
 }
 
 // Map type T to the corresponding styles interface
-type StyleForType<T extends 'point' | 'line' | 'rect'> = 
-    T extends 'point' ? PointStyles
-    : T extends 'line' ? LineStyles
-    : T extends 'rect' ? RectStyles
-    : never;
+type StyleForType<T extends 'point' | 'line' | 'rect'> = T extends 'point'
+    ? PointStyles
+    : T extends 'line'
+      ? LineStyles
+      : T extends 'rect'
+        ? RectStyles
+        : never;
 
 interface CategoricalItem<T extends 'point' | 'line' | 'rect'> {
     type: T;
@@ -169,7 +171,13 @@ class LegendManager {
                     'transform',
                     `translate(${this.legendConfig.continuousBarWidth + 5}, 0)`
                 )
-                .call(d3.axisRight(axisScale).tickValues(axisScale.ticks(5).concat(axisScale.domain()))); // ensures that the edges of the domain (first and last tick) are included
+                .call(
+                    d3
+                        .axisRight(axisScale)
+                        .tickValues(
+                            axisScale.ticks(5).concat(axisScale.domain())
+                        )
+                ); // ensures that the edges of the domain (first and last tick) are included
 
         this.continuousSvg.append('g').call(axisRight);
 
@@ -224,7 +232,10 @@ class LegendManager {
                         .attr('y2', y)
                         .attr('stroke', commonStyles.stroke || 'currentColor')
                         .attr('stroke-width', lineStyles.strokeWidth || 1.5)
-                        .attr('stroke-dasharray', lineStyles.strokeDashArray || '')
+                        .attr(
+                            'stroke-dasharray',
+                            lineStyles.strokeDashArray || ''
+                        )
                         .attr('opacity', commonStyles.opacity ?? 1);
                 } else if (d.type === 'point') {
                     const symbolGenerator = d3

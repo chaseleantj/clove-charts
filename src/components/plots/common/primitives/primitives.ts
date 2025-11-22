@@ -39,7 +39,9 @@ export abstract class Primitive<
         }
     }
 
-    public setStyles(styles: Partial<Omit<TConfig, keyof ImmutablePrimitiveConfig>>) {
+    public setStyles(
+        styles: Partial<Omit<TConfig, keyof ImmutablePrimitiveConfig>>
+    ) {
         this.options = { ...this.options, ...styles };
         return this;
     }
@@ -90,9 +92,7 @@ export abstract class Primitive<
         return element;
     }
 
-    protected applyCommonStyles<
-        T extends Element | Transition
-    >(element: T): T {
+    protected applyCommonStyles<T extends Element | Transition>(element: T): T {
         return (element as any)
             .attr('fill', this.options.fill)
             .attr('stroke', this.options.stroke)
@@ -101,8 +101,10 @@ export abstract class Primitive<
             .attr('pointer-events', this.options.pointerEvents) as T;
     }
 
-
-    public abstract render(transitionDuration: number, ease?: EasingFunction): Transition;
+    public abstract render(
+        transitionDuration: number,
+        ease?: EasingFunction
+    ): Transition;
     public abstract render(transitionDuration?: 0): Element;
 
     public createUpdateFunction(
@@ -166,7 +168,9 @@ export interface PointPrimitiveOptions {
     // strokeWidth?: number;
 }
 
-export class PointPrimitive extends Primitive<PrimitiveConfig & PointPrimitiveOptions> {
+export class PointPrimitive extends Primitive<
+    PrimitiveConfig & PointPrimitiveOptions
+> {
     x?: number;
     y?: number;
 
@@ -184,7 +188,10 @@ export class PointPrimitive extends Primitive<PrimitiveConfig & PointPrimitiveOp
         return this;
     }
 
-    public render(transitionDuration: number, ease?: EasingFunction): Transition;
+    public render(
+        transitionDuration: number,
+        ease?: EasingFunction
+    ): Transition;
     public render(transitionDuration?: 0): Element;
     public render(transitionDuration = 0, ease?: EasingFunction) {
         const element = this.getElementWithTransition(
@@ -215,7 +222,9 @@ export interface LinePrimitiveOptions {
     strokeDashOffset?: number;
 }
 
-export class LinePrimitive extends Primitive<PrimitiveConfig & LinePrimitiveOptions> {
+export class LinePrimitive extends Primitive<
+    PrimitiveConfig & LinePrimitiveOptions
+> {
     x1?: number;
     y1?: number;
     x2?: number;
@@ -237,7 +246,10 @@ export class LinePrimitive extends Primitive<PrimitiveConfig & LinePrimitiveOpti
         return this;
     }
 
-    public render(transitionDuration: number, ease?: EasingFunction): Transition;
+    public render(
+        transitionDuration: number,
+        ease?: EasingFunction
+    ): Transition;
     public render(transitionDuration?: 0): Element;
     public render(transitionDuration = 0, ease?: EasingFunction) {
         let markerStart = null;
@@ -282,7 +294,9 @@ export interface RectanglePrimitiveOptions {
     // strokeWidth?: number;
 }
 
-export class RectanglePrimitive extends Primitive<PrimitiveConfig & RectanglePrimitiveOptions> {
+export class RectanglePrimitive extends Primitive<
+    PrimitiveConfig & RectanglePrimitiveOptions
+> {
     x1?: number;
     y1?: number;
     x2?: number;
@@ -304,7 +318,10 @@ export class RectanglePrimitive extends Primitive<PrimitiveConfig & RectanglePri
         return this;
     }
 
-    public render(transitionDuration: number, ease?: EasingFunction): Transition;
+    public render(
+        transitionDuration: number,
+        ease?: EasingFunction
+    ): Transition;
     public render(transitionDuration?: 0): Element;
     public render(transitionDuration = 0, ease?: EasingFunction) {
         const element = this.getElementWithTransition(
@@ -351,7 +368,9 @@ export interface TextPrimitiveOptions {
 }
 
 // Currently does not support animations with latex rendering
-export class TextPrimitive extends Primitive<PrimitiveConfig & TextPrimitiveOptions> {
+export class TextPrimitive extends Primitive<
+    PrimitiveConfig & TextPrimitiveOptions
+> {
     x?: number;
     y?: number;
     angle: number;
@@ -386,7 +405,10 @@ export class TextPrimitive extends Primitive<PrimitiveConfig & TextPrimitiveOpti
         return this;
     }
 
-    public render(transitionDuration: number, ease?: EasingFunction): Transition;
+    public render(
+        transitionDuration: number,
+        ease?: EasingFunction
+    ): Transition;
     public render(transitionDuration?: 0): Element;
     public render(duration = 0, ease?: EasingFunction) {
         let element = this.getElementWithTransition(
@@ -427,8 +449,18 @@ export class TextPrimitive extends Primitive<PrimitiveConfig & TextPrimitiveOpti
         return element;
     }
 
-    private renderMath<T extends Element | Transition>(element: T, x: number, y: number): T {
-        return renderKatex(this.text, element as any, x, y, this.angle) as unknown as T;
+    private renderMath<T extends Element | Transition>(
+        element: T,
+        x: number,
+        y: number
+    ): T {
+        return renderKatex(
+            this.text,
+            element as any,
+            x,
+            y,
+            this.angle
+        ) as unknown as T;
     }
 }
 
@@ -438,7 +470,9 @@ export interface PathPrimitiveOptions {
     curve?: d3.CurveFactory | d3.CurveFactoryLineOnly;
 }
 
-export class PathPrimitive extends Primitive<PrimitiveConfig & PathPrimitiveOptions> {
+export class PathPrimitive extends Primitive<
+    PrimitiveConfig & PathPrimitiveOptions
+> {
     dataPoints: Record<string, any>[];
     xAccessor!: CoordinateAccessor;
     yAccessor!: CoordinateAccessor;
@@ -466,7 +500,10 @@ export class PathPrimitive extends Primitive<PrimitiveConfig & PathPrimitiveOpti
         return this;
     }
 
-    public render(transitionDuration: number, ease?: EasingFunction): Transition;
+    public render(
+        transitionDuration: number,
+        ease?: EasingFunction
+    ): Transition;
     public render(transitionDuration?: 0): Element;
     public render(transitionDuration = 0, ease?: EasingFunction) {
         const element = this.getElementWithTransition(
@@ -504,7 +541,9 @@ export interface ContourPrimitiveOptions {
     colorScale?: d3.ScaleSequential<string, never> | ((t: number) => string);
 }
 
-export class ContourPrimitive extends Primitive<PrimitiveConfig & ContourPrimitiveOptions> {
+export class ContourPrimitive extends Primitive<
+    PrimitiveConfig & ContourPrimitiveOptions
+> {
     fValues: number[];
     xRange: number[];
     yRange: number[];
@@ -580,7 +619,10 @@ export class ContourPrimitive extends Primitive<PrimitiveConfig & ContourPrimiti
         return this;
     }
 
-    public render(transitionDuration: number, ease?: EasingFunction): Transition;
+    public render(
+        transitionDuration: number,
+        ease?: EasingFunction
+    ): Transition;
     public render(transitionDuration?: 0): Element;
     public render(transitionDuration = 0, ease?: EasingFunction) {
         const contours = this.calculateContours(
@@ -631,7 +673,9 @@ export interface ImagePrimitiveOptions {
     preserveAspectRatio?: string;
 }
 
-export class ImagePrimitive extends Primitive<PrimitiveConfig & ImagePrimitiveOptions> {
+export class ImagePrimitive extends Primitive<
+    PrimitiveConfig & ImagePrimitiveOptions
+> {
     width: number | null;
     coords: [number, number] | null;
     useCornerCoords: boolean;
@@ -768,7 +812,10 @@ export class ImagePrimitive extends Primitive<PrimitiveConfig & ImagePrimitiveOp
         return { x, y, width, height };
     }
 
-    public render(transitionDuration: number, ease?: EasingFunction): Transition;
+    public render(
+        transitionDuration: number,
+        ease?: EasingFunction
+    ): Transition;
     public render(transitionDuration?: 0): Element;
     public render(transitionDuration = 0, ease?: EasingFunction) {
         // Only update if image is loaded
@@ -803,7 +850,7 @@ export class ImagePrimitive extends Primitive<PrimitiveConfig & ImagePrimitiveOp
 }
 
 export abstract class BatchPrimitive<
-    TConfig extends BatchPrimitiveConfig = BatchPrimitiveConfig
+    TConfig extends BatchPrimitiveConfig = BatchPrimitiveConfig,
 > extends Primitive<TConfig> {
     dataPoints: Record<string, any>[];
 
@@ -845,9 +892,10 @@ export abstract class BatchPrimitive<
     }
 
     protected applyCommonStyles<T extends Element | Transition>(element: T): T {
-        return (super
-            .applyCommonStyles(element) as any)
-            .attr('class', this.options.className);
+        return (super.applyCommonStyles(element) as any).attr(
+            'class',
+            this.options.className
+        );
     }
 
     protected performDataJoin(
@@ -904,7 +952,10 @@ export abstract class BatchPrimitive<
         return this.getElementWithTransition(merged, transitionDuration, ease);
     }
 
-    public abstract render(transitionDuration: number, ease?: EasingFunction): Transition;
+    public abstract render(
+        transitionDuration: number,
+        ease?: EasingFunction
+    ): Transition;
     public abstract render(transitionDuration?: 0): Element;
 
     public remove(): void {
@@ -938,8 +989,9 @@ export interface BatchPointsPrimitiveOptions {
     keyAccessor?: (d: Record<string, any>, i: number) => number;
 }
 
-export class BatchPointsPrimitive extends BatchPrimitive<BatchPrimitiveConfig & BatchPointsPrimitiveOptions> {
-
+export class BatchPointsPrimitive extends BatchPrimitive<
+    BatchPrimitiveConfig & BatchPointsPrimitiveOptions
+> {
     xAccessor!: CoordinateAccessor;
     yAccessor!: CoordinateAccessor;
 
@@ -961,7 +1013,10 @@ export class BatchPointsPrimitive extends BatchPrimitive<BatchPrimitiveConfig & 
         return this;
     }
 
-    public render(transitionDuration: number, ease?: EasingFunction): Transition;
+    public render(
+        transitionDuration: number,
+        ease?: EasingFunction
+    ): Transition;
     public render(transitionDuration?: 0): Element;
     public render(transitionDuration = 0, ease?: EasingFunction) {
         const finalSelection = this.performDataJoin(
@@ -976,7 +1031,9 @@ export class BatchPointsPrimitive extends BatchPrimitive<BatchPrimitiveConfig & 
 
         if (typeof this.options.symbolType === 'function') {
             symbolGenerator.type(
-                this.options.symbolType as (d: Record<string, any>) => d3.SymbolType
+                this.options.symbolType as (
+                    d: Record<string, any>
+                ) => d3.SymbolType
             );
         } else {
             symbolGenerator.type(this.options.symbolType as d3.SymbolType);
@@ -1016,7 +1073,9 @@ export interface BatchLinesPrimitiveOptions {
     keyAccessor?: (d: Record<string, any>, i: number) => number;
 }
 
-export class BatchLinesPrimitive extends BatchPrimitive<BatchPrimitiveConfig & BatchLinesPrimitiveOptions> {
+export class BatchLinesPrimitive extends BatchPrimitive<
+    BatchPrimitiveConfig & BatchLinesPrimitiveOptions
+> {
     x1Accessor!: CoordinateAccessor;
     y1Accessor!: CoordinateAccessor;
     x2Accessor!: CoordinateAccessor;
@@ -1044,7 +1103,10 @@ export class BatchLinesPrimitive extends BatchPrimitive<BatchPrimitiveConfig & B
         return this;
     }
 
-    public render(transitionDuration: number, ease?: EasingFunction): Transition;
+    public render(
+        transitionDuration: number,
+        ease?: EasingFunction
+    ): Transition;
     public render(transitionDuration?: 0): Element;
     public render(transitionDuration = 0, ease?: EasingFunction) {
         const finalSelection = this.performDataJoin(
@@ -1053,7 +1115,8 @@ export class BatchLinesPrimitive extends BatchPrimitive<BatchPrimitiveConfig & B
             ease
         );
 
-        if (!this.dataPoints || finalSelection.empty()) return d3.select(null) as any;
+        if (!this.dataPoints || finalSelection.empty())
+            return d3.select(null) as any;
 
         let markerStart: string | null = null;
         let markerEnd: string | null = null;
@@ -1127,7 +1190,9 @@ export interface BatchRectanglesPrimitiveOptions {
     keyAccessor?: (d: Record<string, any>, i: number) => number;
 }
 
-export class BatchRectanglesPrimitive extends BatchPrimitive<BatchPrimitiveConfig & BatchRectanglesPrimitiveOptions> {
+export class BatchRectanglesPrimitive extends BatchPrimitive<
+    BatchPrimitiveConfig & BatchRectanglesPrimitiveOptions
+> {
     x1Accessor!: CoordinateAccessor;
     y1Accessor!: CoordinateAccessor;
     x2Accessor!: CoordinateAccessor;
@@ -1159,7 +1224,10 @@ export class BatchRectanglesPrimitive extends BatchPrimitive<BatchPrimitiveConfi
         return this;
     }
 
-    public render(transitionDuration: number, ease?: EasingFunction): Transition;
+    public render(
+        transitionDuration: number,
+        ease?: EasingFunction
+    ): Transition;
     public render(transitionDuration?: 0): Element;
     public render(transitionDuration = 0, ease?: EasingFunction) {
         const finalSelection = this.performDataJoin(
@@ -1237,7 +1305,9 @@ export interface BatchTextPrimitiveOptions {
     keyAccessor?: (d: Record<string, any>, i: number) => number;
 }
 
-export class BatchTextPrimitive extends BatchPrimitive<BatchPrimitiveConfig & BatchTextPrimitiveOptions> {
+export class BatchTextPrimitive extends BatchPrimitive<
+    BatchPrimitiveConfig & BatchTextPrimitiveOptions
+> {
     xAccessor!: CoordinateAccessor;
     yAccessor!: CoordinateAccessor;
     textAccessor?: (d: Record<string, any>) => string;
@@ -1277,7 +1347,10 @@ export class BatchTextPrimitive extends BatchPrimitive<BatchPrimitiveConfig & Ba
         return this;
     }
 
-    public render(transitionDuration: number, ease?: EasingFunction): Transition;
+    public render(
+        transitionDuration: number,
+        ease?: EasingFunction
+    ): Transition;
     public render(transitionDuration?: 0): Element;
     public render(transitionDuration = 0, ease?: EasingFunction) {
         const finalSelection = this.performDataJoin(

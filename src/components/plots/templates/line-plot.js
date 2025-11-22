@@ -67,7 +67,6 @@ class BaseLinePlot extends BasePlot {
             //   strokeDashOffset: 0
             // }).render(10000);
         }
-
     }
 
     onSetupDomain() {

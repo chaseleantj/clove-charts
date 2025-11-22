@@ -13,15 +13,11 @@ export type ContinuousD3Scale =
 
 export type CategoricalScale =
     | d3.ScaleOrdinal<string, string | number>
-    | d3.ScaleBand<string>
+    | d3.ScaleBand<string>;
 
-export type D3Scale =
-    | CategoricalScale
-    | ContinuousD3Scale;
+export type D3Scale = CategoricalScale | ContinuousD3Scale;
 
-export function isContinuousScale(
-    scale: D3Scale
-): scale is ContinuousD3Scale {
+export function isContinuousScale(scale: D3Scale): scale is ContinuousD3Scale {
     return 'invert' in scale;
 }
 
@@ -78,10 +74,7 @@ class ScaleManager {
     ): D3Scale {
         if (isStringArray(domain)) {
             if (isNumberTuple(range)) {
-                return d3
-                    .scaleBand()
-                    .domain(domain)
-                    .range(range);
+                return d3.scaleBand().domain(domain).range(range);
             }
             return d3
                 .scaleOrdinal<string, string | number>()
