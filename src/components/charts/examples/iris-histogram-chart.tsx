@@ -24,7 +24,7 @@ interface IrisData {
 }
 
 const PLOT_CONFIG: PlotConfig = {
-    themeConfig: { enableZoom: false },
+    themeConfig: { enableZoom: true },
     axisConfig: { xLabel: 'Sepal width (cm)', yLabel: 'Frequency' },
 };
 

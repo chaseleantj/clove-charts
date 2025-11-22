@@ -3,11 +3,14 @@ import * as d3 from 'd3';
 import BasePlot, { BasePlotProps } from '@/components/plots/common/base-plot';
 import ScaleManager from '@/components/plots/common/scale-manager';
 
-interface HistogramPlotProps extends Omit<BasePlotProps, 'yClass'> {
+export interface HistogramPlotConfig {
+    numBins: number;
+    barOpacity: number;
+}
+
+interface HistogramPlotProps extends Omit<BasePlotProps, 'yClass'>, Partial<HistogramPlotConfig> {
     data: Record<string, any>[];
     xClass: string;
-    numBins?: number;
-    barOpacity?: number;
 }
 
 interface HistogramPlotDomain {
@@ -15,12 +18,9 @@ interface HistogramPlotDomain {
     y: [number, number];
 }
 
-const DEFAULT_HISTOGRAM_PLOT_CONFIG = {
+export const DEFAULT_HISTOGRAM_PLOT_CONFIG: HistogramPlotConfig = {
     numBins: 20,
     barOpacity: 1,
-    axisConfig: {yLabel: 'Frequency'},
-    scaleConfig: {formatNiceX: false, formatNiceY: false},
-    themeConfig: {enableZoom: false}
 }
 
 class BaseHistogramPlot extends BasePlot {
@@ -29,9 +29,15 @@ class BaseHistogramPlot extends BasePlot {
     declare domain: HistogramPlotDomain;
     declare props: HistogramPlotProps;
 
+    histogramPlotConfig!: HistogramPlotConfig;
+
     constructor(props: HistogramPlotProps) {
         super(props);
         this.bins = [];
+        this.histogramPlotConfig = {
+            numBins: props.numBins ?? DEFAULT_HISTOGRAM_PLOT_CONFIG.numBins,
+            barOpacity: props.barOpacity ?? DEFAULT_HISTOGRAM_PLOT_CONFIG.barOpacity,
+        };
     }
 
     shouldInitializeChart(): boolean {
@@ -59,7 +65,7 @@ class BaseHistogramPlot extends BasePlot {
             this.config.scaleConfig.formatNiceX
         );
 
-        const numBins = this.props.numBins ?? DEFAULT_HISTOGRAM_PLOT_CONFIG.numBins;
+        const numBins = this.histogramPlotConfig.numBins;
 
         const histogramGenerator = d3
             .bin()
@@ -95,7 +101,7 @@ class BaseHistogramPlot extends BasePlot {
     }
 
     renderElements() {
-        const barOpacity = this.props.barOpacity ?? DEFAULT_HISTOGRAM_PLOT_CONFIG.barOpacity;
+        const barOpacity = this.histogramPlotConfig.barOpacity;
         const barColor = this.config.colorConfig.defaultColor;
 
         const data = this.bins
@@ -121,7 +127,6 @@ class BaseHistogramPlot extends BasePlot {
             {
                 fill: barColor,
                 opacity: barOpacity,
-                className: 'histogram-bar',
             }
         );
     }

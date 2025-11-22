@@ -15,12 +15,12 @@ export type CategoricalScale =
     | d3.ScaleOrdinal<string, string | number>
     | d3.ScaleBand<string>
 
-export type AnyD3Scale =
+export type D3Scale =
     | CategoricalScale
     | ContinuousD3Scale;
 
 export function isContinuousScale(
-    scale: AnyD3Scale
+    scale: D3Scale
 ): scale is ContinuousD3Scale {
     return 'invert' in scale;
 }
@@ -30,7 +30,14 @@ class ScaleManager {
 
     getScale(
         domain: string[],
-        range: string[] | [number, number],
+        range: [number, number],
+        log?: false,
+        formatNiceScales?: boolean
+    ): d3.ScaleBand<string>;
+
+    getScale(
+        domain: string[],
+        range: string[],
         log?: false,
         formatNiceScales?: boolean
     ): d3.ScaleOrdinal<string, string | number>;
@@ -61,18 +68,24 @@ class ScaleManager {
         range: string[] | [number, number],
         log?: boolean,
         formatNiceScales?: boolean
-    ): AnyD3Scale;
+    ): D3Scale;
 
     public getScale(
         domain: string[] | [Date, Date] | [number, number],
         range: string[] | [number, number],
         log = false,
         formatNiceScales = false
-    ): AnyD3Scale {
+    ): D3Scale {
         if (isStringArray(domain)) {
+            if (isNumberTuple(range)) {
+                return d3
+                    .scaleBand()
+                    .domain(domain)
+                    .range(range);
+            }
             return d3
                 .scaleOrdinal<string, string | number>()
-                .domain(domain as string[])
+                .domain(domain)
                 .range(range as string[] | number[]);
         }
         if (isDateTuple(domain)) {
@@ -150,16 +163,13 @@ class ScaleManager {
     }
 
     public setScaleDomain(
-        scale: AnyD3Scale,
+        scale: D3Scale,
         domain: string[] | [Date, Date] | [number, number],
         formatNiceScales: boolean
     ) {
         if (isStringArray(domain)) {
-            const ordinalScale = scale as d3.ScaleOrdinal<
-                string,
-                string | number
-            >;
-            ordinalScale.domain(domain);
+            const categoricalScale = scale as CategoricalScale;
+            categoricalScale.domain(domain);
         } else if (isDateTuple(domain)) {
             const timeScale = scale as d3.ScaleTime<number, number>;
             if (formatNiceScales) {

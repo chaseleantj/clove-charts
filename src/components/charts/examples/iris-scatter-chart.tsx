@@ -25,7 +25,8 @@ interface IrisData {
 
 const PLOT_CONFIG: PlotConfig = {
     themeConfig: { enableZoom: true },
-    axisConfig: { xLabel: 'Sepal width (cm)', yLabel: 'Petal length (cm)' },
+    // scaleConfig: {logY: true},
+    axisConfig: { xLabel: 'Sepal width (cm)', yLabel: 'Petal length (cm)'},
     margin: { right: 80 },
 };
 
@@ -58,8 +59,8 @@ export default function IrisScatterChart() {
                 <ChartTooltip ref={tooltipRef} />
                 <BaseScatterPlot
                     data={irisData}
-                    xClass="sepal_width"
-                    yClass="petal_length"
+                    xClass="petal_width"
+                    yClass="sepal_width"
                     colorByClass="species"
                     legendConfig={legendConfig}
                     tooltipConfig={tooltipConfig}

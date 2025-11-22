@@ -7,7 +7,7 @@ import TooltipManager from '@/components/plots/common/tooltip-manager';
 import LegendManager from '@/components/plots/common/legend-manager';
 import DomainManager from '@/components/plots/common/domain-manager';
 import ScaleManager, {
-    AnyD3Scale,
+    D3Scale,
     isContinuousScale,
 } from '@/components/plots/common/scale-manager';
 import AxisManager from '@/components/plots/common/axis-manager';
@@ -33,8 +33,8 @@ export interface Domain {
 }
 
 export interface Scale {
-    x: AnyD3Scale;
-    y: AnyD3Scale;
+    x: D3Scale;
+    y: D3Scale;
 }
 
 interface PrimaryBasePlotProps {

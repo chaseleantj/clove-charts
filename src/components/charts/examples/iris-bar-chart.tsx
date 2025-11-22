@@ -55,7 +55,7 @@ export default function IrisBarChart() {
                     xClass="species"
                     yClass="count"
                     padding={0.4}
-                    colorByClass={true}
+                    useDifferentColors={true}
                     {...PLOT_CONFIG}
                 />
             </ChartPlotWrapper>

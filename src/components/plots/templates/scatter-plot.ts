@@ -1,19 +1,25 @@
 import * as d3 from 'd3';
 
 import BasePlot, { BasePlotProps, Scale } from '@/components/plots/common/base-plot';
+import { RequiredPlotConfig } from '@/components/plots/common/config';
 import { BatchPointsPrimitive } from '@/components/plots/common/primitives/primitives';
-interface ScatterPlotProps extends BasePlotProps {
+import { isContinuousScale, D3Scale } from '@/components/plots/common/scale-manager';
+
+export interface ScatterPlotConfig {
+    pointSize: number | ((d: Record<string, any>) => number);
+    pointOpacity: number | ((d: Record<string, any>) => number);
+    colorByClass: string | null;
+}
+
+export interface ScatterPlotProps extends BasePlotProps, Partial<ScatterPlotConfig> {
     data: Record<string, any>[];
     xClass: string;
     yClass: string;
-    pointSize?: number | ((d: Record<string, any>) => number);
-    pointOpacity?: number | ((d: Record<string, any>) => number);
-    colorByClass?: string | null;
 }
 
 interface ScatterPlotDomain {
-    x: [number, number] | [Date, Date];
-    y: [number, number] | [Date, Date];
+    x: [number, number] | [Date, Date] | string[];
+    y: [number, number] | [Date, Date] | string[];
     color: [number, number] | [Date, Date] | string[];
 }
 
@@ -23,10 +29,21 @@ interface ScatterPlotScale extends Scale {
         | string
 }
 
-const DEFAULT_SCATTER_PLOT_CONFIG = {
+export const DEFAULT_SCATTER_PLOT_CONFIG: Partial<ScatterPlotConfig> = {
     pointSize: 50,
     colorByClass: null,
 };
+
+export function getScatterPlotConfig(
+    props: ScatterPlotProps,
+    themeConfig: RequiredPlotConfig['themeConfig']
+): ScatterPlotConfig {
+    return {
+        pointSize: props.pointSize ?? DEFAULT_SCATTER_PLOT_CONFIG.pointSize!,
+        colorByClass: props.colorByClass ?? DEFAULT_SCATTER_PLOT_CONFIG.colorByClass!,
+        pointOpacity: props.pointOpacity ?? themeConfig.opacity,
+    };
+}
 
 class BaseScatterPlot extends BasePlot {
 
@@ -34,9 +51,12 @@ class BaseScatterPlot extends BasePlot {
     declare domain: ScatterPlotDomain;
     declare scale: ScatterPlotScale;
     declare props: ScatterPlotProps;
+    
+    scatterPlotConfig!: ScatterPlotConfig;
 
     constructor(props: ScatterPlotProps) {
         super(props);
+        this.scatterPlotConfig = getScatterPlotConfig(props, this.config.themeConfig);
     }
 
     shouldInitializeChart(): boolean {
@@ -44,42 +64,51 @@ class BaseScatterPlot extends BasePlot {
     }
 
     onSetupScales() {
-        if (this.props.colorByClass) {
+        if (this.scatterPlotConfig.colorByClass) {
             this.domain.color = this.domainManager.getDomain(
-                (d) => d[this.props.colorByClass as string]
+                (d) => d[this.scatterPlotConfig.colorByClass as string]
             );
             this.scale.color = this.scaleManager.getColorScale(
                 this.domain.color
             );
         } 
+    }
 
+    private getCoordinateAccessor(key: string, scale: D3Scale) {
+        if (isContinuousScale(scale)) {
+            return (d: Record<string, any>) => d[key];
+        }
+
+        return (d: Record<string, any>) => {
+            const val = d[key];
+            const bandScale = scale as d3.ScaleBand<string>;
+            const scaled = bandScale(val);
+
+            if (scaled === undefined) return null;
+            // Center the point in the band
+            return scaled + bandScale.bandwidth() / 2;
+        };
     }
 
     renderElements() {
-
         this.dataPoints = this.primitives.addPoints(
             this.props.data,
-            d => d[this.props.xClass],
-            d => d[this.props.yClass],
+            this.getCoordinateAccessor(this.props.xClass, this.scale.x),
+            this.getCoordinateAccessor(this.props.yClass, this.scale.y),
             {
                 symbolType: d3.symbolCircle,
-                fill: d => typeof this.scale.color === 'function' ? this.scale.color(d[this.props.colorByClass!]) 
+                fill: d => typeof this.scale.color === 'function' ? this.scale.color(d[this.scatterPlotConfig.colorByClass!]) 
                 : this.scale.color,
-                size:
-                    this.props.pointSize ??
-                    DEFAULT_SCATTER_PLOT_CONFIG.pointSize,
-                opacity:
-                    this.props.pointOpacity ??
-                    this.config.themeConfig.opacity
+                size: this.scatterPlotConfig.pointSize,
+                opacity: this.scatterPlotConfig.pointOpacity
             }
         );
-
     }
 
     onSetupLegend() {
-        if (!this.props.colorByClass) return;
+        if (!this.scatterPlotConfig.colorByClass) return;
 
-        this.legend.setTitle(this.config.legendConfig.title ?? this.props.colorByClass);
+        this.legend.setTitle(this.config.legendConfig.title ?? this.scatterPlotConfig.colorByClass);
 
         if (typeof this.scale.color !== 'string') {
             this.legend.addLegend(this.scale.color, 'point', {
@@ -89,8 +118,8 @@ class BaseScatterPlot extends BasePlot {
     }
 
     drawTooltip() {
-        const displayClasses = this.props.colorByClass
-            ? [this.props.xClass, this.props.yClass, this.props.colorByClass]
+        const displayClasses = this.scatterPlotConfig.colorByClass
+            ? [this.props.xClass, this.props.yClass, this.scatterPlotConfig.colorByClass]
             : [this.props.xClass, this.props.yClass];
 
         const tooltipDisplayClasses =

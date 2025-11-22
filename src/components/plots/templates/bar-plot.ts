@@ -1,6 +1,17 @@
 import * as d3 from 'd3';
 import BasePlot, { BasePlotProps } from '@/components/plots/common/base-plot';
 
+export interface BarPlotConfig {
+    padding: number;
+    useDifferentColors: boolean;
+}
+
+export interface BarPlotProps extends BasePlotProps, Partial<BarPlotConfig> {
+    data: Record<string, any>[];
+    xClass: string;
+    yClass: string;
+}
+
 interface BarPlotScale {
     x: d3.ScaleBand<string>
     y: d3.ScaleLinear<number, number>
@@ -11,17 +22,9 @@ interface BarPlotDomain {
     y: [number, number]
 }
 
-interface BarPlotProps extends BasePlotProps {
-    data: Record<string, any>[];
-    xClass: string;
-    yClass: string;
-    padding?: number;
-    colorByClass?: boolean;
-}
-
-const DEFAULT_BAR_PLOT_CONFIG = {
+const DEFAULT_BAR_PLOT_CONFIG: BarPlotConfig = {
     padding: 0.2,
-    colorByClass: true,
+    useDifferentColors: true,
 };
 
 
@@ -31,8 +34,14 @@ class BaseBarPlot extends BasePlot {
     declare scale: BarPlotScale
     declare props: BarPlotProps
 
+    barPlotConfig!: BarPlotConfig;
+
     constructor(props: BarPlotProps) {
         super(props);
+        this.barPlotConfig = {
+            padding: this.props.padding ?? DEFAULT_BAR_PLOT_CONFIG.padding,
+            useDifferentColors: this.props.useDifferentColors ?? DEFAULT_BAR_PLOT_CONFIG.useDifferentColors
+        }
     }
 
     onSetupDomain() {
@@ -60,7 +69,7 @@ class BaseBarPlot extends BasePlot {
 
     renderElements() {
 
-        const color = this.props.colorByClass ? this.scaleManager.getColorScale(
+        const color = this.barPlotConfig.useDifferentColors ? this.scaleManager.getColorScale(
             this.domainManager.getDomain(d => d[this.props.xClass])
         ) : this.config.colorConfig.defaultColor;
 
