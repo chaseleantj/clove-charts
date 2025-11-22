@@ -169,7 +169,7 @@ class LegendManager {
                     'transform',
                     `translate(${this.legendConfig.continuousBarWidth + 5}, 0)`
                 )
-                .call(d3.axisRight(axisScale).ticks(5));
+                .call(d3.axisRight(axisScale).tickValues(axisScale.ticks(5).concat(axisScale.domain()))); // ensures that the edges of the domain (first and last tick) are included
 
         this.continuousSvg.append('g').call(axisRight);
 
