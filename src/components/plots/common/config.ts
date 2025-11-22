@@ -1,6 +1,7 @@
 import * as d3 from 'd3';
 
 export interface ThemeConfig {
+    opacity?: number;
     transitionDuration?: number;
     enableZoom?: boolean;
     zoomAreaThreshold?: number;
@@ -152,6 +153,7 @@ export function DEFAULT_TICK_FORMAT(d: number | string | Date): string {
 }
 
 export const DEFAULT_THEME_CONFIG: Required<ThemeConfig> = {
+    opacity: 1,
     transitionDuration: 500,
     enableZoom: false,
     zoomAreaThreshold: 1000,

@@ -25,7 +25,6 @@ interface ScatterPlotScale extends Scale {
 
 const DEFAULT_SCATTER_PLOT_CONFIG = {
     pointSize: 50,
-    pointOpacity: 1,
     colorByClass: null,
 };
 
@@ -71,7 +70,7 @@ class BaseScatterPlot extends BasePlot {
                     DEFAULT_SCATTER_PLOT_CONFIG.pointSize,
                 opacity:
                     this.props.pointOpacity ??
-                    DEFAULT_SCATTER_PLOT_CONFIG.pointOpacity,
+                    this.config.themeConfig.opacity
             }
         );
 

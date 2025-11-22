@@ -11,8 +11,12 @@ export type ContinuousD3Scale =
     | d3.ScaleLogarithmic<number, number>
     | d3.ScaleLinear<number, number>;
 
-export type AnyD3Scale =
+export type CategoricalScale =
     | d3.ScaleOrdinal<string, string | number>
+    | d3.ScaleBand<string>
+
+export type AnyD3Scale =
+    | CategoricalScale
     | ContinuousD3Scale;
 
 export function isContinuousScale(
