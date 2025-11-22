@@ -1,7 +1,7 @@
 'use client';
 
 import * as d3 from 'd3';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
 import BaseContourPlot from '@/components/plots/templates/contour-plot';
 import { PlotConfig } from '@/components/plots/common/config';
 import {
@@ -15,18 +15,19 @@ import {
     useChartTooltip,
 } from '@/components/charts/chart-layout';
 
+import { InlineMath } from 'react-katex';
+
 const PLOT_CONFIG: PlotConfig = {
     themeConfig: { enableZoom: true },
-    domainConfig: { domainX: [-1.0, 1.0], domainY: [-1.0, 1.0] },
+    domainConfig: { domainX: [-1, 1], domainY: [-1, 1] },
     colorConfig: { continuousColorScheme: d3.interpolateRdYlBu },
-    // axisConfig: {tickCount: 10},
-    // scaleConfig: {logY: true},
+    axisConfig: { showGrid: false },
     margin: { right: 80 },
 };
 
 export default function TestContourChart() {
     const f = useCallback((x: number, y: number) => {
-        return Math.cos(5 * x * y) + Math.sin(5 * x + y);
+        return Math.cos(2 * Math.PI * x * y) + Math.sin(2 * Math.PI * x + y);
     }, []);
     const { legendRef, legendConfig } = useChartLegend();
     const { tooltipRef, tooltipConfig } = useChartTooltip();
@@ -38,8 +39,7 @@ export default function TestContourChart() {
                 <ChartTooltip ref={tooltipRef} />
                 <BaseContourPlot
                     func={f}
-                    thresholds={50}
-                    // shadeContour={false}
+                    thresholds={20}
                     legendConfig={legendConfig}
                     tooltipConfig={tooltipConfig}
                     {...PLOT_CONFIG}
@@ -47,8 +47,7 @@ export default function TestContourChart() {
             </ChartPlotWrapper>
             <ChartFooter>
                 <ChartCaptions>
-                    A scatter plot of the iris dataset. Hover over the points
-                    for more info.
+                    A contour plot of the function <InlineMath math="\cos(2 \pi xy) + \sin(2 \pi x + y))" />.
                 </ChartCaptions>
             </ChartFooter>
         </ChartLayout>
