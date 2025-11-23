@@ -4,6 +4,11 @@
     margin: auto;
 }
 
+.chart text {
+    font-family: Geist;
+    font-size: 12px;
+}
+
 .plotWrapper {
     position: relative;
     padding: 0.75em;
@@ -30,10 +35,6 @@
     height: fit-content;
     max-width: 130px;
     font-size: 12px;
-}
-
-.legend text {
-    font-family: Geist, Arial, Helvetica, sans-serif;
 }
 
 .legendGroup {
@@ -74,11 +75,6 @@
     max-width: 400px;
     text-align: center;
     margin: 0 auto;
-}
-
-.axes text {
-    font-family: Geist, Arial, Helvetica, sans-serif;
-    font-size: 12px;
 }
 
 .grid {
