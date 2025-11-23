@@ -124,13 +124,13 @@ class BaseScatterPlot extends BasePlot {
     onSetupLegend() {
         if (!this.scatterPlotConfig.colorByClass) return;
 
-        this.legend.setTitle(
+        this.legendManager.setTitle(
             this.config.legendConfig.title ??
                 this.scatterPlotConfig.colorByClass
         );
 
         if (typeof this.scale.color !== 'string') {
-            this.legend.addLegend(this.scale.color, 'point', {
+            this.legendManager.addLegend(this.scale.color, 'point', {
                 symbolType: d3.symbolCircle,
             });
         }

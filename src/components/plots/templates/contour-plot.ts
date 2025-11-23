@@ -124,7 +124,7 @@ class BaseContourPlot extends BasePlot {
 
     onSetupLegend() {
         if (this.contourPlotConfig.shadeContour) {
-            this.legend.addContinuousLegend(
+            this.legendManager.addContinuousLegend(
                 this.scale.color as d3.ScaleSequential<string, never>
             );
         }

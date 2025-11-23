@@ -486,6 +486,7 @@ class PrimitiveManager {
             fill: 'currentColor',
             anchor: 'middle',
             baseline: 'middle',
+            stroke: 'none',
             angleAccessor: undefined,
             keyAccessor: (d: Record<string, any>, i: number) => i,
             ...options,

@@ -77,8 +77,8 @@ class BasePlot extends Component<BasePlotProps> {
     tooltipManager!: TooltipManager;
     axisManager!: AxisManager;
     brushManager!: BrushManager;
+    legendManager!: LegendManager;
 
-    legend!: LegendManager;
     primitives!: PrimitiveManager;
 
     ref: React.RefObject<HTMLDivElement | null>;
@@ -325,7 +325,7 @@ class BasePlot extends Component<BasePlotProps> {
 
     setupLegend(): void {
         if (!this.config.legendConfig.legendRef.current) return;
-        this.legend = new LegendManager({
+        this.legendManager = new LegendManager({
             ...this.config.legendConfig,
             maxHeight: this.config.legendConfig.maxHeight ?? this.plotHeight,
         });

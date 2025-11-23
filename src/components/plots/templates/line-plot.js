@@ -102,9 +102,9 @@ class BaseLinePlot extends BasePlot {
 
     onSetupLegend() {
         if (this.yClasses.length > 1) {
-            this.legend.addCategoricalLegend();
+            this.legendManager.addCategoricalLegend();
             this.yClasses.forEach((yClass) => {
-                this.legend.addCategoricalItem(
+                this.legendManager.addCategoricalItem(
                     'line',
                     this.scales.color(yClass),
                     yClass
