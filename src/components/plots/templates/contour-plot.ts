@@ -4,7 +4,6 @@ import BasePlot, {
     BasePlotProps,
     Scale,
 } from '@/components/plots/common/base-plot';
-import { linspace } from '@/components/plots/common/utils';
 
 export interface ContourPlotConfig {
     func: (x: number, y: number) => number;
@@ -84,12 +83,12 @@ class BaseContourPlot extends BasePlot {
             this.contourPlotConfig.thresholds;
 
         // Generate grid points with padding to avoid rendering artifacts at the edges
-        this.xRange = linspace(
+        this.xRange = this.linspace(
             this.domain.x[0] - xPadding,
             this.domain.x[1] + xPadding,
             this.contourPlotConfig.resolutionX
         );
-        this.yRange = linspace(
+        this.yRange = this.linspace(
             this.domain.y[0] - yPadding,
             this.domain.y[1] + yPadding,
             this.contourPlotConfig.resolutionY
@@ -129,6 +128,13 @@ class BaseContourPlot extends BasePlot {
                 this.scale.color as d3.ScaleSequential<string, never>
             );
         }
+    }
+
+    private linspace(start: number, end: number, num: number): number[] {
+        return Array.from(
+            { length: num },
+            (_, i) => start + (end - start) * (i / (num - 1))
+        );
     }
 }
 

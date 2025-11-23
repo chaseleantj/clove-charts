@@ -131,7 +131,7 @@ class PrimitiveManager {
             : options.className;
 
         const elementType =
-            primitiveClass instanceof TextPrimitive && options.latex
+            (primitiveClass as unknown) === TextPrimitive && options.latex
                 ? 'foreignObject'
                 : primitiveInfo.svgElementType;
         const element = layer.append(elementType);

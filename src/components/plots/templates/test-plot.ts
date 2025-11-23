@@ -20,10 +20,11 @@ class BaseTestPlot extends BasePlot {
             symbolType: d3.symbolTriangle,
         });
 
-        const text = this.primitives.addText('test', 3.5, 3, {
+        const text = this.primitives.addText('2x', 3.5, 3, {
             fontSize: 12,
             fill: 'steelblue',
-            fontFamily: 'Times New Roman',
+            // fontFamily: 'Times New Roman',
+            latex: true
         });
 
         // point
@@ -41,10 +42,12 @@ class BaseTestPlot extends BasePlot {
         //     });
 
         line.setCoords(4, 2, 3, 7).render(5000);
+
         text.setCoords(4, 5)
             .setAngle(30)
             .setStyles({ fontSize: 30 })
-            .render(5000);
+            .render()
+        //     .render(5000);
 
         point.setStyles({
             fill: 'green',

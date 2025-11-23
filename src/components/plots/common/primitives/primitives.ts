@@ -367,7 +367,6 @@ export interface TextPrimitiveOptions {
     latex?: boolean;
 }
 
-// Currently does not support animations with latex rendering
 export class TextPrimitive extends Primitive<
     PrimitiveConfig & TextPrimitiveOptions
 > {

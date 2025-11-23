@@ -8,7 +8,7 @@ import TestImageChart from '@/components/charts/examples/test-image-chart';
 export default function Home() {
     return (
         <main>
-            {/* <BaseChart /> */}
+            <BaseChart />
             <TestImageChart />
             <TestContourChart />
             <IrisBarChart />
