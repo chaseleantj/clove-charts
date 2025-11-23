@@ -1,15 +1,21 @@
-import BasePlot, { BasePlotProps } from '@/components/plots/common/base-plot';
+import BasePlot, {
+    BasePlotProps,
+    DataKey,
+} from '@/components/plots/common/base-plot';
 import { ImagePrimitive } from '@/components/plots/common/primitives/primitives';
 
 export interface ImagePlotConfig {
     useCornerCoords: boolean;
 }
 
-export interface ImagePlotProps extends BasePlotProps, Partial<ImagePlotConfig> {
-    data: Record<string, any>[];
-    imageURLClass: string;
-    widthClass: string;
-    coordsClass: string;
+export interface ImagePlotProps<
+    TData extends Record<string, any> = Record<string, any>,
+> extends BasePlotProps<TData>,
+        Partial<ImagePlotConfig> {
+    data: TData[];
+    imageURLClass: DataKey<TData>;
+    widthClass: DataKey<TData>;
+    coordsClass: DataKey<TData>;
 }
 
 interface ImagePlotDomain {
@@ -21,20 +27,25 @@ export const DEFAULT_IMAGE_PLOT_CONFIG: ImagePlotConfig = {
     useCornerCoords: false,
 };
 
-export function getImagePlotConfig(props: ImagePlotProps): ImagePlotConfig {
+export function getImagePlotConfig<TData extends Record<string, any>>(
+    props: ImagePlotProps<TData>
+): ImagePlotConfig {
     return {
-        useCornerCoords: props.useCornerCoords ?? DEFAULT_IMAGE_PLOT_CONFIG.useCornerCoords,
+        useCornerCoords:
+            props.useCornerCoords ?? DEFAULT_IMAGE_PLOT_CONFIG.useCornerCoords,
     };
 }
 
-class BaseImagePlot extends BasePlot {
+class BaseImagePlot<
+    TData extends Record<string, any> = Record<string, any>,
+> extends BasePlot<TData> {
     declare domain: ImagePlotDomain;
-    declare props: ImagePlotProps;
+    declare props: ImagePlotProps<TData>;
 
     imagePlotConfig: ImagePlotConfig;
     images: ImagePrimitive[] = [];
 
-    constructor(props: ImagePlotProps) {
+    constructor(props: ImagePlotProps<TData>) {
         super(props);
         this.imagePlotConfig = getImagePlotConfig(props);
     }

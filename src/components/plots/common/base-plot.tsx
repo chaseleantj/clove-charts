@@ -37,13 +37,17 @@ export interface Scale {
     y: D3Scale;
 }
 
-interface PrimaryBasePlotProps {
-    data?: Record<string, any>[];
-    xClass?: string;
-    yClass?: string;
+type DataRecord = Record<string, any>;
+export type DataKey<T extends DataRecord> = Extract<keyof T, string>;
+
+interface PrimaryBasePlotProps<TData extends DataRecord = DataRecord> {
+    data?: TData[];
+    xClass?: DataKey<TData>;
+    yClass?: DataKey<TData>;
 }
 
-export type BasePlotProps = PrimaryBasePlotProps & PlotConfig;
+export type BasePlotProps<TData extends DataRecord = DataRecord> =
+    PrimaryBasePlotProps<TData> & PlotConfig;
 
 export function getPlotConfig(
     config?: Partial<PlotConfig>
@@ -61,7 +65,9 @@ export function getPlotConfig(
     };
 }
 
-class BasePlot extends Component<BasePlotProps> {
+class BasePlot<
+    TData extends DataRecord = DataRecord,
+> extends Component<BasePlotProps<TData>> {
     config: RequiredPlotConfig;
 
     width!: number;
@@ -72,7 +78,7 @@ class BasePlot extends Component<BasePlotProps> {
     scale!: Scale;
     domain!: Domain;
 
-    domainManager!: DomainManager<Record<string, any>>;
+    domainManager!: DomainManager<DataRecord>;
     scaleManager!: ScaleManager;
     tooltipManager!: TooltipManager;
     axisManager!: AxisManager;
@@ -94,7 +100,7 @@ class BasePlot extends Component<BasePlotProps> {
     updateFunctions: Array<() => void>;
     resizeObserver!: ResizeObserver;
 
-    constructor(props: BasePlotProps) {
+    constructor(props: BasePlotProps<TData>) {
         super(props);
         this.config = getPlotConfig(props);
         this.ref = React.createRef<HTMLDivElement>();
@@ -120,9 +126,9 @@ class BasePlot extends Component<BasePlotProps> {
         window.removeEventListener('resize', this.handleResize);
     }
 
-    componentDidUpdate(prevProps: BasePlotProps): void {
+    componentDidUpdate(prevProps: BasePlotProps<TData>): void {
         const propsChanged = (
-            Object.keys(this.props) as Array<keyof BasePlotProps>
+            Object.keys(this.props) as Array<keyof BasePlotProps<TData>>
         ).some((prop) => this.props[prop] !== prevProps[prop]);
         if (propsChanged) {
             if (this.shouldInitializeChart()) {
@@ -155,7 +161,7 @@ class BasePlot extends Component<BasePlotProps> {
     }
 
     initializePrimitives(): void {
-        this.primitives = new PrimitiveManager(this);
+        this.primitives = new PrimitiveManager(this as BasePlot<DataRecord>);
         this.onInitializePrimitives();
     }
 
@@ -205,16 +211,15 @@ class BasePlot extends Component<BasePlotProps> {
     }
 
     setupDomain(): void {
-        this.domainManager = new DomainManager(
-            this.props.data as Record<string, any>[]
-        );
+        const data = (this.props.data ?? []) as DataRecord[];
+        this.domainManager = new DomainManager<DataRecord>(data);
 
         let domainX, domainY;
 
         // x domain configuration
         if (this.config.domainConfig.domainX) {
             domainX = this.config.domainConfig.domainX;
-        } else if (this.props.xClass) {
+        } else if (this.props.xClass !== undefined) {
             const xClass = this.props.xClass;
             const paddingX = this.config.scaleConfig.logX
                 ? 0
@@ -227,7 +232,7 @@ class BasePlot extends Component<BasePlotProps> {
         // y domain configuration
         if (this.config.domainConfig.domainY) {
             domainY = this.config.domainConfig.domainY;
-        } else if (this.props.yClass) {
+        } else if (this.props.yClass !== undefined) {
             const yClass = this.props.yClass;
             const paddingY = this.config.scaleConfig.logY
                 ? 0
@@ -261,7 +266,6 @@ class BasePlot extends Component<BasePlotProps> {
                 this.config.scaleConfig.logY,
                 this.config.scaleConfig.formatNiceY
             ),
-            // color: this.scaleManager.getColorScale(),
         };
 
         this.onSetupScales();

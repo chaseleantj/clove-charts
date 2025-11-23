@@ -1,15 +1,21 @@
 import * as d3 from 'd3';
-import BasePlot, { BasePlotProps } from '@/components/plots/common/base-plot';
+import BasePlot, {
+    BasePlotProps,
+    DataKey,
+} from '@/components/plots/common/base-plot';
 
 export interface BarPlotConfig {
     padding: number;
     useDifferentColors: boolean;
 }
 
-export interface BarPlotProps extends BasePlotProps, Partial<BarPlotConfig> {
-    data: Record<string, any>[];
-    xClass: string;
-    yClass: string;
+export interface BarPlotProps<
+    TData extends Record<string, any> = Record<string, any>,
+> extends BasePlotProps<TData>,
+        Partial<BarPlotConfig> {
+    data: TData[];
+    xClass: DataKey<TData>;
+    yClass: DataKey<TData>;
 }
 
 interface BarPlotScale {
@@ -27,14 +33,16 @@ const DEFAULT_BAR_PLOT_CONFIG: BarPlotConfig = {
     useDifferentColors: true,
 };
 
-class BaseBarPlot extends BasePlot {
+class BaseBarPlot<
+    TData extends Record<string, any> = Record<string, any>,
+> extends BasePlot<TData> {
     declare domain: BarPlotDomain;
     declare scale: BarPlotScale;
-    declare props: BarPlotProps;
+    declare props: BarPlotProps<TData>;
 
     barPlotConfig!: BarPlotConfig;
 
-    constructor(props: BarPlotProps) {
+    constructor(props: BarPlotProps<TData>) {
         super(props);
         this.barPlotConfig = {
             padding: this.props.padding ?? DEFAULT_BAR_PLOT_CONFIG.padding,
@@ -65,11 +73,19 @@ class BaseBarPlot extends BasePlot {
     }
 
     renderElements() {
-        const color = this.barPlotConfig.useDifferentColors
+        const colorScale = this.barPlotConfig.useDifferentColors
             ? this.scaleManager.getColorScale(
                   this.domainManager.getDomain((d) => d[this.props.xClass])
               )
             : this.config.colorConfig.defaultColor;
+
+        const fillOption =
+            typeof colorScale === 'function'
+                ? (d: Record<string, any>) =>
+                      (colorScale as (value: unknown) => string)(
+                          d[this.props.xClass]
+                      )
+                : colorScale;
 
         let x1Accessor, y1Accessor, x2Accessor, y2Accessor;
 
@@ -90,10 +106,7 @@ class BaseBarPlot extends BasePlot {
             y2Accessor,
             {
                 opacity: this.config.themeConfig.opacity,
-                fill:
-                    typeof color === 'function'
-                        ? (d) => color(d[this.props.xClass])
-                        : color,
+                fill: fillOption,
                 coordinateSystem: 'pixel',
             }
         );

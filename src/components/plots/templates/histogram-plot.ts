@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 
-import BasePlot, { BasePlotProps } from '@/components/plots/common/base-plot';
+import BasePlot, { BasePlotProps, DataKey } from '@/components/plots/common/base-plot';
 import ScaleManager from '@/components/plots/common/scale-manager';
 
 export interface HistogramPlotConfig {
@@ -8,11 +8,11 @@ export interface HistogramPlotConfig {
     barOpacity: number;
 }
 
-interface HistogramPlotProps
-    extends Omit<BasePlotProps, 'yClass'>,
+interface HistogramPlotProps<TData extends Record<string, any> = Record<string, any>>
+    extends Omit<BasePlotProps<TData>, 'yClass'>,
         Partial<HistogramPlotConfig> {
-    data: Record<string, any>[];
-    xClass: string;
+    data: TData[];
+    xClass: DataKey<TData>;
 }
 
 interface HistogramPlotDomain {
@@ -25,14 +25,16 @@ export const DEFAULT_HISTOGRAM_PLOT_CONFIG: HistogramPlotConfig = {
     barOpacity: 1,
 };
 
-class BaseHistogramPlot extends BasePlot {
+class BaseHistogramPlot<
+    TData extends Record<string, any> = Record<string, any>,
+> extends BasePlot<TData> {
     bins!: d3.Bin<number, number>[];
     declare domain: HistogramPlotDomain;
-    declare props: HistogramPlotProps;
+    declare props: HistogramPlotProps<TData>;
 
     histogramPlotConfig!: HistogramPlotConfig;
 
-    constructor(props: HistogramPlotProps) {
+    constructor(props: HistogramPlotProps<TData>) {
         super(props);
         this.bins = [];
         this.histogramPlotConfig = {

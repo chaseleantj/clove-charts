@@ -2,6 +2,7 @@ import * as d3 from 'd3';
 
 import BasePlot, {
     BasePlotProps,
+    DataKey,
     Scale,
 } from '@/components/plots/common/base-plot';
 import { RequiredPlotConfig } from '@/components/plots/common/config';
@@ -11,18 +12,21 @@ import {
     D3Scale,
 } from '@/components/plots/common/scale-manager';
 
-export interface ScatterPlotConfig {
-    pointSize: number | ((d: Record<string, any>) => number);
-    pointOpacity: number | ((d: Record<string, any>) => number);
-    colorByClass: string | null;
+export interface ScatterPlotConfig<
+    TData extends Record<string, any> = Record<string, any>,
+> {
+    pointSize: number | ((d: TData) => number);
+    pointOpacity: number | ((d: TData) => number);
+    colorByClass: DataKey<TData> | null;
 }
 
-export interface ScatterPlotProps
-    extends BasePlotProps,
-        Partial<ScatterPlotConfig> {
-    data: Record<string, any>[];
-    xClass: string;
-    yClass: string;
+export interface ScatterPlotProps<
+    TData extends Record<string, any> = Record<string, any>,
+> extends BasePlotProps<TData>,
+        Partial<ScatterPlotConfig<TData>> {
+    data: TData[];
+    xClass: DataKey<TData>;
+    yClass: DataKey<TData>;
 }
 
 interface ScatterPlotDomain {
@@ -43,27 +47,28 @@ export const DEFAULT_SCATTER_PLOT_CONFIG: Partial<ScatterPlotConfig> = {
     colorByClass: null,
 };
 
-export function getScatterPlotConfig(
-    props: ScatterPlotProps,
+export function getScatterPlotConfig<TData extends Record<string, any>>(
+    props: ScatterPlotProps<TData>,
     themeConfig: RequiredPlotConfig['themeConfig']
-): ScatterPlotConfig {
+): ScatterPlotConfig<TData> {
     return {
         pointSize: props.pointSize ?? DEFAULT_SCATTER_PLOT_CONFIG.pointSize!,
-        colorByClass:
-            props.colorByClass ?? DEFAULT_SCATTER_PLOT_CONFIG.colorByClass!,
+        colorByClass: props.colorByClass ?? null,
         pointOpacity: props.pointOpacity ?? themeConfig.opacity,
     };
 }
 
-class BaseScatterPlot extends BasePlot {
+class BaseScatterPlot<
+    TData extends Record<string, any> = Record<string, any>,
+> extends BasePlot<TData> {
     dataPoints!: BatchPointsPrimitive;
     declare domain: ScatterPlotDomain;
     declare scale: ScatterPlotScale;
-    declare props: ScatterPlotProps;
+    declare props: ScatterPlotProps<TData>;
 
-    scatterPlotConfig!: ScatterPlotConfig;
+    scatterPlotConfig!: ScatterPlotConfig<TData>;
 
-    constructor(props: ScatterPlotProps) {
+    constructor(props: ScatterPlotProps<TData>) {
         super(props);
         this.scatterPlotConfig = getScatterPlotConfig(
             props,
@@ -76,9 +81,10 @@ class BaseScatterPlot extends BasePlot {
     }
 
     onSetupScales() {
-        if (this.scatterPlotConfig.colorByClass) {
+        const colorKey = this.scatterPlotConfig.colorByClass;
+        if (colorKey) {
             this.domain.color = this.domainManager.getDomain(
-                (d) => d[this.scatterPlotConfig.colorByClass as string]
+                (d) => d[colorKey]
             );
             this.scale.color = this.scaleManager.getColorScale(
                 this.domain.color
@@ -86,7 +92,7 @@ class BaseScatterPlot extends BasePlot {
         }
     }
 
-    private getCoordinateAccessor(key: string, scale: D3Scale) {
+    private getCoordinateAccessor(key: DataKey<TData>, scale: D3Scale) {
         if (isContinuousScale(scale)) {
             return (d: Record<string, any>) => d[key];
         }
@@ -103,20 +109,40 @@ class BaseScatterPlot extends BasePlot {
     }
 
     renderElements() {
+        const { pointSize, pointOpacity, colorByClass } =
+            this.scatterPlotConfig;
+
+        const sizeOption =
+            typeof pointSize === 'function'
+                ? (d: Record<string, any>) => pointSize(d as TData)
+                : pointSize;
+
+        const opacityOption =
+            typeof pointOpacity === 'function'
+                ? (d: Record<string, any>) => pointOpacity(d as TData)
+                : pointOpacity;
+
+        const fillOption =
+            typeof this.scale.color === 'function' && colorByClass
+                ? (d: Record<string, any>) =>
+                      (this.scale.color as
+                          | d3.ScaleSequential<string, never>
+                          | d3.ScaleOrdinal<string, string>)(
+                          d[colorByClass]
+                      )
+                : typeof this.scale.color === 'string'
+                  ? this.scale.color
+                  : this.config.colorConfig.defaultColor;
+
         this.dataPoints = this.primitives.addPoints(
             this.props.data,
             this.getCoordinateAccessor(this.props.xClass, this.scale.x),
             this.getCoordinateAccessor(this.props.yClass, this.scale.y),
             {
                 symbolType: d3.symbolCircle,
-                fill: (d) =>
-                    typeof this.scale.color === 'function'
-                        ? this.scale.color(
-                              d[this.scatterPlotConfig.colorByClass!]
-                          )
-                        : this.scale.color,
-                size: this.scatterPlotConfig.pointSize,
-                opacity: this.scatterPlotConfig.pointOpacity,
+                fill: fillOption,
+                size: sizeOption,
+                opacity: opacityOption,
             }
         );
     }

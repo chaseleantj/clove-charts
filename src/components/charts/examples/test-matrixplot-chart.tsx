@@ -35,7 +35,7 @@ for (const x of xLabels) {
 }
 
 export default function TestMatrixPlotChart() {
-    const { legendRef, legendConfig } = useChartLegend();
+    const { legendRef, legendConfig } = useChartLegend({title: "Values"});
     const { tooltipRef, tooltipConfig } = useChartTooltip();
 
     return (
@@ -47,7 +47,7 @@ export default function TestMatrixPlotChart() {
                     data={data}
                     xClass="xCol"
                     yClass="yCol"
-                    colorByClass="value"
+                    valueClass="value"
                     legendConfig={legendConfig}
                     tooltipConfig={tooltipConfig}
                     {...PLOT_CONFIG}

@@ -10,12 +10,12 @@ export default function Home() {
     return (
         <main>
             {/* <BaseChart /> */}
-            <TestImageChart />
+            <IrisScatterChart />
             <TestMatrixPlotChart />
             <TestContourChart />
             <IrisBarChart />
-            <IrisScatterChart />
             <IrisHistogramChart />
+            <TestImageChart />
         </main>
     );
 }
