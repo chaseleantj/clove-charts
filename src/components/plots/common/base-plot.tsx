@@ -268,21 +268,14 @@ class BasePlot<
     }
 
     setupScales(): void {
-        this.scaleManager = new ScaleManager(this.config.colorConfig);
+        this.scaleManager = new ScaleManager(
+            this.config.colorConfig,
+            this.config.scaleConfig
+        );
 
         this.scale = {
-            x: this.scaleManager.getScale(
-                this.domain.x,
-                [0, this.plotWidth],
-                this.config.scaleConfig.logX,
-                this.config.scaleConfig.formatNiceX
-            ),
-            y: this.scaleManager.getScale(
-                this.domain.y,
-                [this.plotHeight, 0],
-                this.config.scaleConfig.logY,
-                this.config.scaleConfig.formatNiceY
-            ),
+            x: this.scaleManager.getScaleX(this.domain.x, this.plotWidth),
+            y: this.scaleManager.getScaleY(this.domain.y, this.plotHeight),
         };
 
         this.onSetupScales();

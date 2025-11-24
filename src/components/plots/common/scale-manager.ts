@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { ColorConfig } from '@/components/plots/common/config';
+import { ColorConfig, ScaleConfig } from '@/components/plots/common/config';
 import {
     isDateTuple,
     isNumberTuple,
@@ -22,7 +22,10 @@ export function isContinuousScale(scale: D3Scale): scale is ContinuousD3Scale {
 }
 
 class ScaleManager {
-    constructor(private readonly colorConfig: Required<ColorConfig>) {}
+    constructor(
+        private readonly colorConfig: Required<ColorConfig>,
+        private readonly scaleConfig?: Required<ScaleConfig>
+    ) {}
 
     getScale(
         domain: string[],
@@ -191,6 +194,24 @@ class ScaleManager {
         const range = scale.range();
 
         return Math.abs(range[1] - range[0]) / Math.abs(domain[1] - domain[0]);
+    }
+
+    public getScaleX(
+        domain: string[] | [Date, Date] | [number, number],
+        plotWidth: number
+    ): D3Scale {
+        const log = this.scaleConfig?.logX ?? false;
+        const formatNice = this.scaleConfig?.formatNiceX ?? false;
+        return this.getScale(domain, [0, plotWidth], log, formatNice);
+    }
+
+    public getScaleY(
+        domain: string[] | [Date, Date] | [number, number],
+        plotHeight: number
+    ): D3Scale {
+        const log = this.scaleConfig?.logY ?? false;
+        const formatNice = this.scaleConfig?.formatNiceY ?? false;
+        return this.getScale(domain, [plotHeight, 0], log, formatNice);
     }
 }
 
