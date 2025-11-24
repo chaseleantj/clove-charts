@@ -68,7 +68,7 @@ class BaseHistogramPlot<
     }
 
     setupScales() {
-        this.scaleManager = new ScaleManager(this.config.colorConfig);
+        this.scaleManager = new ScaleManager(this.config.scaleConfig, this.config.colorConfig);
 
         const scaleX = this.scaleManager.getScale(
             this.domain.x,

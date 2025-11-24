@@ -37,7 +37,7 @@ export interface Scale {
     y: D3Scale;
 }
 
-type DataRecord = Record<string, any>;
+export type DataRecord = Record<string, any>;
 export type DataKey<T extends DataRecord> = Extract<keyof T, string>;
 
 interface PrimaryBasePlotProps<TData extends DataRecord = DataRecord> {
@@ -78,7 +78,7 @@ class BasePlot<
     scale!: Scale;
     domain!: Domain;
 
-    domainManager!: DomainManager<DataRecord>;
+    domainManager!: DomainManager;
     scaleManager!: ScaleManager;
     tooltipManager!: TooltipManager;
     axisManager!: AxisManager;
@@ -229,39 +229,17 @@ class BasePlot<
 
     setupDomain(): void {
         const data = (this.props.data ?? []) as DataRecord[];
-        this.domainManager = new DomainManager<DataRecord>(data);
+        this.domainManager = new DomainManager(
+            this.config.domainConfig,
+            this.config.scaleConfig
+        );
 
-        let domainX, domainY;
-
-        // x domain configuration
-        if (this.config.domainConfig.domainX) {
-            domainX = this.config.domainConfig.domainX;
-        } else if (this.props.xClass !== undefined) {
-            const xClass = this.props.xClass;
-            const paddingX = this.config.scaleConfig.logX
-                ? 0
-                : this.config.domainConfig.paddingX;
-            domainX = this.domainManager.getDomain((d) => d[xClass], paddingX);
-        } else {
-            domainX = this.config.domainConfig.defaultDomainX;
-        }
-
-        // y domain configuration
-        if (this.config.domainConfig.domainY) {
-            domainY = this.config.domainConfig.domainY;
-        } else if (this.props.yClass !== undefined) {
-            const yClass = this.props.yClass;
-            const paddingY = this.config.scaleConfig.logY
-                ? 0
-                : this.config.domainConfig.paddingY;
-            domainY = this.domainManager.getDomain((d) => d[yClass], paddingY);
-        } else {
-            domainY = this.config.domainConfig.defaultDomainY;
-        }
+        const xValues = this.props.xClass ? data.map((d) => d[this.props.xClass!]) : [];
+        const yValues = this.props.yClass ? data.map((d) => d[this.props.yClass!]) : [];
 
         this.domain = {
-            x: domainX,
-            y: domainY,
+            x: this.domainManager.getDomainX(xValues),
+            y: this.domainManager.getDomainY(yValues),
         };
 
         this.onSetupDomain();

@@ -3,6 +3,7 @@ import * as d3 from 'd3';
 import BasePlot, {
     BasePlotProps,
     DataKey,
+    DataRecord,
     Scale,
 } from '@/components/plots/common/base-plot';
 import { RequiredPlotConfig } from '@/components/plots/common/config';
@@ -86,9 +87,8 @@ class BaseScatterPlot<
     onSetupScales() {
         const colorKey = this.scatterPlotConfig.colorByClass;
         if (colorKey) {
-            this.domain.color = this.domainManager.getDomain(
-                (d) => d[colorKey]
-            );
+            const colorValues = this.props.data.map((d) => d[colorKey]);
+            this.domain.color = this.domainManager.getDomain(colorValues);
             this.scale.color = this.scaleManager.getColorScale(
                 this.domain.color
             );

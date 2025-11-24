@@ -89,37 +89,16 @@ class BaseLinePlot<
     }
 
     onSetupDomain(): void {
-
         if (this.config.domainConfig.domainY) {
             this.domain.y = this.config.domainConfig.domainY;
             return;
         }
 
-        const yPadding = this.config.scaleConfig.logY
-            ? 0
-            : this.config.domainConfig.paddingY;
-
+        const data = (this.props.data ?? []) as Record<string, any>[];
         const yValues = this.props.yClass
-            .map((yClass) =>
-                this.domainManager.getDomain(
-                    (d) => d[yClass as string],
-                    yPadding
-                )
-            )
-            .flat();
+            .flatMap((yClass) => data.map((d) => d[yClass as string]));
 
-        // Calculate min/max across all Y series
-        const isDate = yValues.some((v) => isDateValue(v));
-
-        if (isDate) {
-            const dates = yValues.map((v) => new Date(v as any)); // Force cast for safety, though isDateValue checks
-            const min = new Date(Math.min(...dates.map((d) => d.getTime())));
-            const max = new Date(Math.max(...dates.map((d) => d.getTime())));
-            this.domain.y = [min, max];
-        } else {
-            const nums = yValues as unknown as number[];
-            this.domain.y = [Math.min(...nums), Math.max(...nums)];
-        }
+        this.domain.y = this.domainManager.getDomainY(yValues);
     }
 
     onSetupScales(): void {

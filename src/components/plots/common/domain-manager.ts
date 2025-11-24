@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import { DomainConfig, ScaleConfig } from '@/components/plots/common/config';
 import {
     isDateValue,
     isDefined,
@@ -7,75 +8,69 @@ import {
 } from '@/components/plots/common/type-guards';
 
 export type DataValue = string | number | Date | null | undefined;
-export type DataAccessor<T, R extends DataValue> = (d: T) => R;
 
-class DomainManager<T extends Record<string, any>> {
-    constructor(private readonly data: T[]) {}
+class DomainManager {
+    constructor(
+        private readonly domainConfig: Required<DomainConfig>,
+        private readonly scaleConfig: Required<ScaleConfig>
+    ) {}
 
-    getDomain<R extends string>(
-        accessor: DataAccessor<T, R>,
-        padding?: number
-    ): string[];
+    getDomain(values: DataValue[], padding = 0): string[] | [number, number] | [Date, Date] {
+        const cleanValues = values.filter(isDefined);
 
-    getDomain<R extends number>(
-        accessor: DataAccessor<T, R>,
-        padding?: number
-    ): [number, number];
-
-    getDomain<R extends Date>(
-        accessor: DataAccessor<T, R>,
-        padding?: number
-    ): [Date, Date];
-
-    public getDomain(
-        accessor: DataAccessor<T, DataValue>,
-        padding = 0
-    ): string[] | [number, number] | [Date, Date] {
-        const values = this.collectValues(accessor);
-
-        if (values.length === 0) {
+        if (cleanValues.length === 0) {
             console.warn('Unable to find data domain! Using defaults [0, 1]');
             return [0, 1];
         }
 
-        if (values.every(isStringValue)) {
-            return [...new Set(values as string[])];
+        if (cleanValues.every(isStringValue)) {
+            return [...new Set(cleanValues as string[])];
         }
 
-        if (values.every(isDateValue)) {
-            const dateDomain = this.getDateDomain(values as Date[], padding);
-            if (dateDomain) return dateDomain;
+        if (cleanValues.every(isDateValue)) {
+            return this.getDateDomain(cleanValues as Date[], padding);
         }
 
-        if (values.every(isNumberValue)) {
-            const numberDomain = this.getNumberDomain(
-                values as number[],
-                padding
-            );
-            if (numberDomain) return numberDomain;
+        if (cleanValues.every(isNumberValue)) {
+            return this.getNumberDomain(cleanValues as number[], padding);
         }
 
         console.warn('Mixed or unsupported data types! Using defaults [0, 1]');
         return [0, 1];
     }
 
-    private collectValues<R extends DataValue>(
-        accessor: DataAccessor<T, R>
-    ): DataValue[] {
-        return this.data.map(accessor).filter(isDefined) as DataValue[];
+    getDomainX(values?: DataValue[]): string[] | [number, number] | [Date, Date] {
+        if (this.domainConfig.domainX) {
+            return this.domainConfig.domainX;
+        }
+
+        if (!values || values.length === 0) {
+            return this.domainConfig.defaultDomainX;
+        }
+
+        const padding = this.scaleConfig.logX ? 0 : this.domainConfig.paddingX;
+        return this.getDomain(values, padding);
     }
 
-    private getDateDomain(
-        values: Date[],
-        padding = 0
-    ): [Date, Date] | undefined {
-        const [minValue, maxValue] = d3.extent(values) as [
-            Date | undefined,
-            Date | undefined,
-        ];
+    getDomainY(values?: DataValue[]): string[] | [number, number] | [Date, Date] {
+        if (this.domainConfig.domainY) {
+            return this.domainConfig.domainY;
+        }
+
+        if (!values || values.length === 0) {
+            return this.domainConfig.defaultDomainY;
+        }
+
+        const padding = this.scaleConfig.logY ? 0 : this.domainConfig.paddingY;
+        return this.getDomain(values, padding);
+    }
+
+    private getDateDomain(values: Date[], padding: number): [Date, Date] {
+        const [minValue, maxValue] = d3.extent(values) as [Date, Date];
 
         if (!minValue || !maxValue) {
-            return undefined;
+            console.warn('Invalid date domain! Using defaults');
+            return [new Date(0), new Date()];
         }
 
         const diff = maxValue.getTime() - minValue.getTime();
@@ -85,19 +80,8 @@ class DomainManager<T extends Record<string, any>> {
         ];
     }
 
-    private getNumberDomain(
-        values: number[],
-        padding = 0
-    ): [number, number] | undefined {
-        const cleanValues = values.filter(isNumberValue);
-        if (cleanValues.length === 0) {
-            return undefined;
-        }
-
-        const [minValue, maxValue] = d3.extent(cleanValues) as [
-            number | undefined,
-            number | undefined,
-        ];
+    private getNumberDomain(values: number[], padding: number): [number, number] {
+        const [minValue, maxValue] = d3.extent(values) as [number, number];
 
         if (
             minValue === undefined ||
@@ -105,19 +89,12 @@ class DomainManager<T extends Record<string, any>> {
             Number.isNaN(minValue) ||
             Number.isNaN(maxValue)
         ) {
-            return undefined;
+            console.warn('Invalid number domain! Using defaults [0, 1]');
+            return [0, 1];
         }
 
-        return this.padDomain([minValue, maxValue], padding);
-    }
-
-    private padDomain(
-        domain: [number, number],
-        padding: number
-    ): [number, number] {
-        const [min, max] = domain;
-        const diff = max - min;
-        return [min - padding * diff, max + padding * diff];
+        const diff = maxValue - minValue;
+        return [minValue - padding * diff, maxValue + padding * diff];
     }
 }
 

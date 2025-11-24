@@ -23,8 +23,8 @@ export function isContinuousScale(scale: D3Scale): scale is ContinuousD3Scale {
 
 class ScaleManager {
     constructor(
-        private readonly colorConfig: Required<ColorConfig>,
-        private readonly scaleConfig?: Required<ScaleConfig>
+        private readonly scaleConfig: Required<ScaleConfig>,
+        private readonly colorConfig: Required<ColorConfig>
     ) {}
 
     getScale(
@@ -109,16 +109,6 @@ class ScaleManager {
 
         throw new Error('Invalid domain type!');
     }
-
-    getColorScale(
-        domain?: [number, number] | [Date, Date],
-        colorScheme?: (t: number) => string
-    ): d3.ScaleSequential<string, never> | string;
-
-    getColorScale(
-        domain?: string[],
-        colorScheme?: readonly string[]
-    ): d3.ScaleOrdinal<string, string>;
 
     public getColorScale(
         domain?: string[] | [Date, Date] | [number, number],

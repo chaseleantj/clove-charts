@@ -2,6 +2,7 @@ import * as d3 from 'd3';
 import BasePlot, {
     BasePlotProps,
     DataKey,
+    DataRecord,
 } from '@/components/plots/common/base-plot';
 
 export interface BarPlotConfig {
@@ -82,10 +83,11 @@ class BaseBarPlot<
     }
 
     renderElements() {
+        const data = (this.props.data ?? []) as DataRecord[];
+        const xValues = data.map((d) => d[this.props.xClass]);
+        const categoryDomain = this.domainManager.getDomain(xValues);
         const colorScale = this.barPlotConfig.useDifferentColors
-            ? this.scaleManager.getColorScale(
-                  this.domainManager.getDomain((d) => d[this.props.xClass])
-              )
+            ? this.scaleManager.getColorScale(categoryDomain)
             : this.config.colorConfig.defaultColor;
 
         const fillOption =

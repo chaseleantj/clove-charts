@@ -3,6 +3,7 @@ import * as d3 from 'd3';
 import BasePlot, {
     BasePlotProps,
     DataKey,
+    DataRecord,
     Scale,
 } from '@/components/plots/common/base-plot';
 
@@ -86,12 +87,10 @@ class BaseMatrixPlot<
             .paddingInner(this.matrixPlotConfig.padding)
             .paddingOuter(this.matrixPlotConfig.padding);
 
-        this.domain.color = this.domainManager.getDomain(
-            (d) => d[this.props.valueClass]
-        );
-        this.scale.color = this.scaleManager.getColorScale(
-            this.domain.color
-        );
+        const data = (this.props.data ?? []) as DataRecord[];
+        const colorValues = data.map((d) => d[this.props.valueClass]);
+        this.domain.color = this.domainManager.getDomain(colorValues);
+        this.scale.color = this.scaleManager.getColorScale(this.domain.color);
     }
 
     renderElements() {
