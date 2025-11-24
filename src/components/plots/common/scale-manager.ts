@@ -111,40 +111,25 @@ class ScaleManager {
     }
 
     public getColorScale(
-        domain?: string[] | [Date, Date] | [number, number],
+        domain: string[] | [Date, Date] | [number, number],
         colorScheme?: readonly string[] | ((t: number) => string)
     ):
         | d3.ScaleSequential<string, never>
         | d3.ScaleOrdinal<string, string>
-        | string {
-        const defaultScale = this.colorConfig.defaultColor;
-
-        if (!domain) return defaultScale;
+        {
 
         if (isStringArray(domain)) {
-            const colorRange =
-                colorScheme ?? this.colorConfig.categoricalColorScheme;
-            if (typeof colorRange === 'function') {
-                throw new Error(
-                    'Color scheme must be an array for categorical domains'
-                );
-            }
+            const colorRange = (colorScheme ?? this.colorConfig.categoricalColorScheme) as string[];
+
             return d3
                 .scaleOrdinal<string, string>()
                 .domain(domain)
                 .range(colorRange);
-        } else if (isNumberTuple(domain) || isDateTuple(domain)) {
+        } else {
             const colorInterpolator =
                 colorScheme ?? this.colorConfig.continuousColorScheme;
-            if (!colorInterpolator || typeof colorInterpolator !== 'function') {
-                throw new Error(
-                    'Color scheme must be an interpolator function for continuous domains'
-                );
-            }
             return d3.scaleSequential(colorInterpolator).domain(domain);
             // .nice();
-        } else {
-            return defaultScale;
         }
     }
 

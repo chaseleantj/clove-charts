@@ -8,6 +8,7 @@ import BasePlot, {
 } from '@/components/plots/common/base-plot';
 import { RequiredPlotConfig } from '@/components/plots/common/config';
 import { BatchPointsPrimitive } from '@/components/plots/common/primitives/primitives';
+import { getDomainKind } from '@/components/plots/common/type-guards';
 import {
     isContinuousScale,
     D3Scale,
@@ -37,10 +38,10 @@ interface ScatterPlotDomain {
 }
 
 interface ScatterPlotScale extends Scale {
-    color:
+    color?:
         | d3.ScaleSequential<string, never>
         | d3.ScaleOrdinal<string, string>
-        | string;
+        // | string;
 }
 
 export const DEFAULT_SCATTER_PLOT_CONFIG: Partial<ScatterPlotConfig> = {
@@ -92,6 +93,7 @@ class BaseScatterPlot<
             this.scale.color = this.scaleManager.getColorScale(
                 this.domain.color
             );
+
         }
     }
 
@@ -158,7 +160,7 @@ class BaseScatterPlot<
                 this.scatterPlotConfig.colorByClass
         );
 
-        if (typeof this.scale.color !== 'string') {
+        if (this.scale.color) {
             this.legendManager.addLegend(this.scale.color, 'point', {
                 symbolType: d3.symbolCircle,
             });

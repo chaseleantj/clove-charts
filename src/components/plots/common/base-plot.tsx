@@ -247,8 +247,8 @@ class BasePlot<
 
     setupScales(): void {
         this.scaleManager = new ScaleManager(
+            this.config.scaleConfig,
             this.config.colorConfig,
-            this.config.scaleConfig
         );
 
         this.scale = {
