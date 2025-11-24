@@ -2,7 +2,7 @@
 
 import * as d3 from 'd3';
 import { useEffect, useState } from 'react';
-import BaseScatterPlot from '@/components/plots/templates/scatter-plot';
+import BaseLinePlot from '@/components/plots/templates/line-plot';
 import { PlotConfig } from '@/components/plots/common/config';
 import {
     ChartLayout,
@@ -15,23 +15,24 @@ import {
     useChartTooltip,
 } from '@/components/charts/chart-layout';
 
-interface IrisData {
-    sepal_length: number;
-    sepal_width: number;
-    petal_length: number;
-    petal_width: number;
-    species: string;
+interface StockData {
+    Date: Date;
+    AAPL: number | null;
+    ABB: number | null;
+    HPQ: number | null;
+    MSFT: number | null;
+    NVDA: number | null;
 }
 
 const PLOT_CONFIG: PlotConfig = {
     themeConfig: { enableZoom: true },
-    // scaleConfig: {logY: true},
-    axisConfig: { xLabel: 'Sepal width (cm)', yLabel: 'Petal length (cm)', showGrid: true},
+    domainConfig: { domainY: [0, 350] },
+    axisConfig: { xLabel: 'Date', yLabel: 'Price ($)', showGrid: true },
     margin: { right: 80 },
 };
 
-export default function IrisScatterChart() {
-    const [irisData, setIrisData] = useState<IrisData[]>([]);
+export default function StocksLineChart() {
+    const [stockData, setStockData] = useState<StockData[]>([]);
     const { legendRef, legendConfig } = useChartLegend();
     const { tooltipRef, tooltipConfig } = useChartTooltip();
 
@@ -39,14 +40,18 @@ export default function IrisScatterChart() {
         async function fetchData(): Promise<void> {
             try {
                 d3.csv(
-                    '/data/iris.csv',
+                    '/data/stocks.csv',
                     d3.autoType
                 ).then((data) => {
-                    setIrisData(data as IrisData[]);
+                    const parsedData = data as StockData[];
+                    const filteredData = parsedData.filter((d) => {
+                        return d.Date && d.Date.getFullYear() >= 2010;
+                    });
+                    setStockData(filteredData);
                 });
             } catch (error) {
                 console.error('Error fetching data:', error);
-                setIrisData([]);
+                setStockData([]);
             }
         }
         fetchData();
@@ -57,11 +62,10 @@ export default function IrisScatterChart() {
             <ChartPlotWrapper>
                 <ChartLegend ref={legendRef} />
                 <ChartTooltip ref={tooltipRef} />
-                <BaseScatterPlot
-                    data={irisData}
-                    xClass="petal_width"
-                    yClass="sepal_length"
-                    colorByClass="species"
+                <BaseLinePlot
+                    data={stockData}
+                    xClass="Date"
+                    yClass={['AAPL', 'ABB', 'HPQ', 'MSFT', 'NVDA']}
                     legendConfig={legendConfig}
                     tooltipConfig={tooltipConfig}
                     {...PLOT_CONFIG}
@@ -69,10 +73,10 @@ export default function IrisScatterChart() {
             </ChartPlotWrapper>
             <ChartFooter>
                 <ChartCaptions>
-                    A scatter plot of the iris dataset. Hover over the points
-                    for more info.
+                    Historical stock prices for major tech companies.
                 </ChartCaptions>
             </ChartFooter>
         </ChartLayout>
     );
 }
+

@@ -65,9 +65,12 @@ class BaseMatrixPlot<
 
     constructor(props: MatrixPlotProps<TData>) {
         super(props);
-        this.matrixPlotConfig = getMatrixPlotConfig(props);
     }
 
+    onInitializeProperties(): void {
+        this.matrixPlotConfig = getMatrixPlotConfig(this.props);
+    }
+    
     onSetupScales() {
         this.scale.x = d3
             .scaleBand()

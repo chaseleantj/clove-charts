@@ -2,7 +2,7 @@ import * as d3 from 'd3';
 import React from 'react';
 
 import { TooltipConfig } from '@/components/plots/common/config';
-import { DEFAULT_TICK_FORMAT } from '@/components/plots/common/config';
+// import { DEFAULT_TICK_FORMAT } from '@/components/plots/common/config';
 
 class TooltipManager {
     tooltip: d3.Selection<HTMLDivElement, unknown, null, undefined>;
@@ -45,9 +45,9 @@ class TooltipManager {
             const data = d[displayClass];
             if (data) {
                 let displayData = data;
-                if (typeof data === 'number') {
-                    displayData = DEFAULT_TICK_FORMAT(data);
-                }
+                // if (typeof data === 'number') {
+                //     displayData = DEFAULT_TICK_FORMAT(data);
+                // }
                 content += `${displayClass}: ${displayData}<br/>`;
             }
         }

@@ -42,12 +42,15 @@ class BaseImagePlot<
     declare domain: ImagePlotDomain;
     declare props: ImagePlotProps<TData>;
 
-    imagePlotConfig: ImagePlotConfig;
+    imagePlotConfig!: ImagePlotConfig;
     images: ImagePrimitive[] = [];
 
     constructor(props: ImagePlotProps<TData>) {
         super(props);
-        this.imagePlotConfig = getImagePlotConfig(props);
+    }
+    
+    onInitializeProperties(): void {
+        this.imagePlotConfig = getImagePlotConfig(this.props);
     }
 
     renderElements() {

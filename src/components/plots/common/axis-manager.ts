@@ -1,6 +1,15 @@
 import * as d3 from 'd3';
-import { AxisConfig } from '@/components/plots/common/config';
+import {
+    AxisConfig,
+    defaultNumberFormat,
+    defaultStringFormat,
+} from '@/components/plots/common/config';
 import styles from '@/components/page.module.css';
+import {
+    isDateArray,
+    isNumberArray,
+    isStringArray,
+} from '@/components/plots/common/type-guards';
 
 class AxisManager {
     x!: d3.Selection<SVGGElement, unknown, null, undefined>;
@@ -28,15 +37,30 @@ class AxisManager {
             .attr('overflow', 'visible');
     }
 
+    private getFormatter(
+        scale: d3.AxisScale<string>
+    ): ((domainValue: number | string | Date, index: number) => string) | null {
+        const domain = scale.domain();
+
+        if (isNumberArray(domain)) {
+            return (d) => defaultNumberFormat(d as number);
+        } else if (isStringArray(domain)) {
+            return (d) => defaultStringFormat(d as string);
+        } else if (isDateArray(domain)) {
+            return null;
+        }
+
+        return null;
+    }
+
     setXAxis(scale: d3.AxisScale<string>) {
         let xAxis: d3.Axis<string> = d3
             .axisBottom(scale)
             .ticks(this.axisConfig.tickCount)
             .tickSize(this.axisConfig.tickSize);
 
-        if (this.axisConfig.tickFormat) {
-            xAxis = xAxis.tickFormat(this.axisConfig.tickFormat);
-        }
+        const formatter = this.axisConfig.tickFormatX || this.getFormatter(scale);
+        xAxis = formatter ? xAxis.tickFormat(formatter) : xAxis;
 
         this.x = this.axisGroup
             .append('g')
@@ -51,9 +75,8 @@ class AxisManager {
             .ticks(this.axisConfig.tickCount)
             .tickSize(this.axisConfig.tickSize);
 
-        if (this.axisConfig.tickFormat) {
-            yAxis = yAxis.tickFormat(this.axisConfig.tickFormat);
-        }
+        const formatter = this.axisConfig.tickFormatY || this.getFormatter(scale);
+        yAxis = formatter ? yAxis.tickFormat(formatter) : yAxis;
 
         this.y = this.axisGroup
             .append('g')
@@ -122,8 +145,9 @@ class AxisManager {
             .ticks(this.axisConfig.tickCount)
             .tickSize(this.axisConfig.tickSize);
 
-        if (this.axisConfig.tickFormat) {
-            xAxis = xAxis.tickFormat(this.axisConfig.tickFormat);
+        const formatter = this.axisConfig.tickFormatX || this.getFormatter(scale);
+        if (formatter) {
+            xAxis = xAxis.tickFormat(formatter);
         }
 
         this.x.transition().duration(transitionDuration).call(xAxis);
@@ -135,8 +159,9 @@ class AxisManager {
             .ticks(this.axisConfig.tickCount)
             .tickSize(this.axisConfig.tickSize);
 
-        if (this.axisConfig.tickFormat) {
-            yAxis = yAxis.tickFormat(this.axisConfig.tickFormat);
+        const formatter = this.axisConfig.tickFormatY || this.getFormatter(scale);
+        if (formatter) {
+            yAxis = yAxis.tickFormat(formatter);
         }
 
         this.y.transition().duration(transitionDuration).call(yAxis);

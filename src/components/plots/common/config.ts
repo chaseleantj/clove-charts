@@ -23,10 +23,10 @@ export interface PlotMarginConfig {
 export interface DomainConfig {
     paddingX?: number;
     paddingY?: number;
-    domainX?: [number, number] | null;
-    domainY?: [number, number] | null;
-    defaultDomainX?: [number, number];
-    defaultDomainY?: [number, number];
+    domainX?: [number, number] | [string, string] | [Date, Date] | null;
+    domainY?: [number, number] | [string, string] | [Date, Date] | null;
+    defaultDomainX?: [number, number] | [string, string] | [Date, Date];
+    defaultDomainY?: [number, number] | [string, string] | [Date, Date];
 }
 
 export interface ScaleConfig {
@@ -43,7 +43,8 @@ export interface AxisConfig {
     yLabel?: string | null;
     tickCount?: number;
     tickSize?: number;
-    tickFormat?: (domainValue: string, index: number) => string;
+    tickFormatX?: ((domainValue: any, index: number) => string) | null;
+    tickFormatY?: ((domainValue: any, index: number) => string) | null;
     labelOffsetX?: number;
     labelOffsetY?: number;
 }
@@ -136,21 +137,19 @@ export interface RequiredPlotConfig {
     colorConfig: Required<ColorConfig>;
 }
 
-export function DEFAULT_TICK_FORMAT(d: number | string | Date): string {
-    // if (d instanceof Date) {
-    //     return null; // let d3 format the date itself
-    // }
-    if (typeof d === 'string') {
-        return d;
-    } else if (typeof d === 'number') {
-        if (d === 0) {
-            return '0';
-        } else if (Math.abs(d) >= 1000) {
-            return d3.format('.2s')(d);
-        }
+export function defaultStringFormat(d: string): string {
+    return d;
+}
+
+export function defaultNumberFormat(d: number): string {
+    if (d === 0) {
+        return '0';
+    } else if (Math.abs(d) >= 1000) {
+        return d3.format('.2s')(d);
     }
     return String(d);
 }
+
 
 export const DEFAULT_THEME_CONFIG: Required<ThemeConfig> = {
     opacity: 1,
@@ -195,7 +194,8 @@ export const DEFAULT_AXIS_CONFIG: Required<AxisConfig> = {
     yLabel: null,
     tickCount: 5,
     tickSize: 6,
-    tickFormat: DEFAULT_TICK_FORMAT,
+    tickFormatX: null,
+    tickFormatY: null,
     labelOffsetX: 6,
     labelOffsetY: 12,
 };

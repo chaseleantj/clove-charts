@@ -127,16 +127,32 @@ class BasePlot<
     }
 
     componentDidUpdate(prevProps: BasePlotProps<TData>): void {
-        const propsChanged = (
-            Object.keys(this.props) as Array<keyof BasePlotProps<TData>>
-        ).some((prop) => this.props[prop] !== prevProps[prop]);
-        if (propsChanged) {
-            if (this.shouldInitializeChart()) {
-                this.initializeChart();
-            } else {
-                this.cleanup();
+        if (!this.havePropsChanged(prevProps)) {
+            return;
+        }
+
+        this.config = getPlotConfig(this.props);
+        
+        if (this.shouldInitializeChart()) {
+            this.initializeChart();
+        } else {
+            this.cleanup();
+        }
+    }
+
+    havePropsChanged(prevProps: BasePlotProps<TData>): boolean {
+        const keys = new Set<keyof BasePlotProps<TData>>([
+            ...(Object.keys(this.props) as Array<keyof BasePlotProps<TData>>),
+            ...(Object.keys(prevProps) as Array<keyof BasePlotProps<TData>>),
+        ]);
+
+        for (const key of keys) {
+            if (this.props[key] !== prevProps[key]) {
+                return true;
             }
         }
+
+        return false;
     }
 
     shouldInitializeChart(): boolean {
@@ -145,6 +161,7 @@ class BasePlot<
     }
 
     initializeChart(): void {
+        this.cleanup();
         this.initializeProperties();
         this.drawChart();
     }

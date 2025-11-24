@@ -70,14 +70,17 @@ class BaseScatterPlot<
 
     constructor(props: ScatterPlotProps<TData>) {
         super(props);
-        this.scatterPlotConfig = getScatterPlotConfig(
-            props,
-            this.config.themeConfig
-        );
     }
 
     shouldInitializeChart(): boolean {
         return this.props.data.length > 0;
+    }
+
+    onInitializeProperties(): void {
+        this.scatterPlotConfig = getScatterPlotConfig(
+            this.props,
+            this.config.themeConfig
+        );
     }
 
     onSetupScales() {

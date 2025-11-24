@@ -25,6 +25,16 @@ export const DEFAULT_HISTOGRAM_PLOT_CONFIG: HistogramPlotConfig = {
     barOpacity: 1,
 };
 
+export function getHistogramPlotConfig<TData extends Record<string, any>>(
+    props: HistogramPlotProps<TData>
+) {
+    return {
+        numBins: props.numBins ?? DEFAULT_HISTOGRAM_PLOT_CONFIG.numBins,
+        barOpacity:
+            props.barOpacity ?? DEFAULT_HISTOGRAM_PLOT_CONFIG.barOpacity,
+    };
+}
+
 class BaseHistogramPlot<
     TData extends Record<string, any> = Record<string, any>,
 > extends BasePlot<TData> {
@@ -37,15 +47,14 @@ class BaseHistogramPlot<
     constructor(props: HistogramPlotProps<TData>) {
         super(props);
         this.bins = [];
-        this.histogramPlotConfig = {
-            numBins: props.numBins ?? DEFAULT_HISTOGRAM_PLOT_CONFIG.numBins,
-            barOpacity:
-                props.barOpacity ?? DEFAULT_HISTOGRAM_PLOT_CONFIG.barOpacity,
-        };
     }
-
+    
     shouldInitializeChart(): boolean {
         return this.props.data.length > 0;
+    }
+    
+    onInitializeProperties(): void {
+        this.histogramPlotConfig = getHistogramPlotConfig(this.props);
     }
 
     onSetupDomain() {

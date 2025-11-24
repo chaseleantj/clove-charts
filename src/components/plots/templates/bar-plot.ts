@@ -33,6 +33,17 @@ const DEFAULT_BAR_PLOT_CONFIG: BarPlotConfig = {
     useDifferentColors: true,
 };
 
+export function getBarPlotConfig<TData extends Record<string, any>>(
+    props: BarPlotProps<TData>,
+): BarPlotConfig {
+    return {
+        padding: props.padding ?? DEFAULT_BAR_PLOT_CONFIG.padding,
+            useDifferentColors:
+                props.useDifferentColors ??
+                DEFAULT_BAR_PLOT_CONFIG.useDifferentColors,
+    };
+}
+
 class BaseBarPlot<
     TData extends Record<string, any> = Record<string, any>,
 > extends BasePlot<TData> {
@@ -44,12 +55,10 @@ class BaseBarPlot<
 
     constructor(props: BarPlotProps<TData>) {
         super(props);
-        this.barPlotConfig = {
-            padding: this.props.padding ?? DEFAULT_BAR_PLOT_CONFIG.padding,
-            useDifferentColors:
-                this.props.useDifferentColors ??
-                DEFAULT_BAR_PLOT_CONFIG.useDifferentColors,
-        };
+    }
+    
+    onInitializeProperties(): void {
+        this.barPlotConfig = getBarPlotConfig(this.props);
     }
 
     onSetupDomain() {
@@ -57,7 +66,7 @@ class BaseBarPlot<
 
         this.domain = {
             ...this.domain,
-            y: this.config.domainConfig.domainY ?? [minValue, this.domain.y[1]],
+            y: (this.config.domainConfig.domainY as [number, number]) ?? [minValue, this.domain.y[1]],
         };
     }
 

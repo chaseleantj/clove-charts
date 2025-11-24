@@ -36,7 +36,7 @@ export default function IrisBarChart() {
         async function fetchData(): Promise<void> {
             try {
                 d3.csv(
-                    'https://raw.githubusercontent.com/uiuc-cse/data-fa14/gh-pages/data/iris.csv',
+                    '/data/iris.csv',
                     d3.autoType
                 ).then((data) => {
                     setIrisData(data as IrisData[]);

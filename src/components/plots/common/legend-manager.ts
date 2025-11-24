@@ -166,7 +166,7 @@ class LegendManager {
             g: d3.Selection<SVGGElement, unknown, null, undefined>
         ) =>
             g
-                .attr('class', `y-axis`)
+                // .attr('class', `y-axis`)
                 .attr(
                     'transform',
                     `translate(${this.legendConfig.continuousBarWidth + 5}, 0)`
@@ -175,9 +175,10 @@ class LegendManager {
                     d3
                         .axisRight(axisScale)
                         .tickValues(
-                            axisScale.ticks(5).concat(axisScale.domain())
+                            // axisScale.ticks(5).concat(axisScale.domain())
+                            axisScale.ticks(5)
                         )
-                ); // ensures that the edges of the domain (first and last tick) are included
+                    ); // ensures that the edges of the domain (first and last tick) are included
 
         this.continuousSvg.append('g').call(axisRight);
 
