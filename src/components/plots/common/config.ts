@@ -43,8 +43,10 @@ export interface AxisConfig {
     yLabel?: string | null;
     tickCount?: number;
     tickSize?: number;
-    tickFormatX?: ((domainValue: any, index: number) => string) | null;
-    tickFormatY?: ((domainValue: any, index: number) => string) | null;
+    tickFormatX?: ((domainValue: any, index: number) => string) | ((domainValue: any) => string) | null;
+    tickFormatY?: ((domainValue: any, index: number) => string) | ((domainValue: any) => string) | null;
+    defaultStringFormat?: (domainValue: string) => string;
+    defaultNumberFormat?: (domainValue: number) => string;
     labelOffsetX?: number;
     labelOffsetY?: number;
 }
@@ -137,20 +139,6 @@ export interface RequiredPlotConfig {
     colorConfig: Required<ColorConfig>;
 }
 
-export function defaultStringFormat(d: string): string {
-    return d;
-}
-
-export function defaultNumberFormat(d: number): string {
-    if (d === 0) {
-        return '0';
-    } else if (Math.abs(d) >= 1000) {
-        return d3.format('.2s')(d);
-    }
-    return String(d);
-}
-
-
 export const DEFAULT_THEME_CONFIG: Required<ThemeConfig> = {
     opacity: 1,
     transitionDuration: 500,
@@ -196,6 +184,15 @@ export const DEFAULT_AXIS_CONFIG: Required<AxisConfig> = {
     tickSize: 6,
     tickFormatX: null,
     tickFormatY: null,
+    defaultStringFormat: d => d,
+    defaultNumberFormat: d => {
+        if (d === 0) {
+            return '0';
+        } else if (Math.abs(d) >= 1000) {
+            return d3.format('.2s')(d);
+        }
+        return String(d);
+    },
     labelOffsetX: 6,
     labelOffsetY: 12,
 };

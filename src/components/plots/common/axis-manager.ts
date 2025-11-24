@@ -1,8 +1,6 @@
 import * as d3 from 'd3';
 import {
     AxisConfig,
-    defaultNumberFormat,
-    defaultStringFormat,
 } from '@/components/plots/common/config';
 import styles from '@/components/page.module.css';
 import {
@@ -43,9 +41,9 @@ class AxisManager {
         const domain = scale.domain();
 
         if (isNumberArray(domain)) {
-            return (d) => defaultNumberFormat(d as number);
+            return (d) => this.axisConfig.defaultNumberFormat(d as number);
         } else if (isStringArray(domain)) {
-            return (d) => defaultStringFormat(d as string);
+            return (d) => this.axisConfig.defaultStringFormat(d as string);
         } else if (isDateArray(domain)) {
             return null;
         }

@@ -27,8 +27,8 @@ interface StockData {
 const PLOT_CONFIG: PlotConfig = {
     themeConfig: { enableZoom: true },
     domainConfig: { domainY: [0, 350] },
-    axisConfig: { xLabel: 'Date', yLabel: 'Price ($)', showGrid: true },
-    margin: { right: 80 },
+    axisConfig: { xLabel: 'Date', yLabel: 'Price', showGrid: true, tickFormatY: (domainValue: number) => '$' + String(domainValue) },
+    margin: { left: 60, right: 80 },
 };
 
 export default function StocksLineChart() {
