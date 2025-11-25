@@ -40,6 +40,8 @@ export default function TestContourChart() {
                 <BaseContourPlot
                     func={f}
                     thresholds={20}
+                    // shadeContour={false}
+                    strokeColor='none'
                     legendConfig={legendConfig}
                     tooltipConfig={tooltipConfig}
                     {...PLOT_CONFIG}

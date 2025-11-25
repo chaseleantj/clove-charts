@@ -23,6 +23,7 @@ export interface BarPlotProps<
 interface BarPlotScale {
     x: d3.ScaleBand<string>;
     y: d3.ScaleLinear<number, number> | d3.ScaleLogarithmic<number, number>;
+    color?: d3.ScaleOrdinal<string, string>;
 }
 
 interface BarPlotDomain {
@@ -40,9 +41,9 @@ export function getBarPlotConfig<TData extends Record<string, any>>(
 ): BarPlotConfig {
     return {
         padding: props.padding ?? DEFAULT_BAR_PLOT_CONFIG.padding,
-            useDifferentColors:
-                props.useDifferentColors ??
-                DEFAULT_BAR_PLOT_CONFIG.useDifferentColors,
+        useDifferentColors:
+            props.useDifferentColors ??
+            DEFAULT_BAR_PLOT_CONFIG.useDifferentColors,
     };
 }
 
@@ -66,13 +67,14 @@ class BaseBarPlot<
     protected configureDomainAndScales(): void {
 
         const minValue = this.config.scaleConfig.logY ? 1 : 0;
+        
         this.domain = {
             x: this.getDefaultDomainX() as string[],
             y: (this.config.domainConfig.domainY as [number, number]) ?? [minValue, this.getDefaultDomainY()[1]]
         }
 
         const padding = this.props.padding ?? this.barPlotConfig.padding;
-
+        
         this.scale = {
             x: d3
                 .scaleBand()
@@ -83,41 +85,33 @@ class BaseBarPlot<
             y: this.getDefaultScaleY() as BarPlotScale['y']
         }
         
+        if (this.barPlotConfig.useDifferentColors) {
+            const xValues = this.props.data.map((d) => d[this.props.xClass]) as string[];
+            const categoryDomain = this.domainManager.getDomain(xValues) as string[];
+            this.scale.color = this.scaleManager.getColorScale(categoryDomain) as d3.ScaleOrdinal<string, string>;
+        }
     }
 
     draw() {
-        const data = (this.props.data ?? []) as DataRecord[];
-        const xValues = data.map((d) => d[this.props.xClass]);
-        const categoryDomain = this.domainManager.getDomain(xValues);
-        const colorScale = this.barPlotConfig.useDifferentColors
-            ? this.scaleManager.getColorScale(categoryDomain)
-            : this.config.colorConfig.defaultColor;
 
         const fillOption =
-            typeof colorScale === 'function'
+            typeof this.scale.color === 'function'
                 ? (d: Record<string, any>) =>
-                      (colorScale as (value: unknown) => string)(
+                      (this.scale.color as (value: unknown) => string)(
                           d[this.props.xClass]
                       )
-                : colorScale;
-
-        let x1Accessor, y1Accessor, x2Accessor, y2Accessor;
-
-        x1Accessor = (d: Record<string, any>) =>
-            this.scale.x(d[this.props.xClass]);
-        y1Accessor = (d: Record<string, any>) =>
-            this.scale.y(d[this.props.yClass]);
-        x2Accessor = (d: Record<string, any>) =>
-            (this.scale.x(d[this.props.xClass]) as number) +
-            this.scale.x.bandwidth();
-        y2Accessor = () => this.scale.y(this.domain.y[0]);
+                : this.config.colorConfig.defaultColor;
 
         this.primitiveManager.addRectangles(
             this.props.data,
-            x1Accessor,
-            y1Accessor,
-            x2Accessor,
-            y2Accessor,
+            (d: Record<string, any>) =>
+                this.scale.x(d[this.props.xClass]),
+            (d: Record<string, any>) =>
+                this.scale.y(d[this.props.yClass]),
+            (d: Record<string, any>) =>
+                (this.scale.x(d[this.props.xClass]) as number) +
+                this.scale.x.bandwidth(),
+            () => this.scale.y(this.domain.y[0]),
             {
                 opacity: this.config.themeConfig.opacity,
                 fill: fillOption,

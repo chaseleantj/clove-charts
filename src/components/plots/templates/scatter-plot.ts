@@ -3,12 +3,10 @@ import * as d3 from 'd3';
 import BasePlot, {
     BasePlotProps,
     DataKey,
-    DataRecord,
     Scale,
 } from '@/components/plots/common/base-plot';
 import { RequiredPlotConfig } from '@/components/plots/common/config';
 import { BatchPointsPrimitive } from '@/components/plots/common/primitives/primitives';
-import { getDomainKind } from '@/components/plots/common/type-guards';
 import {
     isContinuousScale,
     D3Scale,
@@ -20,6 +18,7 @@ export interface ScatterPlotConfig<
     pointSize: number | ((d: TData) => number);
     pointOpacity: number | ((d: TData) => number);
     colorByClass: DataKey<TData> | null;
+    symbolType: d3.SymbolType;
 }
 
 export interface ScatterPlotProps<
@@ -41,12 +40,11 @@ interface ScatterPlotScale extends Scale {
     color?:
         | d3.ScaleSequential<string, never>
         | d3.ScaleOrdinal<string, string>
-        // | string;
 }
 
-export const DEFAULT_SCATTER_PLOT_CONFIG: Partial<ScatterPlotConfig> = {
+export const DEFAULT_SCATTER_PLOT_CONFIG: Omit<ScatterPlotConfig, "pointOpacity" | "colorByClass"> = {
     pointSize: 50,
-    colorByClass: null,
+    symbolType: d3.symbolCircle
 };
 
 export function getScatterPlotConfig<TData extends Record<string, any>>(
@@ -54,9 +52,10 @@ export function getScatterPlotConfig<TData extends Record<string, any>>(
     themeConfig: RequiredPlotConfig['themeConfig']
 ): ScatterPlotConfig<TData> {
     return {
-        pointSize: props.pointSize ?? DEFAULT_SCATTER_PLOT_CONFIG.pointSize!,
+        pointSize: props.pointSize ?? DEFAULT_SCATTER_PLOT_CONFIG.pointSize,
         colorByClass: props.colorByClass ?? null,
         pointOpacity: props.pointOpacity ?? themeConfig.opacity,
+        symbolType: props.symbolType ?? DEFAULT_SCATTER_PLOT_CONFIG.symbolType
     };
 }
 
@@ -137,9 +136,7 @@ class BaseScatterPlot<
                           | d3.ScaleOrdinal<string, string>)(
                           d[colorByClass]
                       )
-                : typeof this.scale.color === 'string'
-                  ? this.scale.color
-                  : this.config.colorConfig.defaultColor;
+                : this.config.colorConfig.defaultColor;
 
         this.dataPoints = this.primitiveManager.addPoints(
             this.props.data,

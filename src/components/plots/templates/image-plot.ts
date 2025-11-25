@@ -2,7 +2,6 @@ import BasePlot, {
     BasePlotProps,
     DataKey,
 } from '@/components/plots/common/base-plot';
-import { ImagePrimitive } from '@/components/plots/common/primitives/primitives';
 
 export interface ImagePlotConfig {
     useCornerCoords: boolean;
@@ -43,7 +42,6 @@ class BaseImagePlot<
     declare props: ImagePlotProps<TData>;
 
     imagePlotConfig!: ImagePlotConfig;
-    images: ImagePrimitive[] = [];
 
     constructor(props: ImagePlotProps<TData>) {
         super(props);
@@ -57,13 +55,12 @@ class BaseImagePlot<
 
         this.props.data.forEach((d) => {
 
-            const image = this.primitiveManager.addImage(d[this.props.imageURLClass], {
+            this.primitiveManager.addImage(d[this.props.imageURLClass], {
                 coords: d[this.props.coordsClass],
                 width: d[this.props.widthClass],
                 useCornerCoords: this.imagePlotConfig.useCornerCoords,
             });
 
-            this.images.push(image);
         });
     }
 }

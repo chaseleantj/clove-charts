@@ -60,11 +60,10 @@ class BaseContourPlot extends BasePlot {
     declare scale: ContourPlotScale;
     declare props: ContourPlotProps;
 
-    contourPlotConfig!: ContourPlotConfig;
-
-    fValues!: number[];
-    xRange!: number[];
-    yRange!: number[];
+    contourPlotConfig: ContourPlotConfig;
+    fValues: number[];
+    xRange: number[];
+    yRange: number[];
 
     constructor(props: ContourPlotProps) {
         super(props);
@@ -72,6 +71,10 @@ class BaseContourPlot extends BasePlot {
         this.fValues = [];
         this.xRange = [];
         this.yRange = [];
+    }
+    
+    onInitializeProperties(): void {
+        this.contourPlotConfig = getContourPlotConfig(this.props);
     }
 
     protected configureDomainAndScales(): void {
