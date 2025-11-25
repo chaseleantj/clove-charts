@@ -65,7 +65,7 @@ export function getPlotConfig(
     };
 }
 
-class BasePlot<
+abstract class BasePlot<
     TData extends DataRecord = DataRecord,
 > extends Component<BasePlotProps<TData>> {
     config: RequiredPlotConfig;
@@ -84,21 +84,19 @@ class BasePlot<
     axisManager!: AxisManager;
     brushManager!: BrushManager;
     legendManager!: LegendManager;
-
-    primitives!: PrimitiveManager;
+    primitiveManager!: PrimitiveManager;
 
     ref: React.RefObject<HTMLDivElement | null>;
     svg!: d3.Selection<SVGSVGElement, unknown, null, undefined>;
-    clip!: d3.Selection<d3.BaseType, unknown, null, undefined>;
     plotArea!: d3.Selection<SVGGElement, unknown, null, undefined>;
     plot!: d3.Selection<SVGGElement, unknown, null, undefined>;
     interactionSurface!:
         | d3.Selection<d3.BaseType, unknown, null, undefined>
         | d3.Selection<SVGRectElement, unknown, null, undefined>;
+    resizeObserver!: ResizeObserver;
 
     clipPathId: string;
     updateFunctions: Array<() => void>;
-    resizeObserver!: ResizeObserver;
 
     constructor(props: BasePlotProps<TData>) {
         super(props);
@@ -177,11 +175,6 @@ class BasePlot<
         this.onInitializeProperties();
     }
 
-    private initializePrimitives(): void {
-        this.primitives = new PrimitiveManager(this as BasePlot<DataRecord>);
-        this.onInitializePrimitives();
-    }
-
     private initializePlot(): void {
         d3.select(this.ref.current).selectAll('*').remove();
         d3.select(this.config.legendConfig.legendRef.current)
@@ -203,7 +196,7 @@ class BasePlot<
             .attr('width', this.width)
             .attr('height', this.height);
 
-        this.clip = this.svg
+        this.svg
             .append('defs')
             .append('svg:clipPath')
             .attr('id', this.clipPathId)
@@ -225,6 +218,10 @@ class BasePlot<
             .attr('clip-path', `url(#${this.clipPathId})`);
 
         this.onInitializePlot();
+    }
+
+    private setupPrimitives(): void {
+        this.primitiveManager = new PrimitiveManager(this as BasePlot<DataRecord>);
     }
 
     getDefaultDomainX(): Domain['x'] {
@@ -261,9 +258,22 @@ class BasePlot<
         }
     }
     
-    protected setupDomainAndScales(): void {
+    protected configureDomainAndScales(): void {
         this.domain = this.getDefaultDomain();
         this.scale = this.getDefaultScales();
+    }
+
+    private setupDomainAndScales(): void {
+        this.domainManager = new DomainManager(
+            this.config.domainConfig,
+            this.config.scaleConfig
+        );
+
+        this.scaleManager = new ScaleManager(
+            this.config.scaleConfig,
+            this.config.colorConfig,
+        );
+        this.configureDomainAndScales();
     }
 
     private setupAxes(): void {
@@ -322,25 +332,6 @@ class BasePlot<
         });
     }
 
-    setupLegend(): void {
-        if (!this.config.legendConfig.legendRef.current) return;
-        this.legendManager = new LegendManager({
-            ...this.config.legendConfig,
-            maxHeight: this.config.legendConfig.maxHeight ?? this.plotHeight,
-        });
-        this.onSetupLegend();
-    }
-
-    setupTooltip(): void {
-        if (!this.config.tooltipConfig.tooltipRef.current) return;
-        this.tooltipManager = new TooltipManager(
-            this.config.tooltipConfig,
-            this.ref
-        );
-        this.tooltipManager.hideTooltip();
-        this.onSetupTooltip();
-    }
-
     setupBrush(): void {
         if (!this.config.themeConfig.enableZoom) return;
 
@@ -354,8 +345,6 @@ class BasePlot<
             this.resetZoom.bind(this),
             this.config.themeConfig.transitionDuration
         );
-
-        this.onSetupBrush();
     }
 
     resetZoom(): void {
@@ -414,12 +403,34 @@ class BasePlot<
         } else {
             this.interactionSurface = this.plot
                 .append('rect')
-                .attr('class', 'interaction-surface')
                 .attr('fill', 'none')
                 .attr('width', this.plotWidth)
                 .attr('height', this.plotHeight)
                 .style('pointer-events', 'all');
         }
+        // Ensure that the primitives are in front (have the highest z-index for interactivity)
+        if (this.primitiveManager) {
+            this.primitiveManager.sortLayers();
+        }
+    }
+
+    setupLegend(): void {
+        if (!this.config.legendConfig.legendRef.current) return;
+        this.legendManager = new LegendManager({
+            ...this.config.legendConfig,
+            maxHeight: this.config.legendConfig.maxHeight ?? this.plotHeight,
+        });
+        this.drawLegend();
+    }
+
+    setupTooltip(): void {
+        if (!this.config.tooltipConfig.tooltipRef.current) return;
+        this.tooltipManager = new TooltipManager(
+            this.config.tooltipConfig,
+            this.ref
+        );
+        this.tooltipManager.hideTooltip();
+        this.drawTooltip();
     }
 
     setupResizeObserver(): void {
@@ -522,91 +533,36 @@ class BasePlot<
         this.onCleanup();
     }
 
-    handleDrawError(error: unknown): void {
-        console.error(`${this.constructor.name} chart drawing failed:`, error);
-    }
-
-    drawTooltip(): void {
-        console.warn(
-            'drawTooltip() is not implemented! Override this method in your chart subclass.'
-        );
-    }
-
-    renderTooltip(): void {
-        if (this.config.tooltipConfig.tooltipRef.current) {
-            this.drawTooltip();
-        }
-    }
-
-    renderElements(): void {
-        console.warn(
-            'renderElements() is not implemented! Override this method in your chart subclass.'
-        );
-    }
-
+    
     // Main drawing method
     drawChart(): void {
         try {
-            this.initializePhase();
-            this.setupPhase();
-            this.renderPhase();
+            this.initializePlot();
+            this.setupPrimitives();
+            this.setupDomainAndScales();
+            this.setupAxes();
+            this.setupBrush();
+            this.setupInteractionSurface();
+            this.draw();
+            this.setupLegend();
+            this.setupTooltip();
         } catch (error) {
             this.handleDrawError(error);
-            ``;
             this.cleanup();
         }
     }
-
-    initializePhase(): void {
-        this.initializePlot();
-        this.initializePrimitives();
-    }
-
-    setupPhase(): void {
-
-        this.domainManager = new DomainManager(
-            this.config.domainConfig,
-            this.config.scaleConfig
-        );
-
-        this.scaleManager = new ScaleManager(
-            this.config.scaleConfig,
-            this.config.colorConfig,
-        );
-
-        // this.setupDomain();
-        // this.setupScales();
-
-        this.setupDomainAndScales();
-        this.setupAxes();
-        this.setupBrush();
-        this.setupInteractionSurface();
-
-        // Ensure that the primitives are in front (have the highest z-index for interactivity)
-        if (this.primitives) {
-            this.primitives.sortLayers();
-        }
-    }
-
-    renderPhase(): void {
-        this.setupLegend();
-        this.setupTooltip();
-        this.renderElements();
-        this.renderTooltip();
-        this.onRenderComplete();
-    }
+    
+    // Required hook - to plot objects on the screen
+    abstract draw(): void;
 
     // Lifecycle hooks - to be optionally overridden by subclasses
     onInitializeProperties(): void {}
     onInitializePlot(): void {}
-    onInitializePrimitives(): void {}
-    onSetupAxes(): void {}
-    onSetupBrush(): void {}
-    onSetupLegend(): void {}
-    onSetupTooltip(): void {}
-    onRenderComplete(): void {}
+    drawTooltip(): void {}
+    drawLegend(): void {}
     onUpdateChart(): void {}
     onCleanup(): void {}
+    handleDrawError(error: unknown): void {}
 
     render() {
         return <div ref={this.ref} style={{ width: '100%' }}></div>;

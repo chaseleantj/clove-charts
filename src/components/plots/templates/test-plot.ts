@@ -11,16 +11,16 @@ class BaseTestPlot extends BasePlot {
         this.domain.y = [0, 10];
     }
 
-    renderElements() {
-        const line = this.primitives.addLine(2, 1, 4, 6, {
+    draw() {
+        const line = this.primitiveManager.addLine(2, 1, 4, 6, {
             arrow: 'both',
         });
 
-        const point = this.primitives.addPoint(3, 3, {
+        const point = this.primitiveManager.addPoint(3, 3, {
             symbolType: d3.symbolTriangle,
         });
 
-        const text = this.primitives.addText('2x', 3.5, 3, {
+        const text = this.primitiveManager.addText('2x', 3.5, 3, {
             fontSize: 12,
             fill: 'steelblue',
             // fontFamily: 'Times New Roman',

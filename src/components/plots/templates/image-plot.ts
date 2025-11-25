@@ -53,11 +53,11 @@ class BaseImagePlot<
         this.imagePlotConfig = getImagePlotConfig(this.props);
     }
 
-    renderElements() {
+    draw() {
 
         this.props.data.forEach((d) => {
 
-            const image = this.primitives.addImage(d[this.props.imageURLClass], {
+            const image = this.primitiveManager.addImage(d[this.props.imageURLClass], {
                 coords: d[this.props.coordsClass],
                 width: d[this.props.widthClass],
                 useCornerCoords: this.imagePlotConfig.useCornerCoords,

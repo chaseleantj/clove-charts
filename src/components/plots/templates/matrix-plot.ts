@@ -72,7 +72,7 @@ class BaseMatrixPlot<
         this.matrixPlotConfig = getMatrixPlotConfig(this.props);
     }
 
-    protected setupDomainAndScales(): void {
+    protected configureDomainAndScales(): void {
 
         this.domain = this.getDefaultDomain() as MatrixPlotDomain;
 
@@ -97,11 +97,11 @@ class BaseMatrixPlot<
         }
     }
 
-    renderElements() {
+    draw() {
 
         const colorKey = this.props.valueClass;
         
-        this.primitives.addRectangles(
+        this.primitiveManager.addRectangles(
             this.props.data,
             (d) => this.scale.x(d[this.props.xClass]),
             (d) => this.scale.y(d[this.props.yClass]),
@@ -124,7 +124,7 @@ class BaseMatrixPlot<
         );
 
         if (this.matrixPlotConfig.showCellLabel && colorKey) {
-            this.primitives.addTexts(
+            this.primitiveManager.addTexts(
                 this.props.data,
                 (d) =>
                     (this.scale.x(d[this.props.xClass]) as number) +
@@ -147,7 +147,7 @@ class BaseMatrixPlot<
         }
     }
 
-    onSetupLegend() {
+    drawLegend() {
         this.legendManager.setTitle(this.config.legendConfig.title ?? this.props.valueClass);
 
         if (this.scale.color) {

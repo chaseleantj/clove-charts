@@ -63,7 +63,7 @@ class BaseBarPlot<
         this.barPlotConfig = getBarPlotConfig(this.props);
     }
 
-    protected setupDomainAndScales(): void {
+    protected configureDomainAndScales(): void {
 
         const minValue = this.config.scaleConfig.logY ? 1 : 0;
         this.domain = {
@@ -85,7 +85,7 @@ class BaseBarPlot<
         
     }
 
-    renderElements() {
+    draw() {
         const data = (this.props.data ?? []) as DataRecord[];
         const xValues = data.map((d) => d[this.props.xClass]);
         const categoryDomain = this.domainManager.getDomain(xValues);
@@ -112,7 +112,7 @@ class BaseBarPlot<
             this.scale.x.bandwidth();
         y2Accessor = () => this.scale.y(this.domain.y[0]);
 
-        this.primitives.addRectangles(
+        this.primitiveManager.addRectangles(
             this.props.data,
             x1Accessor,
             y1Accessor,

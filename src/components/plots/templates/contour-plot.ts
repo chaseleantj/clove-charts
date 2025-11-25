@@ -74,7 +74,7 @@ class BaseContourPlot extends BasePlot {
         this.yRange = [];
     }
 
-    protected setupDomainAndScales(): void {
+    protected configureDomainAndScales(): void {
         this.domain = {
             x: this.domainManager.getDomainX() as [number, number],
             y: this.domainManager.getDomainY() as [number, number]
@@ -119,15 +119,15 @@ class BaseContourPlot extends BasePlot {
 
     }
 
-    renderElements() {
-        this.primitives.addContour(this.fValues, this.xRange, this.yRange, {
+    draw() {
+        this.primitiveManager.addContour(this.fValues, this.xRange, this.yRange, {
             colorScale: this.scale.color ?? undefined,
             thresholds: this.contourPlotConfig.thresholds,
             stroke: this.contourPlotConfig.strokeColor,
         });
     }
 
-    onSetupLegend() {
+    drawLegend() {
         if (this.config.legendConfig.title) {
             this.legendManager.setTitle(this.config.legendConfig.title);
         }

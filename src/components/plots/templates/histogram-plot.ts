@@ -53,7 +53,7 @@ class BaseHistogramPlot<
         this.histogramPlotConfig = getHistogramPlotConfig(this.props);
     }
 
-    protected setupDomainAndScales(): void {
+    protected configureDomainAndScales(): void {
         let domainX = this.getDefaultDomainX() as [number, number];
         if (this.config.scaleConfig.logX) {
             domainX = [
@@ -108,7 +108,7 @@ class BaseHistogramPlot<
 
     }
 
-    renderElements() {
+    draw() {
 
         const data = this.bins
             .filter((binData) => binData.length > 0)
@@ -124,7 +124,7 @@ class BaseHistogramPlot<
                 };
             });
 
-        this.primitives.addRectangles(
+        this.primitiveManager.addRectangles(
             data,
             (d) => d.x1,
             (d) => d.y1,

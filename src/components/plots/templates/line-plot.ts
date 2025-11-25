@@ -87,7 +87,7 @@ class BaseLinePlot<
         this.linePlotConfig = getLinePlotConfig(this.props);
     }
 
-    protected setupDomainAndScales(): void {
+    protected configureDomainAndScales(): void {
         const xValues = this.props.xClass ? this.props.data.map((d) => d[this.props.xClass]) : [];
         const yValues = this.props.yClass
             .flatMap((yClass) => this.props.data.map((d) => d[yClass]));
@@ -105,7 +105,7 @@ class BaseLinePlot<
         
     }
 
-    renderElements(): void {
+    draw(): void {
         for (let yClass of this.props.yClass) {
             const key = yClass as string;
             const colorScale = this.scale.color as d3.ScaleOrdinal<
@@ -113,7 +113,7 @@ class BaseLinePlot<
                 string
             >;
 
-            this.primitives.addPath(
+            this.primitiveManager.addPath(
                 this.props.data,
                 (d) => d[this.props.xClass as string],
                 (d) => d[key],
@@ -126,7 +126,7 @@ class BaseLinePlot<
         }
     }
 
-    onSetupLegend(): void {
+    drawLegend(): void {
         if (this.props.yClass.length > 1) {
             this.legendManager.addLegend(
                 this.scale.color as d3.ScaleOrdinal<string, string>,
@@ -139,9 +139,9 @@ class BaseLinePlot<
     }
 
     setupLabels(): void {
-        this.primitives.createLayer('tooltips', 100);
+        this.primitiveManager.createLayer('tooltips', 100);
 
-        this.lineLabel = this.primitives.addLine(0, 0, 0, 0, {
+        this.lineLabel = this.primitiveManager.addLine(0, 0, 0, 0, {
             stroke: this.linePlotConfig.lineLabelColor,
             strokeWidth: this.linePlotConfig.lineLabelWidth,
             strokeDashArray: '4,4',
@@ -155,7 +155,7 @@ class BaseLinePlot<
 
         for (let yClass of this.props.yClass) {
             const key = yClass as string;
-            this.pointLabels[key] = this.primitives.addPoint(0, 0, {
+            this.pointLabels[key] = this.primitiveManager.addPoint(0, 0, {
                 size: 50,
                 symbolType: d3.symbolCircle,
                 fill: colorScale(key),
@@ -213,7 +213,7 @@ class BaseLinePlot<
         return i;
     }
 
-    onSetupTooltip(): void {
+    drawTooltip(): void {
         this.setupLabels();
 
         // Explicitly cast interactionSurface to resolve TypeScript union type ambiguity

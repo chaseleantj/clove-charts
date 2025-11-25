@@ -85,7 +85,7 @@ class BaseScatterPlot<
         );
     }
 
-    protected setupDomainAndScales(): void {
+    protected configureDomainAndScales(): void {
         this.domain = this.getDefaultDomain();
         this.scale = this.getDefaultScales();
 
@@ -115,7 +115,7 @@ class BaseScatterPlot<
         };
     }
 
-    renderElements() {
+    draw() {
         const { pointSize, pointOpacity, colorByClass } =
             this.scatterPlotConfig;
 
@@ -141,7 +141,7 @@ class BaseScatterPlot<
                   ? this.scale.color
                   : this.config.colorConfig.defaultColor;
 
-        this.dataPoints = this.primitives.addPoints(
+        this.dataPoints = this.primitiveManager.addPoints(
             this.props.data,
             this.getCoordinateAccessor(this.props.xClass, this.scale.x),
             this.getCoordinateAccessor(this.props.yClass, this.scale.y),
@@ -154,7 +154,7 @@ class BaseScatterPlot<
         );
     }
 
-    onSetupLegend() {
+    drawLegend() {
         if (!this.scatterPlotConfig.colorByClass) return;
 
         this.legendManager.setTitle(
