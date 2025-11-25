@@ -34,7 +34,7 @@ export interface ScatterPlotProps<
 interface ScatterPlotDomain {
     x: [number, number] | [Date, Date] | string[];
     y: [number, number] | [Date, Date] | string[];
-    color: [number, number] | [Date, Date] | string[];
+    color?: [number, number] | [Date, Date] | string[];
 }
 
 interface ScatterPlotScale extends Scale {
@@ -85,7 +85,10 @@ class BaseScatterPlot<
         );
     }
 
-    onSetupScales() {
+    protected setupDomainAndScales(): void {
+        this.domain = this.getDefaultDomain();
+        this.scale = this.getDefaultScales();
+
         const colorKey = this.scatterPlotConfig.colorByClass;
         if (colorKey) {
             const colorValues = this.props.data.map((d) => d[colorKey]);
@@ -93,7 +96,6 @@ class BaseScatterPlot<
             this.scale.color = this.scaleManager.getColorScale(
                 this.domain.color
             );
-
         }
     }
 

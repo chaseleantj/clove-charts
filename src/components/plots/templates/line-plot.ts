@@ -5,7 +5,7 @@ import BasePlot, {
     DataKey,
     Scale,
 } from '@/components/plots/common/base-plot';
-import { isDateValue, isDefined } from '@/components/plots/common/type-guards';
+import { isDefined } from '@/components/plots/common/type-guards';
 import { isContinuousScale } from '@/components/plots/common/scale-manager';
 import {
     LinePrimitive,
@@ -29,10 +29,9 @@ export interface LinePlotProps<
 }
 
 interface LinePlotScale extends Scale {
-    color:
+    color?:
         | d3.ScaleOrdinal<string, string>
         | d3.ScaleSequential<string, never>
-        | string;
 }
 
 export const DEFAULT_LINE_PLOT_CONFIG: LinePlotConfig = {
@@ -88,24 +87,22 @@ class BaseLinePlot<
         this.linePlotConfig = getLinePlotConfig(this.props);
     }
 
-    onSetupDomain(): void {
-        if (this.config.domainConfig.domainY) {
-            this.domain.y = this.config.domainConfig.domainY;
-            return;
+    protected setupDomainAndScales(): void {
+        const xValues = this.props.xClass ? this.props.data.map((d) => d[this.props.xClass]) : [];
+        const yValues = this.props.yClass
+            .flatMap((yClass) => this.props.data.map((d) => d[yClass]));
+
+        this.domain = {
+            x: this.domainManager.getDomainX(xValues),
+            y: this.domainManager.getDomainY(yValues)
         }
 
-        const data = (this.props.data ?? []) as Record<string, any>[];
-        const yValues = this.props.yClass
-            .flatMap((yClass) => data.map((d) => d[yClass as string]));
-
-        this.domain.y = this.domainManager.getDomainY(yValues);
-    }
-
-    onSetupScales(): void {
-        this.scale.color = this.scaleManager.getColorScale(
-            this.props.yClass as string[],
-            this.config.colorConfig.categoricalColorScheme
-        );
+        this.scale = {
+            x: this.getDefaultScaleX(),
+            y: this.getDefaultScaleY(),
+            color: this.scaleManager.getColorScale(this.props.yClass)
+        }
+        
     }
 
     renderElements(): void {
@@ -124,8 +121,6 @@ class BaseLinePlot<
                     stroke: colorScale(key),
                     strokeWidth: this.linePlotConfig.lineWidth,
                     opacity: this.linePlotConfig.lineOpacity,
-                    layerName: 'lines',
-                    className: `line-plot line-plot-${key}`,
                 }
             );
         }

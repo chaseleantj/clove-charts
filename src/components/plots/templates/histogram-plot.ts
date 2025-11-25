@@ -5,8 +5,11 @@ import ScaleManager from '@/components/plots/common/scale-manager';
 
 export interface HistogramPlotConfig {
     numBins: number;
-    barOpacity: number;
 }
+
+export const DEFAULT_HISTOGRAM_PLOT_CONFIG: HistogramPlotConfig = {
+    numBins: 20,
+};
 
 interface HistogramPlotProps<TData extends Record<string, any> = Record<string, any>>
     extends Omit<BasePlotProps<TData>, 'yClass'>,
@@ -20,18 +23,11 @@ interface HistogramPlotDomain {
     y: [number, number];
 }
 
-export const DEFAULT_HISTOGRAM_PLOT_CONFIG: HistogramPlotConfig = {
-    numBins: 20,
-    barOpacity: 1,
-};
-
 export function getHistogramPlotConfig<TData extends Record<string, any>>(
     props: HistogramPlotProps<TData>
 ) {
     return {
         numBins: props.numBins ?? DEFAULT_HISTOGRAM_PLOT_CONFIG.numBins,
-        barOpacity:
-            props.barOpacity ?? DEFAULT_HISTOGRAM_PLOT_CONFIG.barOpacity,
     };
 }
 
@@ -57,21 +53,17 @@ class BaseHistogramPlot<
         this.histogramPlotConfig = getHistogramPlotConfig(this.props);
     }
 
-    onSetupDomain() {
+    protected setupDomainAndScales(): void {
+        let domainX = this.getDefaultDomainX() as [number, number];
         if (this.config.scaleConfig.logX) {
-            this.domain.x = [
+            domainX = [
                 Math.log10(this.domain.x[0]),
                 Math.log10(this.domain.x[1]),
             ];
         }
-        // y-domain cannot be setup yet
-    }
-
-    setupScales() {
-        this.scaleManager = new ScaleManager(this.config.scaleConfig, this.config.colorConfig);
-
+        
         const scaleX = this.scaleManager.getScale(
-            this.domain.x,
+            domainX,
             [0, this.plotWidth],
             // For histograms, the x-scale is always linear after domain adjustment for logX
             false,
@@ -79,12 +71,11 @@ class BaseHistogramPlot<
         );
 
         const numBins = this.histogramPlotConfig.numBins;
-
         const histogramGenerator = d3
             .bin()
             .domain(scaleX.domain() as [number, number])
             .thresholds(scaleX.ticks(numBins));
-
+    
         const data: number[] = this.props.data.map((d: Record<string, any>) => {
             return this.config.scaleConfig.logX
                 ? Math.log10(d[this.props.xClass])
@@ -92,30 +83,32 @@ class BaseHistogramPlot<
         });
 
         this.bins = histogramGenerator(data);
-
         const yMax = d3.max(this.bins, (d) => d.length) as number;
-        this.domain.y = this.config.scaleConfig.logY
+
+        let domainY = this.config.scaleConfig.logY
             ? [1, Math.max(1, yMax)]
             : [0, yMax];
-
+    
         const scaleY = this.scaleManager.getScale(
-            this.domain.y,
+            domainY as [number, number],
             [this.plotHeight, 0],
             this.config.scaleConfig.logY,
             this.config.scaleConfig.formatNiceY
         );
 
+        this.domain = {
+            x: domainX as [number, number],
+            y: domainY as [number, number]
+        }
+
         this.scale = {
             x: scaleX,
-            y: scaleY,
-        };
+            y: scaleY
+        }
 
-        this.onSetupScales();
     }
 
     renderElements() {
-        const barOpacity = this.histogramPlotConfig.barOpacity;
-        const barColor = this.config.colorConfig.defaultColor;
 
         const data = this.bins
             .filter((binData) => binData.length > 0)
@@ -138,8 +131,8 @@ class BaseHistogramPlot<
             (d) => d.x2,
             (d) => d.y2,
             {
-                fill: barColor,
-                opacity: barOpacity,
+                fill: this.config.colorConfig.defaultColor,
+                opacity: this.config.themeConfig.opacity,
             }
         );
     }

@@ -23,17 +23,18 @@ export interface ContourPlotProps
 interface ContourPlotDomain {
     x: [number, number];
     y: [number, number];
+    color?: [number, number]
 }
 
 interface ContourPlotScale extends Scale {
-    color: d3.ScaleSequential<string, never> | ((t: number) => string);
+    color?: d3.ScaleSequential<string, never> | ((t: number) => string);
 }
 
 export const DEFAULT_CONTOUR_PLOT_CONFIG: Omit<ContourPlotConfig, 'func'> = {
     resolutionX: 32,
     resolutionY: 32,
     thresholds: 10,
-    strokeColor: 'none',
+    strokeColor: 'currentColor',
     shadeContour: true,
 };
 
@@ -73,7 +74,14 @@ class BaseContourPlot extends BasePlot {
         this.yRange = [];
     }
 
-    onSetupScales() {
+    protected setupDomainAndScales(): void {
+        this.domain = {
+            x: this.domainManager.getDomainX() as [number, number],
+            y: this.domainManager.getDomainY() as [number, number]
+        };
+        
+        this.scale = this.getDefaultScales();
+
         // Calculate padding equal to one threshold step
         const xPadding =
             (this.domain.x[1] - this.domain.x[0]) /
@@ -104,19 +112,16 @@ class BaseContourPlot extends BasePlot {
         }
 
         if (this.contourPlotConfig.shadeContour) {
-            const fDomain = d3.extent(this.fValues) as [number, number];
-            this.scale.color = this.scaleManager.getColorScale(
-                fDomain,
-                this.config.colorConfig.continuousColorScheme
+            this.domain.color = this.domainManager.getDomain(this.fValues) as [number, number];
+            this.scale.color = this.scaleManager.getColorScale(this.domain.color,
             ) as d3.ScaleSequential<string, never>;
-        } else {
-            this.contourPlotConfig.strokeColor = 'currentColor';
         }
+
     }
 
     renderElements() {
         this.primitives.addContour(this.fValues, this.xRange, this.yRange, {
-            colorScale: this.scale.color,
+            colorScale: this.scale.color ?? undefined,
             thresholds: this.contourPlotConfig.thresholds,
             stroke: this.contourPlotConfig.strokeColor,
         });

@@ -155,18 +155,18 @@ class BasePlot<
         return false;
     }
 
-    shouldInitializeChart(): boolean {
+    protected shouldInitializeChart(): boolean {
         // return this.props.data !== undefined && this.props.data.length > 0;
         return true;
     }
 
-    initializeChart(): void {
+    private initializeChart(): void {
         this.cleanup();
         this.initializeProperties();
         this.drawChart();
     }
 
-    initializeProperties(): void {
+    private initializeProperties(): void {
         if (!this.ref.current) return;
         const rect = this.ref.current.getBoundingClientRect();
         this.width = this.config.dimensions.width ?? rect.width;
@@ -177,12 +177,12 @@ class BasePlot<
         this.onInitializeProperties();
     }
 
-    initializePrimitives(): void {
+    private initializePrimitives(): void {
         this.primitives = new PrimitiveManager(this as BasePlot<DataRecord>);
         this.onInitializePrimitives();
     }
 
-    initializePlot(): void {
+    private initializePlot(): void {
         d3.select(this.ref.current).selectAll('*').remove();
         d3.select(this.config.legendConfig.legendRef.current)
             .selectAll('*')
@@ -227,39 +227,46 @@ class BasePlot<
         this.onInitializePlot();
     }
 
-    setupDomain(): void {
+    getDefaultDomainX(): Domain['x'] {
         const data = (this.props.data ?? []) as DataRecord[];
-        this.domainManager = new DomainManager(
-            this.config.domainConfig,
-            this.config.scaleConfig
-        );
-
         const xValues = this.props.xClass ? data.map((d) => d[this.props.xClass!]) : [];
+        return this.domainManager.getDomainX(xValues)
+    }   
+
+    getDefaultDomainY(): Domain['y'] {
+        const data = (this.props.data ?? []) as DataRecord[];
         const yValues = this.props.yClass ? data.map((d) => d[this.props.yClass!]) : [];
-
-        this.domain = {
-            x: this.domainManager.getDomainX(xValues),
-            y: this.domainManager.getDomainY(yValues),
+        return this.domainManager.getDomainY(yValues)
+    }   
+    
+    getDefaultDomain(): Domain {
+        return {
+            x: this.getDefaultDomainX(),
+            y: this.getDefaultDomainY()
         };
-
-        this.onSetupDomain();
     }
 
-    setupScales(): void {
-        this.scaleManager = new ScaleManager(
-            this.config.scaleConfig,
-            this.config.colorConfig,
-        );
-
-        this.scale = {
-            x: this.scaleManager.getScaleX(this.domain.x, this.plotWidth),
-            y: this.scaleManager.getScaleY(this.domain.y, this.plotHeight),
-        };
-
-        this.onSetupScales();
+    getDefaultScaleX(): Scale['x'] {
+        return this.scaleManager.getScaleX(this.domain.x, this.plotWidth);
     }
 
-    setupAxes(): void {
+    getDefaultScaleY(): Scale['y'] {
+        return this.scaleManager.getScaleY(this.domain.y, this.plotHeight);
+    }
+
+    getDefaultScales(): Scale {
+        return {
+            x: this.getDefaultScaleX(),
+            y: this.getDefaultScaleY()
+        }
+    }
+    
+    protected setupDomainAndScales(): void {
+        this.domain = this.getDefaultDomain();
+        this.scale = this.getDefaultScales();
+    }
+
+    private setupAxes(): void {
         if (!this.config.axisConfig.showAxis) return;
 
         this.axisManager = new AxisManager(
@@ -556,8 +563,21 @@ class BasePlot<
     }
 
     setupPhase(): void {
-        this.setupDomain();
-        this.setupScales();
+
+        this.domainManager = new DomainManager(
+            this.config.domainConfig,
+            this.config.scaleConfig
+        );
+
+        this.scaleManager = new ScaleManager(
+            this.config.scaleConfig,
+            this.config.colorConfig,
+        );
+
+        // this.setupDomain();
+        // this.setupScales();
+
+        this.setupDomainAndScales();
         this.setupAxes();
         this.setupBrush();
         this.setupInteractionSurface();
@@ -580,8 +600,6 @@ class BasePlot<
     onInitializeProperties(): void {}
     onInitializePlot(): void {}
     onInitializePrimitives(): void {}
-    onSetupDomain(): void {}
-    onSetupScales(): void {}
     onSetupAxes(): void {}
     onSetupBrush(): void {}
     onSetupLegend(): void {}

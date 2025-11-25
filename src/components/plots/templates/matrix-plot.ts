@@ -26,16 +26,16 @@ Partial<MatrixPlotConfig> {
 export interface MatrixPlotDomain {
     x: string[];
     y: string[];
-    color: [number, number] | [Date, Date] | string[];
+    color?: [number, number] | [Date, Date] | string[];
 }
 
 interface MatrixPlotScale extends Scale {
     x: d3.ScaleBand<string>;
     y: d3.ScaleBand<string>;
-    color:
+    color?:
         | d3.ScaleSequential<string, never>
         | d3.ScaleOrdinal<string, string>
-        | string;
+        // | string;
 }
 
 export const DEFAULT_MATRIX_PLOT_CONFIG: Partial<MatrixPlotConfig> = {
@@ -71,26 +71,30 @@ class BaseMatrixPlot<
     onInitializeProperties(): void {
         this.matrixPlotConfig = getMatrixPlotConfig(this.props);
     }
-    
-    onSetupScales() {
-        this.scale.x = d3
-            .scaleBand()
-            .domain(this.domain.x)
-            .range([0, this.plotWidth])
-            .paddingInner(this.matrixPlotConfig.padding)
-            .paddingOuter(this.matrixPlotConfig.padding);
 
-        this.scale.y = d3
-            .scaleBand()
-            .domain(this.domain.y)
-            .range([0, this.plotHeight])
-            .paddingInner(this.matrixPlotConfig.padding)
-            .paddingOuter(this.matrixPlotConfig.padding);
+    protected setupDomainAndScales(): void {
+
+        this.domain = this.getDefaultDomain() as MatrixPlotDomain;
 
         const data = (this.props.data ?? []) as DataRecord[];
         const colorValues = data.map((d) => d[this.props.valueClass]);
         this.domain.color = this.domainManager.getDomain(colorValues);
-        this.scale.color = this.scaleManager.getColorScale(this.domain.color);
+
+        this.scale = {
+            x: d3
+                .scaleBand()
+                .domain(this.domain.x)
+                .range([0, this.plotWidth])
+                .paddingInner(this.matrixPlotConfig.padding)
+                .paddingOuter(this.matrixPlotConfig.padding),
+            y: d3
+                .scaleBand()
+                .domain(this.domain.y)
+                .range([0, this.plotHeight])
+                .paddingInner(this.matrixPlotConfig.padding)
+                .paddingOuter(this.matrixPlotConfig.padding),
+            color: this.scaleManager.getColorScale(this.domain.color)
+        }
     }
 
     renderElements() {
@@ -109,11 +113,11 @@ class BaseMatrixPlot<
                 this.scale.y.bandwidth(),
             {
                 fill: (d) =>
-                    typeof this.scale.color === 'function' && colorKey
+                    this.scale.color && colorKey
                         ? this.scale.color(
                               d[colorKey]
                           )
-                        : this.scale.color as string,
+                        : this.config.colorConfig.defaultColor,
                 coordinateSystem: 'pixel',
                 opacity: this.config.themeConfig.opacity,
             }
@@ -146,7 +150,7 @@ class BaseMatrixPlot<
     onSetupLegend() {
         this.legendManager.setTitle(this.config.legendConfig.title ?? this.props.valueClass);
 
-        if (typeof this.scale.color !== 'string') {
+        if (this.scale.color) {
             this.legendManager.addLegend(this.scale.color, 'rect');
         }
     }

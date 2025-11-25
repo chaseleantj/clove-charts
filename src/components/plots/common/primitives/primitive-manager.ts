@@ -305,7 +305,7 @@ class PrimitiveManager {
         options = {
             thresholds: 10,
             // className: 'primitive-contours',
-            colorScale: d3.interpolateRdBu,
+            // colorScale: d3.interpolateRdBu,
             ...options,
         };
 

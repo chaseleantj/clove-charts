@@ -3,6 +3,7 @@ import BasePlot, {
     BasePlotProps,
     DataKey,
     DataRecord,
+    Domain,
 } from '@/components/plots/common/base-plot';
 
 export interface BarPlotConfig {
@@ -21,7 +22,7 @@ export interface BarPlotProps<
 
 interface BarPlotScale {
     x: d3.ScaleBand<string>;
-    y: d3.ScaleLinear<number, number>;
+    y: d3.ScaleLinear<number, number> | d3.ScaleLogarithmic<number, number>;
 }
 
 interface BarPlotDomain {
@@ -62,24 +63,26 @@ class BaseBarPlot<
         this.barPlotConfig = getBarPlotConfig(this.props);
     }
 
-    onSetupDomain() {
+    protected setupDomainAndScales(): void {
+
         const minValue = this.config.scaleConfig.logY ? 1 : 0;
-
         this.domain = {
-            ...this.domain,
-            y: (this.config.domainConfig.domainY as [number, number]) ?? [minValue, this.domain.y[1]],
-        };
-    }
+            x: this.getDefaultDomainX() as string[],
+            y: (this.config.domainConfig.domainY as [number, number]) ?? [minValue, this.getDefaultDomainY()[1]]
+        }
 
-    onSetupScales() {
-        const padding = this.props.padding ?? DEFAULT_BAR_PLOT_CONFIG.padding;
+        const padding = this.props.padding ?? this.barPlotConfig.padding;
 
-        this.scale.x = d3
-            .scaleBand()
-            .domain(this.domain.x)
-            .range([0, this.plotWidth])
-            .paddingInner(padding)
-            .paddingOuter(padding);
+        this.scale = {
+            x: d3
+                .scaleBand()
+                .domain(this.domain.x)
+                .range([0, this.plotWidth])
+                .paddingInner(padding)
+                .paddingOuter(padding),
+            y: this.getDefaultScaleY() as BarPlotScale['y']
+        }
+        
     }
 
     renderElements() {
