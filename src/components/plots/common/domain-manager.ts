@@ -1,9 +1,12 @@
 import * as d3 from 'd3';
 import { DomainConfig, ScaleConfig } from '@/components/plots/common/config';
 import {
+    isDateArray,
     isDateValue,
     isDefined,
+    isNumberArray,
     isNumberValue,
+    isStringArray,
     isStringValue,
 } from '@/components/plots/common/type-guards';
 
@@ -15,6 +18,9 @@ class DomainManager {
         private readonly scaleConfig: Required<ScaleConfig>
     ) {}
 
+    getDomain(values: string[], padding?: number): string[];
+    getDomain(values: number[], padding?: number): [number, number];
+    getDomain(values: Date[], padding?: number): [Date, Date];
     getDomain(
         values: DataValue[],
         padding = 0
@@ -42,6 +48,10 @@ class DomainManager {
         return [0, 1];
     }
 
+    getDomainX(): [number, number];
+    getDomainX(values: string[]): string[];
+    getDomainX(values: number[]): [number, number];
+    getDomainX(values: Date[]): [Date, Date];
     getDomainX(
         values?: DataValue[]
     ): string[] | [number, number] | [Date, Date] {
@@ -54,9 +64,25 @@ class DomainManager {
         }
 
         const padding = this.scaleConfig.logX ? 0 : this.domainConfig.paddingX;
-        return this.getDomain(values, padding);
+
+        if (isStringArray(values)) {
+            return this.getDomain(values, padding);
+        }
+        if (isNumberArray(values)) {
+            return this.getDomain(values, padding);
+        }
+        if (isDateArray(values)) {
+            return this.getDomain(values, padding);
+        }
+
+        console.warn('Mixed or unsupported X domain types! Using defaults');
+        return this.domainConfig.defaultDomainX;
     }
 
+    getDomainY(): [number, number];
+    getDomainY(values: string[]): string[];
+    getDomainY(values: number[]): [number, number];
+    getDomainY(values: Date[]): [Date, Date];
     getDomainY(
         values?: DataValue[]
     ): string[] | [number, number] | [Date, Date] {
@@ -69,7 +95,19 @@ class DomainManager {
         }
 
         const padding = this.scaleConfig.logY ? 0 : this.domainConfig.paddingY;
-        return this.getDomain(values, padding);
+
+        if (isStringArray(values)) {
+            return this.getDomain(values, padding);
+        }
+        if (isNumberArray(values)) {
+            return this.getDomain(values, padding);
+        }
+        if (isDateArray(values)) {
+            return this.getDomain(values, padding);
+        }
+
+        console.warn('Mixed or unsupported Y domain types! Using defaults');
+        return this.domainConfig.defaultDomainY;
     }
 
     private getDateDomain(values: Date[], padding: number): [Date, Date] {

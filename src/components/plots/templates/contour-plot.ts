@@ -70,8 +70,8 @@ class BaseContourPlot extends BasePlot {
 
     protected configureDomainAndScales(): void {
         this.domain = {
-            x: this.domainManager.getDomainX() as [number, number],
-            y: this.domainManager.getDomainY() as [number, number],
+            x: this.domainManager.getDomainX(),
+            y: this.domainManager.getDomainY(),
         };
 
         this.scale = this.getDefaultScales();
@@ -106,10 +106,7 @@ class BaseContourPlot extends BasePlot {
         }
 
         if (this.contourPlotConfig.shadeContour) {
-            this.domain.color = this.domainManager.getDomain(this.fValues) as [
-                number,
-                number,
-            ];
+            this.domain.color = this.domainManager.getDomain(this.fValues);
             this.scale.color = this.scaleManager.getColorScale(
                 this.domain.color
             ) as d3.ScaleSequential<string, never>;

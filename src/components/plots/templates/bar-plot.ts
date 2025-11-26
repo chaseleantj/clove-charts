@@ -82,9 +82,7 @@ class BaseBarPlot<
             const xValues = this.props.data.map(
                 (d) => d[this.props.xKey]
             ) as string[];
-            const categoryDomain = this.domainManager.getDomain(
-                xValues
-            ) as string[];
+            const categoryDomain = this.domainManager.getDomain(xValues);
             this.scale.color = this.scaleManager.getColorScale(
                 categoryDomain
             ) as d3.ScaleOrdinal<string, string>;
