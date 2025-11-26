@@ -535,6 +535,91 @@ export class PathPrimitive extends Primitive<
     }
 }
 
+export interface AreaPrimitiveOptions {
+    curve?: d3.CurveFactory;
+}
+
+export class AreaPrimitive extends Primitive<
+    PrimitiveConfig & AreaPrimitiveOptions
+> {
+    dataPoints: Record<string, any>[];
+    xAccessor!: CoordinateAccessor;
+    y0Accessor!: CoordinateAccessor;
+    y1Accessor!: CoordinateAccessor;
+
+    constructor(
+        manager: PrimitiveManager,
+        element: Element,
+        options: Required<PrimitiveConfig> & Required<AreaPrimitiveOptions>
+    ) {
+        super(manager, element, options);
+        this.dataPoints = [];
+    }
+
+    public setData(dataPoints: Record<string, any>[]): this {
+        this.dataPoints = dataPoints;
+        return this;
+    }
+
+    public setCoordinateAccessors(
+        xAccessor: CoordinateAccessor,
+        y0Accessor: CoordinateAccessor,
+        y1Accessor: CoordinateAccessor
+    ): this {
+        this.xAccessor = xAccessor;
+        this.y0Accessor = y0Accessor;
+        this.y1Accessor = y1Accessor;
+        return this;
+    }
+
+    public render(
+        transitionDuration: number,
+        ease?: EasingFunction
+    ): Transition;
+    public render(transitionDuration?: 0): Element;
+    public render(transitionDuration = 0, ease?: EasingFunction) {
+        const element = this.getElementWithTransition(
+            this.element,
+            transitionDuration,
+            ease
+        );
+
+        const areaGenerator = d3
+            .area<Record<string, any>>()
+            .x((d) => {
+                const val = this.xAccessor(d);
+                return val != null ? this.convertX(val) : 0;
+            })
+            .y0((d) => {
+                const val = this.y0Accessor(d);
+                return val != null ? this.convertY(val) : 0;
+            })
+            .y1((d) => {
+                const val = this.y1Accessor(d);
+                return val != null ? this.convertY(val) : 0;
+            })
+            .defined((d) => {
+                const x = this.xAccessor(d);
+                const y0 = this.y0Accessor(d);
+                const y1 = this.y1Accessor(d);
+                return (
+                    x != null &&
+                    y0 != null &&
+                    y1 != null &&
+                    !isNaN(x) &&
+                    !isNaN(y0) &&
+                    !isNaN(y1)
+                );
+            })
+            .curve(this.options.curve);
+
+        return (this.applyCommonStyles(element) as any).attr(
+            'd',
+            areaGenerator(this.dataPoints)
+        );
+    }
+}
+
 export interface ContourPrimitiveOptions {
     thresholds?: number | number[];
     colorScale?: d3.ScaleSequential<string, never> | ((t: number) => string);
@@ -1417,6 +1502,7 @@ export const PrimitiveInfoMap = new Map<PrimitiveConstructor, PrimitiveInfo>([
     [RectanglePrimitive, { isBatch: false, svgElementType: 'rect' }],
     [TextPrimitive, { isBatch: false, svgElementType: 'text' }],
     [PathPrimitive, { isBatch: false, svgElementType: 'path' }],
+    [AreaPrimitive, { isBatch: false, svgElementType: 'path' }],
     [ContourPrimitive, { isBatch: false, svgElementType: 'g' }],
     [ImagePrimitive, { isBatch: false, svgElementType: 'image' }],
     [BatchPointsPrimitive, { isBatch: true, svgElementType: 'g' }],

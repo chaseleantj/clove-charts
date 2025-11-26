@@ -57,12 +57,6 @@ class BaseLinePlot<
 
     shouldInitializeChart(): boolean {
         if (this.props.data.length === 0) return false;
-        if (!this.props.yKeys || this.props.yKeys.length === 0) {
-            console.warn(
-                "BaseLinePlot: Must provide 'yKeys' as an array of keys"
-            );
-            return false;
-        }
         return true;
     }
 

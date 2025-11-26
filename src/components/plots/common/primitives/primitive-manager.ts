@@ -13,6 +13,8 @@ import {
     TextPrimitiveOptions,
     PathPrimitive,
     PathPrimitiveOptions,
+    AreaPrimitive,
+    AreaPrimitiveOptions,
     ContourPrimitive,
     ContourPrimitiveOptions,
     ImagePrimitive,
@@ -235,6 +237,38 @@ class PrimitiveManager {
         }
 
         return path;
+    }
+
+    addArea(
+        dataPoints: Record<string, any>[],
+        xAccessor: (d: Record<string, any>) => number | null | undefined,
+        y0Accessor: (d: Record<string, any>) => number | null | undefined,
+        y1Accessor: (d: Record<string, any>) => number | null | undefined,
+        options: AreaPrimitiveOptions & PrimitiveConfig = {}
+    ): AreaPrimitive {
+        options = {
+            fill: DEFAULT_PRIMITIVE_CONFIG.fill,
+            stroke: 'none',
+            opacity: 0.5,
+            curve: d3.curveLinear,
+            ...options,
+        };
+
+        const area = this.addPrimitive(AreaPrimitive, options);
+
+        area.setData(dataPoints)
+            .setCoordinateAccessors(xAccessor, y0Accessor, y1Accessor)
+            .render();
+
+        if (area.options.coordinateSystem === 'data') {
+            area.createUpdateFunction(function () {
+                area.setData(dataPoints)
+                    .setCoordinateAccessors(xAccessor, y0Accessor, y1Accessor)
+                    .render(this.config.themeConfig.transitionDuration);
+            });
+        }
+
+        return area;
     }
 
     addRectangle(
