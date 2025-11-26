@@ -113,13 +113,10 @@ class ScaleManager {
     public getColorScale(
         domain: string[] | [Date, Date] | [number, number],
         colorScheme?: readonly string[] | ((t: number) => string)
-    ):
-        | d3.ScaleSequential<string, never>
-        | d3.ScaleOrdinal<string, string>
-        {
-
+    ): d3.ScaleSequential<string, never> | d3.ScaleOrdinal<string, string> {
         if (isStringArray(domain)) {
-            const colorRange = (colorScheme ?? this.colorConfig.categoricalColorScheme) as string[];
+            const colorRange = (colorScheme ??
+                this.colorConfig.categoricalColorScheme) as string[];
 
             return d3
                 .scaleOrdinal<string, string>()

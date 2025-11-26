@@ -48,10 +48,13 @@ export default function TestImageChart() {
             </ChartPlotWrapper>
             <ChartFooter>
                 <ChartCaptions>
-                    A chart displaying some nature illustrations from this <a href="https://airtable.com/appuuiIPhpJ1rdFJc/shr3GNFCWXWQzJq6O/tbliyo8URaoHAKPvG">library</a>.
+                    A chart displaying some nature illustrations from this{' '}
+                    <a href="https://airtable.com/appuuiIPhpJ1rdFJc/shr3GNFCWXWQzJq6O/tbliyo8URaoHAKPvG">
+                        library
+                    </a>
+                    .
                 </ChartCaptions>
             </ChartFooter>
         </ChartLayout>
     );
 }
-

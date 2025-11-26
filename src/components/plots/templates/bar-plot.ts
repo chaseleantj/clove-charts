@@ -37,7 +37,7 @@ const DEFAULT_BAR_PLOT_CONFIG: BarPlotConfig = {
 };
 
 export function getBarPlotConfig<TData extends Record<string, any>>(
-    props: BarPlotProps<TData>,
+    props: BarPlotProps<TData>
 ): BarPlotConfig {
     return {
         padding: props.padding ?? DEFAULT_BAR_PLOT_CONFIG.padding,
@@ -59,22 +59,24 @@ class BaseBarPlot<
     constructor(props: BarPlotProps<TData>) {
         super(props);
     }
-    
+
     onInitializeProperties(): void {
         this.barPlotConfig = getBarPlotConfig(this.props);
     }
 
     protected configureDomainAndScales(): void {
-
         const minValue = this.config.scaleConfig.logY ? 1 : 0;
-        
+
         this.domain = {
             x: this.getDefaultDomainX() as string[],
-            y: (this.config.domainConfig.domainY as [number, number]) ?? [minValue, this.getDefaultDomainY()[1]]
-        }
+            y: (this.config.domainConfig.domainY as [number, number]) ?? [
+                minValue,
+                this.getDefaultDomainY()[1],
+            ],
+        };
 
         const padding = this.props.padding ?? this.barPlotConfig.padding;
-        
+
         this.scale = {
             x: d3
                 .scaleBand()
@@ -82,18 +84,23 @@ class BaseBarPlot<
                 .range([0, this.plotWidth])
                 .paddingInner(padding)
                 .paddingOuter(padding),
-            y: this.getDefaultScaleY() as BarPlotScale['y']
-        }
-        
+            y: this.getDefaultScaleY() as BarPlotScale['y'],
+        };
+
         if (this.barPlotConfig.useDifferentColors) {
-            const xValues = this.props.data.map((d) => d[this.props.xClass]) as string[];
-            const categoryDomain = this.domainManager.getDomain(xValues) as string[];
-            this.scale.color = this.scaleManager.getColorScale(categoryDomain) as d3.ScaleOrdinal<string, string>;
+            const xValues = this.props.data.map(
+                (d) => d[this.props.xClass]
+            ) as string[];
+            const categoryDomain = this.domainManager.getDomain(
+                xValues
+            ) as string[];
+            this.scale.color = this.scaleManager.getColorScale(
+                categoryDomain
+            ) as d3.ScaleOrdinal<string, string>;
         }
     }
 
     draw() {
-
         const fillOption =
             typeof this.scale.color === 'function'
                 ? (d: Record<string, any>) =>
@@ -104,10 +111,8 @@ class BaseBarPlot<
 
         this.primitiveManager.addRectangles(
             this.props.data,
-            (d: Record<string, any>) =>
-                this.scale.x(d[this.props.xClass]),
-            (d: Record<string, any>) =>
-                this.scale.y(d[this.props.yClass]),
+            (d: Record<string, any>) => this.scale.x(d[this.props.xClass]),
+            (d: Record<string, any>) => this.scale.y(d[this.props.yClass]),
             (d: Record<string, any>) =>
                 (this.scale.x(d[this.props.xClass]) as number) +
                 this.scale.x.bandwidth(),

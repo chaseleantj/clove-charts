@@ -14,9 +14,9 @@ export interface MatrixPlotConfig {
 }
 
 export interface MatrixPlotProps<
-TData extends Record<string, any> = Record<string, any>,
+    TData extends Record<string, any> = Record<string, any>,
 > extends BasePlotProps<TData>,
-Partial<MatrixPlotConfig> {
+        Partial<MatrixPlotConfig> {
     data: TData[];
     xClass: DataKey<TData>;
     yClass: DataKey<TData>;
@@ -32,10 +32,8 @@ export interface MatrixPlotDomain {
 interface MatrixPlotScale extends Scale {
     x: d3.ScaleBand<string>;
     y: d3.ScaleBand<string>;
-    color?:
-        | d3.ScaleSequential<string, never>
-        | d3.ScaleOrdinal<string, string>
-        // | string;
+    color?: d3.ScaleSequential<string, never> | d3.ScaleOrdinal<string, string>;
+    // | string;
 }
 
 export const DEFAULT_MATRIX_PLOT_CONFIG: Partial<MatrixPlotConfig> = {
@@ -73,7 +71,6 @@ class BaseMatrixPlot<
     }
 
     protected configureDomainAndScales(): void {
-
         this.domain = this.getDefaultDomain() as MatrixPlotDomain;
 
         const data = (this.props.data ?? []) as DataRecord[];
@@ -93,14 +90,13 @@ class BaseMatrixPlot<
                 .range([0, this.plotHeight])
                 .paddingInner(this.matrixPlotConfig.padding)
                 .paddingOuter(this.matrixPlotConfig.padding),
-            color: this.scaleManager.getColorScale(this.domain.color)
-        }
+            color: this.scaleManager.getColorScale(this.domain.color),
+        };
     }
 
     draw() {
-
         const colorKey = this.props.valueClass;
-        
+
         this.primitiveManager.addRectangles(
             this.props.data,
             (d) => this.scale.x(d[this.props.xClass]),
@@ -114,9 +110,7 @@ class BaseMatrixPlot<
             {
                 fill: (d) =>
                     this.scale.color && colorKey
-                        ? this.scale.color(
-                              d[colorKey]
-                          )
+                        ? this.scale.color(d[colorKey])
                         : this.config.colorConfig.defaultColor,
                 coordinateSystem: 'pixel',
                 opacity: this.config.themeConfig.opacity,
@@ -148,7 +142,9 @@ class BaseMatrixPlot<
     }
 
     drawLegend() {
-        this.legendManager.setTitle(this.config.legendConfig.title ?? this.props.valueClass);
+        this.legendManager.setTitle(
+            this.config.legendConfig.title ?? this.props.valueClass
+        );
 
         if (this.scale.color) {
             this.legendManager.addLegend(this.scale.color, 'rect');
@@ -157,4 +153,3 @@ class BaseMatrixPlot<
 }
 
 export default BaseMatrixPlot;
-

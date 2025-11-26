@@ -1,7 +1,5 @@
 import * as d3 from 'd3';
-import {
-    AxisConfig,
-} from '@/components/plots/common/config';
+import { AxisConfig } from '@/components/plots/common/config';
 import styles from '@/components/page.module.css';
 import {
     isDateArray,
@@ -57,7 +55,8 @@ class AxisManager {
             .ticks(this.axisConfig.tickCount)
             .tickSize(this.axisConfig.tickSize);
 
-        const formatter = this.axisConfig.tickFormatX || this.getFormatter(scale);
+        const formatter =
+            this.axisConfig.tickFormatX || this.getFormatter(scale);
         xAxis = formatter ? xAxis.tickFormat(formatter) : xAxis;
 
         this.x = this.axisGroup
@@ -73,7 +72,8 @@ class AxisManager {
             .ticks(this.axisConfig.tickCount)
             .tickSize(this.axisConfig.tickSize);
 
-        const formatter = this.axisConfig.tickFormatY || this.getFormatter(scale);
+        const formatter =
+            this.axisConfig.tickFormatY || this.getFormatter(scale);
         yAxis = formatter ? yAxis.tickFormat(formatter) : yAxis;
 
         this.y = this.axisGroup
@@ -143,7 +143,8 @@ class AxisManager {
             .ticks(this.axisConfig.tickCount)
             .tickSize(this.axisConfig.tickSize);
 
-        const formatter = this.axisConfig.tickFormatX || this.getFormatter(scale);
+        const formatter =
+            this.axisConfig.tickFormatX || this.getFormatter(scale);
         if (formatter) {
             xAxis = xAxis.tickFormat(formatter);
         }
@@ -157,7 +158,8 @@ class AxisManager {
             .ticks(this.axisConfig.tickCount)
             .tickSize(this.axisConfig.tickSize);
 
-        const formatter = this.axisConfig.tickFormatY || this.getFormatter(scale);
+        const formatter =
+            this.axisConfig.tickFormatY || this.getFormatter(scale);
         if (formatter) {
             yAxis = yAxis.tickFormat(formatter);
         }

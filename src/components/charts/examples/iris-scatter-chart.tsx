@@ -26,7 +26,11 @@ interface IrisData {
 const PLOT_CONFIG: PlotConfig = {
     themeConfig: { enableZoom: true },
     // scaleConfig: {logY: true},
-    axisConfig: { xLabel: 'Sepal width (cm)', yLabel: 'Petal length (cm)', showGrid: true},
+    axisConfig: {
+        xLabel: 'Sepal width (cm)',
+        yLabel: 'Petal length (cm)',
+        showGrid: true,
+    },
     margin: { right: 80 },
 };
 
@@ -38,10 +42,7 @@ export default function IrisScatterChart() {
     useEffect(() => {
         async function fetchData(): Promise<void> {
             try {
-                d3.csv(
-                    '/data/iris.csv',
-                    d3.autoType
-                ).then((data) => {
+                d3.csv('/data/iris.csv', d3.autoType).then((data) => {
                     setIrisData(data as IrisData[]);
                 });
             } catch (error) {

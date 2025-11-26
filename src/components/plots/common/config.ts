@@ -43,8 +43,14 @@ export interface AxisConfig {
     yLabel?: string | null;
     tickCount?: number;
     tickSize?: number;
-    tickFormatX?: ((domainValue: any, index: number) => string) | ((domainValue: any) => string) | null;
-    tickFormatY?: ((domainValue: any, index: number) => string) | ((domainValue: any) => string) | null;
+    tickFormatX?:
+        | ((domainValue: any, index: number) => string)
+        | ((domainValue: any) => string)
+        | null;
+    tickFormatY?:
+        | ((domainValue: any, index: number) => string)
+        | ((domainValue: any) => string)
+        | null;
     defaultStringFormat?: (domainValue: string) => string;
     defaultNumberFormat?: (domainValue: number) => string;
     labelOffsetX?: number;
@@ -184,8 +190,8 @@ export const DEFAULT_AXIS_CONFIG: Required<AxisConfig> = {
     tickSize: 6,
     tickFormatX: null,
     tickFormatY: null,
-    defaultStringFormat: d => d,
-    defaultNumberFormat: d => {
+    defaultStringFormat: (d) => d,
+    defaultNumberFormat: (d) => {
         if (d === 0) {
             return '0';
         } else if (Math.abs(d) >= 1000) {

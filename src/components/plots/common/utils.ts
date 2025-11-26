@@ -54,7 +54,7 @@ export function renderKatex(
         // If the user sets angle to 0, it might not clear a previous rotation.
         // However, existing code checked `if (angle)`.
         if (angle === 0) {
-             (element as any).attr('transform', null);
+            (element as any).attr('transform', null);
         }
     }
 
@@ -77,9 +77,7 @@ export function renderKatex(
 
         // Only set the dimensions afterwards, once the width and height are measured accurately
         // Use selection to set width/height instantly (snap)
-        selection
-            .attr('width', width)
-            .attr('height', height);
+        selection.attr('width', width).attr('height', height);
     });
     return element;
 }

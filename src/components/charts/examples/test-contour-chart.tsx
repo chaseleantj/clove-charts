@@ -41,7 +41,7 @@ export default function TestContourChart() {
                     func={f}
                     thresholds={20}
                     // shadeContour={false}
-                    strokeColor='none'
+                    strokeColor="none"
                     legendConfig={legendConfig}
                     tooltipConfig={tooltipConfig}
                     {...PLOT_CONFIG}
@@ -49,7 +49,8 @@ export default function TestContourChart() {
             </ChartPlotWrapper>
             <ChartFooter>
                 <ChartCaptions>
-                    A contour plot of the function <InlineMath math="\cos(2 \pi xy) + \sin(2 \pi x + y))" />.
+                    A contour plot of the function{' '}
+                    <InlineMath math="\cos(2 \pi xy) + \sin(2 \pi x + y))" />.
                 </ChartCaptions>
             </ChartFooter>
         </ChartLayout>

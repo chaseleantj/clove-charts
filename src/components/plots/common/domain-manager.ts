@@ -15,7 +15,10 @@ class DomainManager {
         private readonly scaleConfig: Required<ScaleConfig>
     ) {}
 
-    getDomain(values: DataValue[], padding = 0): string[] | [number, number] | [Date, Date] {
+    getDomain(
+        values: DataValue[],
+        padding = 0
+    ): string[] | [number, number] | [Date, Date] {
         const cleanValues = values.filter(isDefined);
 
         if (cleanValues.length === 0) {
@@ -39,7 +42,9 @@ class DomainManager {
         return [0, 1];
     }
 
-    getDomainX(values?: DataValue[]): string[] | [number, number] | [Date, Date] {
+    getDomainX(
+        values?: DataValue[]
+    ): string[] | [number, number] | [Date, Date] {
         if (this.domainConfig.domainX) {
             return this.domainConfig.domainX;
         }
@@ -52,7 +57,9 @@ class DomainManager {
         return this.getDomain(values, padding);
     }
 
-    getDomainY(values?: DataValue[]): string[] | [number, number] | [Date, Date] {
+    getDomainY(
+        values?: DataValue[]
+    ): string[] | [number, number] | [Date, Date] {
         if (this.domainConfig.domainY) {
             return this.domainConfig.domainY;
         }
@@ -80,7 +87,10 @@ class DomainManager {
         ];
     }
 
-    private getNumberDomain(values: number[], padding: number): [number, number] {
+    private getNumberDomain(
+        values: number[],
+        padding: number
+    ): [number, number] {
         const [minValue, maxValue] = d3.extent(values) as [number, number];
 
         if (

@@ -23,7 +23,7 @@ export interface ContourPlotProps
 interface ContourPlotDomain {
     x: [number, number];
     y: [number, number];
-    color?: [number, number]
+    color?: [number, number];
 }
 
 interface ContourPlotScale extends Scale {
@@ -72,7 +72,7 @@ class BaseContourPlot extends BasePlot {
         this.xRange = [];
         this.yRange = [];
     }
-    
+
     onInitializeProperties(): void {
         this.contourPlotConfig = getContourPlotConfig(this.props);
     }
@@ -80,9 +80,9 @@ class BaseContourPlot extends BasePlot {
     protected configureDomainAndScales(): void {
         this.domain = {
             x: this.domainManager.getDomainX() as [number, number],
-            y: this.domainManager.getDomainY() as [number, number]
+            y: this.domainManager.getDomainY() as [number, number],
         };
-        
+
         this.scale = this.getDefaultScales();
 
         // Calculate padding equal to one threshold step
@@ -115,19 +115,27 @@ class BaseContourPlot extends BasePlot {
         }
 
         if (this.contourPlotConfig.shadeContour) {
-            this.domain.color = this.domainManager.getDomain(this.fValues) as [number, number];
-            this.scale.color = this.scaleManager.getColorScale(this.domain.color,
+            this.domain.color = this.domainManager.getDomain(this.fValues) as [
+                number,
+                number,
+            ];
+            this.scale.color = this.scaleManager.getColorScale(
+                this.domain.color
             ) as d3.ScaleSequential<string, never>;
         }
-
     }
 
     draw() {
-        this.primitiveManager.addContour(this.fValues, this.xRange, this.yRange, {
-            colorScale: this.scale.color ?? undefined,
-            thresholds: this.contourPlotConfig.thresholds,
-            stroke: this.contourPlotConfig.strokeColor,
-        });
+        this.primitiveManager.addContour(
+            this.fValues,
+            this.xRange,
+            this.yRange,
+            {
+                colorScale: this.scale.color ?? undefined,
+                thresholds: this.contourPlotConfig.thresholds,
+                stroke: this.contourPlotConfig.strokeColor,
+            }
+        );
     }
 
     drawLegend() {

@@ -37,14 +37,15 @@ interface ScatterPlotDomain {
 }
 
 interface ScatterPlotScale extends Scale {
-    color?:
-        | d3.ScaleSequential<string, never>
-        | d3.ScaleOrdinal<string, string>
+    color?: d3.ScaleSequential<string, never> | d3.ScaleOrdinal<string, string>;
 }
 
-export const DEFAULT_SCATTER_PLOT_CONFIG: Omit<ScatterPlotConfig, "pointOpacity" | "colorByClass"> = {
+export const DEFAULT_SCATTER_PLOT_CONFIG: Omit<
+    ScatterPlotConfig,
+    'pointOpacity' | 'colorByClass'
+> = {
     pointSize: 50,
-    symbolType: d3.symbolCircle
+    symbolType: d3.symbolCircle,
 };
 
 export function getScatterPlotConfig<TData extends Record<string, any>>(
@@ -55,7 +56,7 @@ export function getScatterPlotConfig<TData extends Record<string, any>>(
         pointSize: props.pointSize ?? DEFAULT_SCATTER_PLOT_CONFIG.pointSize,
         colorByClass: props.colorByClass ?? null,
         pointOpacity: props.pointOpacity ?? themeConfig.opacity,
-        symbolType: props.symbolType ?? DEFAULT_SCATTER_PLOT_CONFIG.symbolType
+        symbolType: props.symbolType ?? DEFAULT_SCATTER_PLOT_CONFIG.symbolType,
     };
 }
 
@@ -131,11 +132,11 @@ class BaseScatterPlot<
         const fillOption =
             typeof this.scale.color === 'function' && colorByClass
                 ? (d: Record<string, any>) =>
-                      (this.scale.color as
-                          | d3.ScaleSequential<string, never>
-                          | d3.ScaleOrdinal<string, string>)(
-                          d[colorByClass]
-                      )
+                      (
+                          this.scale.color as
+                              | d3.ScaleSequential<string, never>
+                              | d3.ScaleOrdinal<string, string>
+                      )(d[colorByClass])
                 : this.config.colorConfig.defaultColor;
 
         this.dataPoints = this.primitiveManager.addPoints(

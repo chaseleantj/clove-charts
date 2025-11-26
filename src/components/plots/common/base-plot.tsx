@@ -130,7 +130,7 @@ abstract class BasePlot<
         }
 
         this.config = getPlotConfig(this.props);
-        
+
         if (this.shouldInitializeChart()) {
             this.initializeChart();
         } else {
@@ -221,25 +221,31 @@ abstract class BasePlot<
     }
 
     private setupPrimitives(): void {
-        this.primitiveManager = new PrimitiveManager(this as BasePlot<DataRecord>);
+        this.primitiveManager = new PrimitiveManager(
+            this as BasePlot<DataRecord>
+        );
     }
 
     getDefaultDomainX(): Domain['x'] {
         const data = (this.props.data ?? []) as DataRecord[];
-        const xValues = this.props.xClass ? data.map((d) => d[this.props.xClass!]) : [];
-        return this.domainManager.getDomainX(xValues)
-    }   
+        const xValues = this.props.xClass
+            ? data.map((d) => d[this.props.xClass!])
+            : [];
+        return this.domainManager.getDomainX(xValues);
+    }
 
     getDefaultDomainY(): Domain['y'] {
         const data = (this.props.data ?? []) as DataRecord[];
-        const yValues = this.props.yClass ? data.map((d) => d[this.props.yClass!]) : [];
-        return this.domainManager.getDomainY(yValues)
-    }   
-    
+        const yValues = this.props.yClass
+            ? data.map((d) => d[this.props.yClass!])
+            : [];
+        return this.domainManager.getDomainY(yValues);
+    }
+
     getDefaultDomain(): Domain {
         return {
             x: this.getDefaultDomainX(),
-            y: this.getDefaultDomainY()
+            y: this.getDefaultDomainY(),
         };
     }
 
@@ -254,10 +260,10 @@ abstract class BasePlot<
     getDefaultScales(): Scale {
         return {
             x: this.getDefaultScaleX(),
-            y: this.getDefaultScaleY()
-        }
+            y: this.getDefaultScaleY(),
+        };
     }
-    
+
     protected configureDomainAndScales(): void {
         this.domain = this.getDefaultDomain();
         this.scale = this.getDefaultScales();
@@ -271,7 +277,7 @@ abstract class BasePlot<
 
         this.scaleManager = new ScaleManager(
             this.config.scaleConfig,
-            this.config.colorConfig,
+            this.config.colorConfig
         );
         this.configureDomainAndScales();
     }
@@ -533,7 +539,6 @@ abstract class BasePlot<
         this.onCleanup();
     }
 
-    
     // Main drawing method
     drawChart(): void {
         try {
@@ -551,7 +556,7 @@ abstract class BasePlot<
             this.cleanup();
         }
     }
-    
+
     // Required hook - to plot objects on the screen
     abstract draw(): void;
 

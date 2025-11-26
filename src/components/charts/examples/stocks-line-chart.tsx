@@ -27,7 +27,12 @@ interface StockData {
 const PLOT_CONFIG: PlotConfig = {
     themeConfig: { enableZoom: true },
     domainConfig: { domainY: [0, 350] },
-    axisConfig: { xLabel: 'Date', yLabel: 'Price', showGrid: true, tickFormatY: (domainValue: number) => '$' + String(domainValue) },
+    axisConfig: {
+        xLabel: 'Date',
+        yLabel: 'Price',
+        showGrid: true,
+        tickFormatY: (domainValue: number) => '$' + String(domainValue),
+    },
     margin: { left: 60, right: 80 },
 };
 
@@ -39,10 +44,7 @@ export default function StocksLineChart() {
     useEffect(() => {
         async function fetchData(): Promise<void> {
             try {
-                d3.csv(
-                    '/data/stocks.csv',
-                    d3.autoType
-                ).then((data) => {
+                d3.csv('/data/stocks.csv', d3.autoType).then((data) => {
                     const parsedData = data as StockData[];
                     const filteredData = parsedData.filter((d) => {
                         return d.Date && d.Date.getFullYear() >= 2010;
@@ -79,4 +81,3 @@ export default function StocksLineChart() {
         </ChartLayout>
     );
 }
-

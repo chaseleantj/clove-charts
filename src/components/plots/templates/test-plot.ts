@@ -24,7 +24,7 @@ class BaseTestPlot extends BasePlot {
             fontSize: 12,
             fill: 'steelblue',
             // fontFamily: 'Times New Roman',
-            latex: true
+            latex: true,
         });
 
         // point
@@ -43,10 +43,7 @@ class BaseTestPlot extends BasePlot {
 
         line.setCoords(4, 2, 3, 7).render(5000);
 
-        text.setCoords(4, 5)
-            .setAngle(30)
-            .setStyles({ fontSize: 30 })
-            .render()
+        text.setCoords(4, 5).setAngle(30).setStyles({ fontSize: 30 }).render();
         //     .render(5000);
 
         point.setStyles({

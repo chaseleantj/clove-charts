@@ -46,21 +46,18 @@ class BaseImagePlot<
     constructor(props: ImagePlotProps<TData>) {
         super(props);
     }
-    
+
     onInitializeProperties(): void {
         this.imagePlotConfig = getImagePlotConfig(this.props);
     }
 
     draw() {
-
         this.props.data.forEach((d) => {
-
             this.primitiveManager.addImage(d[this.props.imageURLClass], {
                 coords: d[this.props.coordsClass],
                 width: d[this.props.widthClass],
                 useCornerCoords: this.imagePlotConfig.useCornerCoords,
             });
-
         });
     }
 }

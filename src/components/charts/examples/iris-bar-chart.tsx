@@ -35,10 +35,7 @@ export default function IrisBarChart() {
     useEffect(() => {
         async function fetchData(): Promise<void> {
             try {
-                d3.csv(
-                    '/data/iris.csv',
-                    d3.autoType
-                ).then((data) => {
+                d3.csv('/data/iris.csv', d3.autoType).then((data) => {
                     setIrisData(data as IrisData[]);
                 });
             } catch (error) {

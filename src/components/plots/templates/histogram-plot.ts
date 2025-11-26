@@ -1,6 +1,9 @@
 import * as d3 from 'd3';
 
-import BasePlot, { BasePlotProps, DataKey } from '@/components/plots/common/base-plot';
+import BasePlot, {
+    BasePlotProps,
+    DataKey,
+} from '@/components/plots/common/base-plot';
 import ScaleManager from '@/components/plots/common/scale-manager';
 
 export interface HistogramPlotConfig {
@@ -11,8 +14,9 @@ export const DEFAULT_HISTOGRAM_PLOT_CONFIG: HistogramPlotConfig = {
     numBins: 20,
 };
 
-interface HistogramPlotProps<TData extends Record<string, any> = Record<string, any>>
-    extends Omit<BasePlotProps<TData>, 'yClass'>,
+interface HistogramPlotProps<
+    TData extends Record<string, any> = Record<string, any>,
+> extends Omit<BasePlotProps<TData>, 'yClass'>,
         Partial<HistogramPlotConfig> {
     data: TData[];
     xClass: DataKey<TData>;
@@ -34,7 +38,7 @@ export function getHistogramPlotConfig<TData extends Record<string, any>>(
 class BaseHistogramPlot<
     TData extends Record<string, any> = Record<string, any>,
 > extends BasePlot<TData> {
-    bins!: d3.Bin<number, number>[];
+    bins: d3.Bin<number, number>[];
     declare domain: HistogramPlotDomain;
     declare props: HistogramPlotProps<TData>;
 
@@ -44,11 +48,11 @@ class BaseHistogramPlot<
         super(props);
         this.bins = [];
     }
-    
+
     shouldInitializeChart(): boolean {
         return this.props.data.length > 0;
     }
-    
+
     onInitializeProperties(): void {
         this.histogramPlotConfig = getHistogramPlotConfig(this.props);
     }
@@ -61,7 +65,7 @@ class BaseHistogramPlot<
                 Math.log10(this.domain.x[1]),
             ];
         }
-        
+
         const scaleX = this.scaleManager.getScale(
             domainX,
             [0, this.plotWidth],
@@ -70,12 +74,11 @@ class BaseHistogramPlot<
             this.config.scaleConfig.formatNiceX
         );
 
-        const numBins = this.histogramPlotConfig.numBins;
         const histogramGenerator = d3
             .bin()
             .domain(scaleX.domain() as [number, number])
-            .thresholds(scaleX.ticks(numBins));
-    
+            .thresholds(scaleX.ticks(this.histogramPlotConfig.numBins));
+
         const data: number[] = this.props.data.map((d: Record<string, any>) => {
             return this.config.scaleConfig.logX
                 ? Math.log10(d[this.props.xClass])
@@ -88,7 +91,7 @@ class BaseHistogramPlot<
         let domainY = this.config.scaleConfig.logY
             ? [1, Math.max(1, yMax)]
             : [0, yMax];
-    
+
         const scaleY = this.scaleManager.getScale(
             domainY as [number, number],
             [this.plotHeight, 0],
@@ -98,18 +101,16 @@ class BaseHistogramPlot<
 
         this.domain = {
             x: domainX as [number, number],
-            y: domainY as [number, number]
-        }
+            y: domainY as [number, number],
+        };
 
         this.scale = {
             x: scaleX,
-            y: scaleY
-        }
-
+            y: scaleY,
+        };
     }
 
     draw() {
-
         const data = this.bins
             .filter((binData) => binData.length > 0)
             .map((binData) => {

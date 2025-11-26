@@ -29,9 +29,7 @@ export interface LinePlotProps<
 }
 
 interface LinePlotScale extends Scale {
-    color?:
-        | d3.ScaleOrdinal<string, string>
-        | d3.ScaleSequential<string, never>
+    color?: d3.ScaleOrdinal<string, string> | d3.ScaleSequential<string, never>;
 }
 
 export const DEFAULT_LINE_PLOT_CONFIG: LinePlotConfig = {
@@ -88,21 +86,23 @@ class BaseLinePlot<
     }
 
     protected configureDomainAndScales(): void {
-        const xValues = this.props.xClass ? this.props.data.map((d) => d[this.props.xClass]) : [];
-        const yValues = this.props.yClass
-            .flatMap((yClass) => this.props.data.map((d) => d[yClass]));
+        const xValues = this.props.xClass
+            ? this.props.data.map((d) => d[this.props.xClass])
+            : [];
+        const yValues = this.props.yClass.flatMap((yClass) =>
+            this.props.data.map((d) => d[yClass])
+        );
 
         this.domain = {
             x: this.domainManager.getDomainX(xValues),
-            y: this.domainManager.getDomainY(yValues)
-        }
+            y: this.domainManager.getDomainY(yValues),
+        };
 
         this.scale = {
             x: this.getDefaultScaleX(),
             y: this.getDefaultScaleY(),
-            color: this.scaleManager.getColorScale(this.props.yClass)
-        }
-        
+            color: this.scaleManager.getColorScale(this.props.yClass),
+        };
     }
 
     draw(): void {
@@ -203,7 +203,7 @@ class BaseLinePlot<
     locateNearestDataPoint(event: any, className: string) {
         const bisectCenter = d3.bisector((d: any) => d[className]).center;
         const xPos = d3.pointer(event, this.plot.node())[0];
-        
+
         if (!isContinuousScale(this.scale.x)) {
             return 0;
         }
@@ -277,4 +277,3 @@ class BaseLinePlot<
 }
 
 export default BaseLinePlot;
-

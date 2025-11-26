@@ -35,7 +35,7 @@ for (const x of xLabels) {
 }
 
 export default function TestMatrixPlotChart() {
-    const { legendRef, legendConfig } = useChartLegend({title: "Values"});
+    const { legendRef, legendConfig } = useChartLegend({ title: 'Values' });
     const { tooltipRef, tooltipConfig } = useChartTooltip();
 
     return (
@@ -54,11 +54,8 @@ export default function TestMatrixPlotChart() {
                 />
             </ChartPlotWrapper>
             <ChartFooter>
-                <ChartCaptions>
-                    A random matrix plot example.
-                </ChartCaptions>
+                <ChartCaptions>A random matrix plot example.</ChartCaptions>
             </ChartFooter>
         </ChartLayout>
     );
 }
-
