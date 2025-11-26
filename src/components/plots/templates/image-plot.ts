@@ -2,6 +2,7 @@ import BasePlot, {
     BasePlotProps,
     DataKey,
 } from '@/components/plots/common/base-plot';
+import { mergeWithDefaults } from '@/components/plots/common/template-config';
 
 export interface ImagePlotConfig {
     useCornerCoords: boolean;
@@ -26,15 +27,6 @@ export const DEFAULT_IMAGE_PLOT_CONFIG: ImagePlotConfig = {
     useCornerCoords: false,
 };
 
-export function getImagePlotConfig<TData extends Record<string, any>>(
-    props: ImagePlotProps<TData>
-): ImagePlotConfig {
-    return {
-        useCornerCoords:
-            props.useCornerCoords ?? DEFAULT_IMAGE_PLOT_CONFIG.useCornerCoords,
-    };
-}
-
 class BaseImagePlot<
     TData extends Record<string, any> = Record<string, any>,
 > extends BasePlot<TData> {
@@ -48,7 +40,10 @@ class BaseImagePlot<
     }
 
     onInitializeProperties(): void {
-        this.imagePlotConfig = getImagePlotConfig(this.props);
+        this.imagePlotConfig = mergeWithDefaults(
+            DEFAULT_IMAGE_PLOT_CONFIG,
+            this.props
+        );
     }
 
     draw() {

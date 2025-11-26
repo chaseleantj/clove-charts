@@ -4,6 +4,7 @@ import BasePlot, {
     BasePlotProps,
     Scale,
 } from '@/components/plots/common/base-plot';
+import { mergeWithDefaults } from '@/components/plots/common/template-config';
 
 export interface ContourPlotConfig {
     func: (x: number, y: number) => number;
@@ -38,23 +39,6 @@ export const DEFAULT_CONTOUR_PLOT_CONFIG: Omit<ContourPlotConfig, 'func'> = {
     shadeContour: true,
 };
 
-export function getContourPlotConfig(
-    props: ContourPlotProps
-): ContourPlotConfig {
-    return {
-        func: props.func,
-        resolutionX:
-            props.resolutionX ?? DEFAULT_CONTOUR_PLOT_CONFIG.resolutionX,
-        resolutionY:
-            props.resolutionY ?? DEFAULT_CONTOUR_PLOT_CONFIG.resolutionY,
-        thresholds: props.thresholds ?? DEFAULT_CONTOUR_PLOT_CONFIG.thresholds,
-        strokeColor:
-            props.strokeColor ?? DEFAULT_CONTOUR_PLOT_CONFIG.strokeColor,
-        shadeContour:
-            props.shadeContour ?? DEFAULT_CONTOUR_PLOT_CONFIG.shadeContour,
-    };
-}
-
 class BaseContourPlot extends BasePlot {
     declare domain: ContourPlotDomain;
     declare scale: ContourPlotScale;
@@ -67,14 +51,21 @@ class BaseContourPlot extends BasePlot {
 
     constructor(props: ContourPlotProps) {
         super(props);
-        this.contourPlotConfig = getContourPlotConfig(props);
+        // Initialize with props.func since it's required (has no default)
+        this.contourPlotConfig = {
+            func: props.func,
+            ...mergeWithDefaults(DEFAULT_CONTOUR_PLOT_CONFIG, props),
+        };
         this.fValues = [];
         this.xRange = [];
         this.yRange = [];
     }
 
     onInitializeProperties(): void {
-        this.contourPlotConfig = getContourPlotConfig(this.props);
+        this.contourPlotConfig = {
+            func: this.props.func,
+            ...mergeWithDefaults(DEFAULT_CONTOUR_PLOT_CONFIG, this.props),
+        };
     }
 
     protected configureDomainAndScales(): void {

@@ -4,7 +4,7 @@ import BasePlot, {
     BasePlotProps,
     DataKey,
 } from '@/components/plots/common/base-plot';
-import ScaleManager from '@/components/plots/common/scale-manager';
+import { mergeWithDefaults } from '@/components/plots/common/template-config';
 
 export interface HistogramPlotConfig {
     numBins: number;
@@ -27,14 +27,6 @@ interface HistogramPlotDomain {
     y: [number, number];
 }
 
-export function getHistogramPlotConfig<TData extends Record<string, any>>(
-    props: HistogramPlotProps<TData>
-) {
-    return {
-        numBins: props.numBins ?? DEFAULT_HISTOGRAM_PLOT_CONFIG.numBins,
-    };
-}
-
 class BaseHistogramPlot<
     TData extends Record<string, any> = Record<string, any>,
 > extends BasePlot<TData> {
@@ -54,7 +46,10 @@ class BaseHistogramPlot<
     }
 
     onInitializeProperties(): void {
-        this.histogramPlotConfig = getHistogramPlotConfig(this.props);
+        this.histogramPlotConfig = mergeWithDefaults(
+            DEFAULT_HISTOGRAM_PLOT_CONFIG,
+            this.props
+        );
     }
 
     protected configureDomainAndScales(): void {

@@ -11,6 +11,7 @@ import {
     LinePrimitive,
     PointPrimitive,
 } from '@/components/plots/common/primitives/primitives';
+import { mergeWithDefaults } from '@/components/plots/common/template-config';
 
 export interface LinePlotConfig {
     lineWidth: number;
@@ -25,7 +26,7 @@ export interface LinePlotProps<
         Partial<LinePlotConfig> {
     data: TData[];
     xKey: DataKey<TData>;
-    yKey: DataKey<TData>[];
+    yKeys: DataKey<TData>[];
 }
 
 interface LinePlotScale extends Scale {
@@ -39,23 +40,9 @@ export const DEFAULT_LINE_PLOT_CONFIG: LinePlotConfig = {
     lineLabelColor: 'gray',
 };
 
-export function getLinePlotConfig<TData extends Record<string, any>>(
-    props: LinePlotProps<TData>
-): LinePlotConfig {
-    return {
-        lineWidth: props.lineWidth ?? DEFAULT_LINE_PLOT_CONFIG.lineWidth,
-        lineOpacity: props.lineOpacity ?? DEFAULT_LINE_PLOT_CONFIG.lineOpacity,
-        lineLabelWidth:
-            props.lineLabelWidth ?? DEFAULT_LINE_PLOT_CONFIG.lineLabelWidth,
-        lineLabelColor:
-            props.lineLabelColor ?? DEFAULT_LINE_PLOT_CONFIG.lineLabelColor,
-    };
-}
-
 class BaseLinePlot<
     TData extends Record<string, any> = Record<string, any>,
 > extends BasePlot<TData> {
-    // @ts-ignore: Overriding yKey to be an array, which is incompatible with BasePlotProps
     declare props: LinePlotProps<TData>;
     linePlotConfig!: LinePlotConfig;
     declare scale: LinePlotScale;
@@ -65,16 +52,14 @@ class BaseLinePlot<
     pointLabels: Record<string, PointPrimitive> = {};
 
     constructor(props: LinePlotProps<TData>) {
-        // BasePlot expects yKey as single DataKey, but we passed array.
-        // We rely on Omit and type assertion to satisfy TS, and override behavior at runtime.
-        super(props as any);
+        super(props);
     }
 
     shouldInitializeChart(): boolean {
         if (this.props.data.length === 0) return false;
-        if (!this.props.yKey || this.props.yKey.length === 0) {
+        if (!this.props.yKeys || this.props.yKeys.length === 0) {
             console.warn(
-                "BaseLinePlot: Must provide 'yKey' as an array of keys"
+                "BaseLinePlot: Must provide 'yKeys' as an array of keys"
             );
             return false;
         }
@@ -82,14 +67,17 @@ class BaseLinePlot<
     }
 
     onInitializeProperties(): void {
-        this.linePlotConfig = getLinePlotConfig(this.props);
+        this.linePlotConfig = mergeWithDefaults(
+            DEFAULT_LINE_PLOT_CONFIG,
+            this.props
+        );
     }
 
     protected configureDomainAndScales(): void {
         const xValues = this.props.xKey
             ? this.props.data.map((d) => d[this.props.xKey])
             : [];
-        const yValues = this.props.yKey.flatMap((yKey) =>
+        const yValues = this.props.yKeys.flatMap((yKey) =>
             this.props.data.map((d) => d[yKey])
         );
 
@@ -101,12 +89,12 @@ class BaseLinePlot<
         this.scale = {
             x: this.getDefaultScaleX(),
             y: this.getDefaultScaleY(),
-            color: this.scaleManager.getColorScale(this.props.yKey),
+            color: this.scaleManager.getColorScale(this.props.yKeys),
         };
     }
 
     draw(): void {
-        for (let yKey of this.props.yKey) {
+        for (let yKey of this.props.yKeys) {
             const key = yKey as string;
             const colorScale = this.scale.color as d3.ScaleOrdinal<
                 string,
@@ -127,7 +115,7 @@ class BaseLinePlot<
     }
 
     drawLegend(): void {
-        if (this.props.yKey.length > 1) {
+        if (this.props.yKeys.length > 1) {
             this.legendManager.addLegend(
                 this.scale.color as d3.ScaleOrdinal<string, string>,
                 'line',
@@ -153,7 +141,7 @@ class BaseLinePlot<
         this.pointLabels = {};
         const colorScale = this.scale.color as d3.ScaleOrdinal<string, string>;
 
-        for (let yKey of this.props.yKey) {
+        for (let yKey of this.props.yKeys) {
             const key = yKey as string;
             this.pointLabels[key] = this.primitiveManager.addPoint(0, 0, {
                 size: 50,
@@ -187,7 +175,7 @@ class BaseLinePlot<
 
         this.lineLabel.show();
 
-        for (let yKey of this.props.yKey) {
+        for (let yKey of this.props.yKeys) {
             const key = yKey as string;
             if (!isDefined(d[key])) continue;
             const pointLabel = this.pointLabels[key];
@@ -244,7 +232,7 @@ class BaseLinePlot<
                 const tooltipDisplayKeys = this.config.tooltipConfig
                     .tooltipKeys ?? [
                     this.props.xKey as string,
-                    ...(this.props.yKey as string[]),
+                    ...(this.props.yKeys as string[]),
                 ];
 
                 if (d) {

@@ -40,14 +40,14 @@ interface ScatterPlotScale extends Scale {
     color?: d3.ScaleSequential<string, never> | d3.ScaleOrdinal<string, string>;
 }
 
-export const DEFAULT_SCATTER_PLOT_CONFIG: Omit<
-    ScatterPlotConfig,
-    'pointOpacity' | 'colorKey'
-> = {
-    pointSize: 50,
+// For configs with generic function types, keep explicit defaults
+export const DEFAULT_SCATTER_PLOT_CONFIG = {
+    pointSize: 50 as number,
+    colorKey: null,
     symbolType: d3.symbolCircle,
 };
 
+// Generic configs need explicit getConfig functions to preserve type parameters
 export function getScatterPlotConfig<TData extends Record<string, any>>(
     props: ScatterPlotProps<TData>,
     themeConfig: RequiredPlotConfig['themeConfig']

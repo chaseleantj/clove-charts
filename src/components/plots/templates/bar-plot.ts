@@ -2,9 +2,8 @@ import * as d3 from 'd3';
 import BasePlot, {
     BasePlotProps,
     DataKey,
-    DataRecord,
-    Domain,
 } from '@/components/plots/common/base-plot';
+import { mergeWithDefaults } from '@/components/plots/common/template-config';
 
 export interface BarPlotConfig {
     padding: number;
@@ -31,21 +30,10 @@ interface BarPlotDomain {
     y: [number, number];
 }
 
-const DEFAULT_BAR_PLOT_CONFIG: BarPlotConfig = {
+export const DEFAULT_BAR_PLOT_CONFIG: BarPlotConfig = {
     padding: 0.2,
     useDifferentColors: true,
 };
-
-export function getBarPlotConfig<TData extends Record<string, any>>(
-    props: BarPlotProps<TData>
-): BarPlotConfig {
-    return {
-        padding: props.padding ?? DEFAULT_BAR_PLOT_CONFIG.padding,
-        useDifferentColors:
-            props.useDifferentColors ??
-            DEFAULT_BAR_PLOT_CONFIG.useDifferentColors,
-    };
-}
 
 class BaseBarPlot<
     TData extends Record<string, any> = Record<string, any>,
@@ -61,7 +49,10 @@ class BaseBarPlot<
     }
 
     onInitializeProperties(): void {
-        this.barPlotConfig = getBarPlotConfig(this.props);
+        this.barPlotConfig = mergeWithDefaults(
+            DEFAULT_BAR_PLOT_CONFIG,
+            this.props
+        );
     }
 
     protected configureDomainAndScales(): void {
