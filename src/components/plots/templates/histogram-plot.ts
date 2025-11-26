@@ -16,10 +16,10 @@ export const DEFAULT_HISTOGRAM_PLOT_CONFIG: HistogramPlotConfig = {
 
 interface HistogramPlotProps<
     TData extends Record<string, any> = Record<string, any>,
-> extends Omit<BasePlotProps<TData>, 'yClass'>,
+> extends Omit<BasePlotProps<TData>, 'yKey'>,
         Partial<HistogramPlotConfig> {
     data: TData[];
-    xClass: DataKey<TData>;
+    xKey: DataKey<TData>;
 }
 
 interface HistogramPlotDomain {
@@ -81,8 +81,8 @@ class BaseHistogramPlot<
 
         const data: number[] = this.props.data.map((d: Record<string, any>) => {
             return this.config.scaleConfig.logX
-                ? Math.log10(d[this.props.xClass])
-                : d[this.props.xClass];
+                ? Math.log10(d[this.props.xKey])
+                : d[this.props.xKey];
         });
 
         this.bins = histogramGenerator(data);

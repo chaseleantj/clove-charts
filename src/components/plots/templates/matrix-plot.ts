@@ -18,9 +18,9 @@ export interface MatrixPlotProps<
 > extends BasePlotProps<TData>,
         Partial<MatrixPlotConfig> {
     data: TData[];
-    xClass: DataKey<TData>;
-    yClass: DataKey<TData>;
-    valueClass: DataKey<TData>;
+    xKey: DataKey<TData>;
+    yKey: DataKey<TData>;
+    valueKey: DataKey<TData>;
 }
 
 export interface MatrixPlotDomain {
@@ -74,7 +74,7 @@ class BaseMatrixPlot<
         this.domain = this.getDefaultDomain() as MatrixPlotDomain;
 
         const data = (this.props.data ?? []) as DataRecord[];
-        const colorValues = data.map((d) => d[this.props.valueClass]);
+        const colorValues = data.map((d) => d[this.props.valueKey]);
         this.domain.color = this.domainManager.getDomain(colorValues);
 
         this.scale = {
@@ -95,17 +95,17 @@ class BaseMatrixPlot<
     }
 
     draw() {
-        const colorKey = this.props.valueClass;
+        const colorKey = this.props.valueKey;
 
         this.primitiveManager.addRectangles(
             this.props.data,
-            (d) => this.scale.x(d[this.props.xClass]),
-            (d) => this.scale.y(d[this.props.yClass]),
+            (d) => this.scale.x(d[this.props.xKey]),
+            (d) => this.scale.y(d[this.props.yKey]),
             (d) =>
-                (this.scale.x(d[this.props.xClass]) as number) +
+                (this.scale.x(d[this.props.xKey]) as number) +
                 this.scale.x.bandwidth(),
             (d) =>
-                (this.scale.y(d[this.props.yClass]) as number) +
+                (this.scale.y(d[this.props.yKey]) as number) +
                 this.scale.y.bandwidth(),
             {
                 fill: (d) =>
@@ -121,10 +121,10 @@ class BaseMatrixPlot<
             this.primitiveManager.addTexts(
                 this.props.data,
                 (d) =>
-                    (this.scale.x(d[this.props.xClass]) as number) +
+                    (this.scale.x(d[this.props.xKey]) as number) +
                     this.scale.x.bandwidth() / 2,
                 (d) =>
-                    (this.scale.y(d[this.props.yClass]) as number) +
+                    (this.scale.y(d[this.props.yKey]) as number) +
                     this.scale.y.bandwidth() / 2,
                 (d) => {
                     const val = d[colorKey];
@@ -143,7 +143,7 @@ class BaseMatrixPlot<
 
     drawLegend() {
         this.legendManager.setTitle(
-            this.config.legendConfig.title ?? this.props.valueClass
+            this.config.legendConfig.title ?? this.props.valueKey
         );
 
         if (this.scale.color) {

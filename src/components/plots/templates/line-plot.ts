@@ -21,11 +21,11 @@ export interface LinePlotConfig {
 
 export interface LinePlotProps<
     TData extends Record<string, any> = Record<string, any>,
-> extends Omit<BasePlotProps<TData>, 'yClass'>,
+> extends Omit<BasePlotProps<TData>, 'yKey'>,
         Partial<LinePlotConfig> {
     data: TData[];
-    xClass: DataKey<TData>;
-    yClass: DataKey<TData>[];
+    xKey: DataKey<TData>;
+    yKey: DataKey<TData>[];
 }
 
 interface LinePlotScale extends Scale {
@@ -55,7 +55,7 @@ export function getLinePlotConfig<TData extends Record<string, any>>(
 class BaseLinePlot<
     TData extends Record<string, any> = Record<string, any>,
 > extends BasePlot<TData> {
-    // @ts-ignore: Overriding yClass to be an array, which is incompatible with BasePlotProps
+    // @ts-ignore: Overriding yKey to be an array, which is incompatible with BasePlotProps
     declare props: LinePlotProps<TData>;
     linePlotConfig!: LinePlotConfig;
     declare scale: LinePlotScale;
@@ -65,16 +65,16 @@ class BaseLinePlot<
     pointLabels: Record<string, PointPrimitive> = {};
 
     constructor(props: LinePlotProps<TData>) {
-        // BasePlot expects yClass as single DataKey, but we passed array.
+        // BasePlot expects yKey as single DataKey, but we passed array.
         // We rely on Omit and type assertion to satisfy TS, and override behavior at runtime.
         super(props as any);
     }
 
     shouldInitializeChart(): boolean {
         if (this.props.data.length === 0) return false;
-        if (!this.props.yClass || this.props.yClass.length === 0) {
+        if (!this.props.yKey || this.props.yKey.length === 0) {
             console.warn(
-                "BaseLinePlot: Must provide 'yClass' as an array of keys"
+                "BaseLinePlot: Must provide 'yKey' as an array of keys"
             );
             return false;
         }
@@ -86,11 +86,11 @@ class BaseLinePlot<
     }
 
     protected configureDomainAndScales(): void {
-        const xValues = this.props.xClass
-            ? this.props.data.map((d) => d[this.props.xClass])
+        const xValues = this.props.xKey
+            ? this.props.data.map((d) => d[this.props.xKey])
             : [];
-        const yValues = this.props.yClass.flatMap((yClass) =>
-            this.props.data.map((d) => d[yClass])
+        const yValues = this.props.yKey.flatMap((yKey) =>
+            this.props.data.map((d) => d[yKey])
         );
 
         this.domain = {
@@ -101,13 +101,13 @@ class BaseLinePlot<
         this.scale = {
             x: this.getDefaultScaleX(),
             y: this.getDefaultScaleY(),
-            color: this.scaleManager.getColorScale(this.props.yClass),
+            color: this.scaleManager.getColorScale(this.props.yKey),
         };
     }
 
     draw(): void {
-        for (let yClass of this.props.yClass) {
-            const key = yClass as string;
+        for (let yKey of this.props.yKey) {
+            const key = yKey as string;
             const colorScale = this.scale.color as d3.ScaleOrdinal<
                 string,
                 string
@@ -115,7 +115,7 @@ class BaseLinePlot<
 
             this.primitiveManager.addPath(
                 this.props.data,
-                (d) => d[this.props.xClass as string],
+                (d) => d[this.props.xKey as string],
                 (d) => d[key],
                 {
                     stroke: colorScale(key),
@@ -127,7 +127,7 @@ class BaseLinePlot<
     }
 
     drawLegend(): void {
-        if (this.props.yClass.length > 1) {
+        if (this.props.yKey.length > 1) {
             this.legendManager.addLegend(
                 this.scale.color as d3.ScaleOrdinal<string, string>,
                 'line',
@@ -153,8 +153,8 @@ class BaseLinePlot<
         this.pointLabels = {};
         const colorScale = this.scale.color as d3.ScaleOrdinal<string, string>;
 
-        for (let yClass of this.props.yClass) {
-            const key = yClass as string;
+        for (let yKey of this.props.yKey) {
+            const key = yKey as string;
             this.pointLabels[key] = this.primitiveManager.addPoint(0, 0, {
                 size: 50,
                 symbolType: d3.symbolCircle,
@@ -174,26 +174,26 @@ class BaseLinePlot<
     updateLabels(event: any): void {
         const idx = this.locateNearestDataPoint(
             event,
-            this.props.xClass as string
+            this.props.xKey as string
         );
         const d = this.props.data[idx];
 
         if (!d) return;
 
-        const xVal = d[this.props.xClass as string];
+        const xVal = d[this.props.xKey as string];
         const xPos = (this.scale.x as d3.ScaleLinear<number, number>)(xVal);
 
         this.lineLabel.setCoords(xPos, 0, xPos, this.plotHeight).render();
 
         this.lineLabel.show();
 
-        for (let yClass of this.props.yClass) {
-            const key = yClass as string;
+        for (let yKey of this.props.yKey) {
+            const key = yKey as string;
             if (!isDefined(d[key])) continue;
             const pointLabel = this.pointLabels[key];
             if (pointLabel) {
                 pointLabel
-                    .setCoords(d[this.props.xClass as string], d[key])
+                    .setCoords(d[this.props.xKey as string], d[key])
                     .render();
                 pointLabel.show();
             }
@@ -237,18 +237,18 @@ class BaseLinePlot<
 
                 const idx = this.locateNearestDataPoint(
                     event,
-                    this.props.xClass as string
+                    this.props.xKey as string
                 );
                 const d = this.props.data[idx];
 
-                const tooltipDisplayClasses = this.config.tooltipConfig
-                    .tooltipClasses ?? [
-                    this.props.xClass as string,
-                    ...(this.props.yClass as string[]),
+                const tooltipDisplayKeys = this.config.tooltipConfig
+                    .tooltipKeys ?? [
+                    this.props.xKey as string,
+                    ...(this.props.yKey as string[]),
                 ];
 
                 if (d) {
-                    this.tooltipManager.formatTooltip(d, tooltipDisplayClasses);
+                    this.tooltipManager.formatTooltip(d, tooltipDisplayKeys);
                     this.tooltipManager.positionTooltip(event);
                     this.tooltipManager.showTooltip();
                 }

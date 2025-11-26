@@ -42,8 +42,8 @@ export type DataKey<T extends DataRecord> = Extract<keyof T, string>;
 
 interface PrimaryBasePlotProps<TData extends DataRecord = DataRecord> {
     data?: TData[];
-    xClass?: DataKey<TData>;
-    yClass?: DataKey<TData>;
+    xKey?: DataKey<TData>;
+    yKey?: DataKey<TData>;
 }
 
 export type BasePlotProps<TData extends DataRecord = DataRecord> =
@@ -228,16 +228,16 @@ abstract class BasePlot<
 
     getDefaultDomainX(): Domain['x'] {
         const data = (this.props.data ?? []) as DataRecord[];
-        const xValues = this.props.xClass
-            ? data.map((d) => d[this.props.xClass!])
+        const xValues = this.props.xKey
+            ? data.map((d) => d[this.props.xKey!])
             : [];
         return this.domainManager.getDomainX(xValues);
     }
 
     getDefaultDomainY(): Domain['y'] {
         const data = (this.props.data ?? []) as DataRecord[];
-        const yValues = this.props.yClass
-            ? data.map((d) => d[this.props.yClass!])
+        const yValues = this.props.yKey
+            ? data.map((d) => d[this.props.yKey!])
             : [];
         return this.domainManager.getDomainY(yValues);
     }
@@ -302,7 +302,7 @@ abstract class BasePlot<
 
         const xLabel =
             this.config.axisConfig.xLabel === null
-                ? this.props.xClass
+                ? this.props.xKey
                 : this.config.axisConfig.xLabel;
 
         if (xLabel) {
@@ -311,7 +311,7 @@ abstract class BasePlot<
 
         const yLabel =
             this.config.axisConfig.yLabel === null
-                ? this.props.yClass
+                ? this.props.yKey
                 : this.config.axisConfig.yLabel;
 
         if (yLabel) {

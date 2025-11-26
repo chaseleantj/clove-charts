@@ -16,8 +16,8 @@ export interface BarPlotProps<
 > extends BasePlotProps<TData>,
         Partial<BarPlotConfig> {
     data: TData[];
-    xClass: DataKey<TData>;
-    yClass: DataKey<TData>;
+    xKey: DataKey<TData>;
+    yKey: DataKey<TData>;
 }
 
 interface BarPlotScale {
@@ -89,7 +89,7 @@ class BaseBarPlot<
 
         if (this.barPlotConfig.useDifferentColors) {
             const xValues = this.props.data.map(
-                (d) => d[this.props.xClass]
+                (d) => d[this.props.xKey]
             ) as string[];
             const categoryDomain = this.domainManager.getDomain(
                 xValues
@@ -105,16 +105,16 @@ class BaseBarPlot<
             typeof this.scale.color === 'function'
                 ? (d: Record<string, any>) =>
                       (this.scale.color as (value: unknown) => string)(
-                          d[this.props.xClass]
+                          d[this.props.xKey]
                       )
                 : this.config.colorConfig.defaultColor;
 
         this.primitiveManager.addRectangles(
             this.props.data,
-            (d: Record<string, any>) => this.scale.x(d[this.props.xClass]),
-            (d: Record<string, any>) => this.scale.y(d[this.props.yClass]),
+            (d: Record<string, any>) => this.scale.x(d[this.props.xKey]),
+            (d: Record<string, any>) => this.scale.y(d[this.props.yKey]),
             (d: Record<string, any>) =>
-                (this.scale.x(d[this.props.xClass]) as number) +
+                (this.scale.x(d[this.props.xKey]) as number) +
                 this.scale.x.bandwidth(),
             () => this.scale.y(this.domain.y[0]),
             {

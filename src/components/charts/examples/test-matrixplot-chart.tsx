@@ -45,9 +45,9 @@ export default function TestMatrixPlotChart() {
                 <ChartTooltip ref={tooltipRef} />
                 <BaseMatrixPlot
                     data={data}
-                    xClass="xCol"
-                    yClass="yCol"
-                    valueClass="value"
+                    xKey="xCol"
+                    yKey="yCol"
+                    valueKey="value"
                     legendConfig={legendConfig}
                     tooltipConfig={tooltipConfig}
                     {...PLOT_CONFIG}

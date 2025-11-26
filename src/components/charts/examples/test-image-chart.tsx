@@ -40,9 +40,9 @@ export default function TestImageChart() {
             <ChartPlotWrapper>
                 <BaseImagePlot
                     data={IMAGE_DATA}
-                    imageURLClass="url"
-                    coordsClass="coords"
-                    widthClass="width"
+                    imageURLKey="url"
+                    coordsKey="coords"
+                    widthKey="width"
                     {...PLOT_CONFIG}
                 />
             </ChartPlotWrapper>

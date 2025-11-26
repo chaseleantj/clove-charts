@@ -17,7 +17,7 @@ export interface ScatterPlotConfig<
 > {
     pointSize: number | ((d: TData) => number);
     pointOpacity: number | ((d: TData) => number);
-    colorByClass: DataKey<TData> | null;
+    colorKey: DataKey<TData> | null;
     symbolType: d3.SymbolType;
 }
 
@@ -26,8 +26,8 @@ export interface ScatterPlotProps<
 > extends BasePlotProps<TData>,
         Partial<ScatterPlotConfig<TData>> {
     data: TData[];
-    xClass: DataKey<TData>;
-    yClass: DataKey<TData>;
+    xKey: DataKey<TData>;
+    yKey: DataKey<TData>;
 }
 
 interface ScatterPlotDomain {
@@ -42,7 +42,7 @@ interface ScatterPlotScale extends Scale {
 
 export const DEFAULT_SCATTER_PLOT_CONFIG: Omit<
     ScatterPlotConfig,
-    'pointOpacity' | 'colorByClass'
+    'pointOpacity' | 'colorKey'
 > = {
     pointSize: 50,
     symbolType: d3.symbolCircle,
@@ -54,7 +54,7 @@ export function getScatterPlotConfig<TData extends Record<string, any>>(
 ): ScatterPlotConfig<TData> {
     return {
         pointSize: props.pointSize ?? DEFAULT_SCATTER_PLOT_CONFIG.pointSize,
-        colorByClass: props.colorByClass ?? null,
+        colorKey: props.colorKey ?? null,
         pointOpacity: props.pointOpacity ?? themeConfig.opacity,
         symbolType: props.symbolType ?? DEFAULT_SCATTER_PLOT_CONFIG.symbolType,
     };
@@ -89,7 +89,7 @@ class BaseScatterPlot<
         this.domain = this.getDefaultDomain();
         this.scale = this.getDefaultScales();
 
-        const colorKey = this.scatterPlotConfig.colorByClass;
+        const colorKey = this.scatterPlotConfig.colorKey;
         if (colorKey) {
             const colorValues = this.props.data.map((d) => d[colorKey]);
             this.domain.color = this.domainManager.getDomain(colorValues);
@@ -116,8 +116,7 @@ class BaseScatterPlot<
     }
 
     draw() {
-        const { pointSize, pointOpacity, colorByClass } =
-            this.scatterPlotConfig;
+        const { pointSize, pointOpacity, colorKey } = this.scatterPlotConfig;
 
         const sizeOption =
             typeof pointSize === 'function'
@@ -130,19 +129,19 @@ class BaseScatterPlot<
                 : pointOpacity;
 
         const fillOption =
-            typeof this.scale.color === 'function' && colorByClass
+            typeof this.scale.color === 'function' && colorKey
                 ? (d: Record<string, any>) =>
                       (
                           this.scale.color as
                               | d3.ScaleSequential<string, never>
                               | d3.ScaleOrdinal<string, string>
-                      )(d[colorByClass])
+                      )(d[colorKey])
                 : this.config.colorConfig.defaultColor;
 
         this.dataPoints = this.primitiveManager.addPoints(
             this.props.data,
-            this.getCoordinateAccessor(this.props.xClass, this.scale.x),
-            this.getCoordinateAccessor(this.props.yClass, this.scale.y),
+            this.getCoordinateAccessor(this.props.xKey, this.scale.x),
+            this.getCoordinateAccessor(this.props.yKey, this.scale.y),
             {
                 symbolType: d3.symbolCircle,
                 fill: fillOption,
@@ -153,11 +152,10 @@ class BaseScatterPlot<
     }
 
     drawLegend() {
-        if (!this.scatterPlotConfig.colorByClass) return;
+        if (!this.scatterPlotConfig.colorKey) return;
 
         this.legendManager.setTitle(
-            this.config.legendConfig.title ??
-                this.scatterPlotConfig.colorByClass
+            this.config.legendConfig.title ?? this.scatterPlotConfig.colorKey
         );
 
         if (this.scale.color) {
@@ -168,16 +166,16 @@ class BaseScatterPlot<
     }
 
     drawTooltip() {
-        const displayClasses = this.scatterPlotConfig.colorByClass
+        const displayKeys = this.scatterPlotConfig.colorKey
             ? [
-                  this.props.xClass,
-                  this.props.yClass,
-                  this.scatterPlotConfig.colorByClass,
+                  this.props.xKey,
+                  this.props.yKey,
+                  this.scatterPlotConfig.colorKey,
               ]
-            : [this.props.xClass, this.props.yClass];
+            : [this.props.xKey, this.props.yKey];
 
-        const tooltipDisplayClasses =
-            this.config.tooltipConfig.tooltipClasses ?? displayClasses;
+        const tooltipDisplayKeys =
+            this.config.tooltipConfig.tooltipKeys ?? displayKeys;
 
         const getPointSize = (d: Record<string, any>) => {
             const { size } = this.dataPoints.options;
@@ -205,7 +203,7 @@ class BaseScatterPlot<
             .attachEvent('mouseover', (event, d) => {
                 if (!this.brushManager || !this.brushManager.brushing) {
                     animatePoint(event.currentTarget as SVGPathElement, 4, d);
-                    this.tooltipManager.formatTooltip(d, tooltipDisplayClasses);
+                    this.tooltipManager.formatTooltip(d, tooltipDisplayKeys);
                     this.tooltipManager.positionTooltip(event);
                     this.tooltipManager.showTooltip();
                 }

@@ -34,20 +34,17 @@ class TooltipManager {
         this.tooltip.style('transform', `translate(${x}px,${y}px)`);
     }
 
-    public formatTooltip(
-        d: Record<string, any>,
-        displayClasses: string[]
-    ): void {
+    public formatTooltip(d: Record<string, any>, displayKeys: string[]): void {
         let content = '';
-        displayClasses = [...new Set(displayClasses)];
-        for (let displayClass of displayClasses) {
-            const data = d[displayClass];
+        displayKeys = [...new Set(displayKeys)];
+        for (let displayKey of displayKeys) {
+            const data = d[displayKey];
             if (data) {
                 let displayData = data;
                 if (typeof data === 'number') {
                     displayData = d3.format('.3f')(data);
                 }
-                content += `${displayClass}: ${displayData}<br/>`;
+                content += `${displayKey}: ${displayData}<br/>`;
             }
         }
         this.tooltip.html(content);

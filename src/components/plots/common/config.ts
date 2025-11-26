@@ -72,7 +72,7 @@ export interface LegendConfig {
 
 export interface TooltipConfig {
     tooltipRef?: { current: HTMLDivElement | null };
-    tooltipClasses?: string[] | null;
+    tooltipKeys?: string[] | null;
     offsetX?: number;
     offsetY?: number;
 }
@@ -219,7 +219,7 @@ export const DEFAULT_LEGEND_CONFIG: Required<LegendConfig> = {
 
 export const DEFAULT_TOOLTIP_CONFIG: Required<TooltipConfig> = {
     tooltipRef: { current: null },
-    tooltipClasses: null,
+    tooltipKeys: null,
     offsetX: 20,
     offsetY: -20,
 };

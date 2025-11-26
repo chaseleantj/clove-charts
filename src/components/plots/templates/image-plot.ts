@@ -12,9 +12,9 @@ export interface ImagePlotProps<
 > extends BasePlotProps<TData>,
         Partial<ImagePlotConfig> {
     data: TData[];
-    imageURLClass: DataKey<TData>;
-    widthClass: DataKey<TData>;
-    coordsClass: DataKey<TData>;
+    imageURLKey: DataKey<TData>;
+    widthKey: DataKey<TData>;
+    coordsKey: DataKey<TData>;
 }
 
 interface ImagePlotDomain {
@@ -53,9 +53,9 @@ class BaseImagePlot<
 
     draw() {
         this.props.data.forEach((d) => {
-            this.primitiveManager.addImage(d[this.props.imageURLClass], {
-                coords: d[this.props.coordsClass],
-                width: d[this.props.widthClass],
+            this.primitiveManager.addImage(d[this.props.imageURLKey], {
+                coords: d[this.props.coordsKey],
+                width: d[this.props.widthKey],
                 useCornerCoords: this.imagePlotConfig.useCornerCoords,
             });
         });

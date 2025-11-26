@@ -54,7 +54,7 @@ export default function IrisHistogramChart() {
                 <ChartTooltip ref={tooltipRef} />
                 <BaseHistogramPlot
                     data={irisData}
-                    xClass="sepal_width"
+                    xKey="sepal_width"
                     numBins={10}
                     legendConfig={legendConfig}
                     tooltipConfig={tooltipConfig}

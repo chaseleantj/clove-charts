@@ -51,8 +51,8 @@ export default function IrisBarChart() {
             <ChartPlotWrapper>
                 <BaseBarPlot
                     data={irisSpeciesCounts}
-                    xClass="species"
-                    yClass="count"
+                    xKey="species"
+                    yKey="count"
                     padding={0.4}
                     useDifferentColors={true}
                     {...PLOT_CONFIG}

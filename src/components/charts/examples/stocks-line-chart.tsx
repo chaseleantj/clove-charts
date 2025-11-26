@@ -66,8 +66,8 @@ export default function StocksLineChart() {
                 <ChartTooltip ref={tooltipRef} />
                 <BaseLinePlot
                     data={stockData}
-                    xClass="Date"
-                    yClass={['AAPL', 'ABB', 'HPQ', 'MSFT', 'NVDA']}
+                    xKey="Date"
+                    yKey={['AAPL', 'ABB', 'HPQ', 'MSFT', 'NVDA']}
                     legendConfig={legendConfig}
                     tooltipConfig={tooltipConfig}
                     {...PLOT_CONFIG}
