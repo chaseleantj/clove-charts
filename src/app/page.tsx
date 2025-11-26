@@ -10,7 +10,6 @@ import StocksLineChart from '@/components/charts/examples/stocks-line-chart';
 export default function Home() {
     return (
         <main>
-            {/* <BaseChart /> */}
             <StocksLineChart />
             <IrisScatterChart />
             <TestMatrixPlotChart />

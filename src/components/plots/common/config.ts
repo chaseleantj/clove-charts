@@ -23,10 +23,10 @@ export interface PlotMarginConfig {
 export interface DomainConfig {
     paddingX?: number;
     paddingY?: number;
-    domainX?: [number, number] | [string, string] | [Date, Date] | null;
-    domainY?: [number, number] | [string, string] | [Date, Date] | null;
-    defaultDomainX?: [number, number] | [string, string] | [Date, Date];
-    defaultDomainY?: [number, number] | [string, string] | [Date, Date];
+    domainX?: readonly [number, number] | readonly [string, string] | readonly [Date, Date] | null;
+    domainY?: readonly [number, number] | readonly [string, string] | readonly [Date, Date] | null;
+    defaultDomainX?: readonly [number, number] | readonly [string, string] | readonly [Date, Date];
+    defaultDomainY?: readonly [number, number] | readonly [string, string] | readonly [Date, Date];
 }
 
 export interface ScaleConfig {
@@ -148,7 +148,7 @@ export interface RequiredPlotConfig {
 export const DEFAULT_THEME_CONFIG: Required<ThemeConfig> = {
     opacity: 1,
     transitionDuration: 500,
-    enableZoom: false,
+    enableZoom: true,
     zoomAreaThreshold: 1000,
 };
 
@@ -209,7 +209,7 @@ export const DEFAULT_LEGEND_CONFIG: Required<LegendConfig> = {
     maxHeight: null, // automatically set to plotHeight otherwise
     absolutePositions: {
         // position: absolute; top: 0%; right: 0%;
-        top: '14px',
+        top: '5%',
         right: '0%',
     },
     categoricalItemHeight: 20,
