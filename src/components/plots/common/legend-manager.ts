@@ -168,7 +168,9 @@ class LegendManager {
     }
 
     public addContinuousLegend(colorScale: d3.ScaleSequential<string, never>) {
-        const wrapper = this.container.append('div').style('text-align', 'left');
+        const wrapper = this.container
+            .append('div')
+            .style('text-align', 'left');
 
         const svg = wrapper.append('svg');
 

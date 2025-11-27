@@ -230,9 +230,7 @@ class BaseLinePlot<
                 ];
 
                 if (d) {
-                    this.tooltipManager.formatTooltip(d, tooltipDisplayKeys);
-                    this.tooltipManager.positionTooltip(event);
-                    this.tooltipManager.showTooltip();
+                    this.tooltipManager.show(event, d, tooltipDisplayKeys);
                 }
             })
             .on('mouseout', () => {
@@ -245,7 +243,7 @@ class BaseLinePlot<
         if (this.pointLabels) {
             Object.values(this.pointLabels).forEach((p) => p.hide());
         }
-        this.tooltipManager.hideTooltip();
+        this.tooltipManager.hide();
     }
 
     onSetupBrush() {

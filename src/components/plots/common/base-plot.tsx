@@ -221,7 +221,7 @@ abstract class BasePlot<
             .attr(
                 'transform',
                 `translate(${this.config.margin.left},${this.config.margin.top})`
-            )
+            );
 
         this.plot = this.plotArea
             .append('g')
@@ -440,7 +440,8 @@ abstract class BasePlot<
         this.legendManager = new LegendManager(
             {
                 ...this.config.legendConfig,
-                maxHeight: this.config.legendConfig.maxHeight ?? this.plotHeight,
+                maxHeight:
+                    this.config.legendConfig.maxHeight ?? this.plotHeight,
             },
             this.legendRef.current
         );
@@ -456,7 +457,7 @@ abstract class BasePlot<
             this.tooltipRef.current,
             this.wrapperRef
         );
-        this.tooltipManager.hideTooltip();
+        this.tooltipManager.hide();
         this.drawTooltip();
     }
 
@@ -545,7 +546,7 @@ abstract class BasePlot<
             this.svg.selectAll('*').interrupt();
         }
         if (this.tooltipManager) {
-            this.tooltipManager.hideTooltip();
+            this.tooltipManager.hide();
         }
 
         d3.select(this.ref.current).selectAll('*').remove();
@@ -595,19 +596,13 @@ abstract class BasePlot<
         return (
             <div ref={this.wrapperRef} className={styles.chartWrapper}>
                 {tooltipEnabled && (
-                    <div
-                        ref={this.tooltipRef}
-                        className={styles.tooltip}
-                    />
+                    <div ref={this.tooltipRef} className={styles.tooltip} />
                 )}
 
                 <div ref={this.ref} style={{ width: '100%' }} />
 
                 {legendEnabled && (
-                    <div
-                        ref={this.legendRef}
-                        className={styles.legend}
-                    />
+                    <div ref={this.legendRef} className={styles.legend} />
                 )}
             </div>
         );

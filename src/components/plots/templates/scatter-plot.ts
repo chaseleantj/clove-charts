@@ -203,20 +203,18 @@ class BaseScatterPlot<
             .attachEvent('mouseover', (event, d) => {
                 if (!this.brushManager || !this.brushManager.brushing) {
                     animatePoint(event.currentTarget as SVGPathElement, 4, d);
-                    this.tooltipManager.formatTooltip(d, tooltipDisplayKeys);
-                    this.tooltipManager.positionTooltip(event);
-                    this.tooltipManager.showTooltip();
+                    this.tooltipManager.show(event, d, tooltipDisplayKeys);
                 }
             })
             .attachEvent('mouseout', (event, d) => {
                 if (!this.brushManager || !this.brushManager.brushing) {
                     animatePoint(event.currentTarget as SVGPathElement, 1, d);
-                    this.tooltipManager.hideTooltip();
+                    this.tooltipManager.hide();
                 }
             });
 
         this.interactionSurface.on('click', () =>
-            this.tooltipManager.hideTooltip()
+            this.tooltipManager.hide()
         );
     }
 }

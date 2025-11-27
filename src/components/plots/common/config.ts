@@ -72,11 +72,15 @@ export interface LegendConfig {
     continuousBarLength?: number;
 }
 
+export type TooltipValueFormatter = (value: unknown, key: string) => string;
+
 export interface TooltipConfig {
     enabled?: boolean;
     tooltipKeys?: string[] | null;
     offsetX?: number;
     offsetY?: number;
+    valueFormatter?: TooltipValueFormatter | null;
+    edgePadding?: number;
 }
 
 export interface ColorConfig {
@@ -225,6 +229,8 @@ export const DEFAULT_TOOLTIP_CONFIG: Required<TooltipConfig> = {
     tooltipKeys: null,
     offsetX: 15,
     offsetY: -15,
+    valueFormatter: null,
+    edgePadding: 10,
 };
 
 export const DEFAULT_COLOR_CONFIG: Required<ColorConfig> = {
