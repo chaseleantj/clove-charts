@@ -8,10 +8,10 @@ class TooltipManager {
 
     constructor(
         private readonly tooltipConfig: Required<TooltipConfig>,
-        private readonly plotRef: React.RefObject<HTMLDivElement | null>
+        containerNode: HTMLDivElement,
+        private readonly wrapperRef: React.RefObject<HTMLDivElement | null>
     ) {
-        this.tooltip = d3.select(this.tooltipConfig.tooltipRef.current!);
-        this.plotRef = plotRef;
+        this.tooltip = d3.select(containerNode);
     }
 
     public showTooltip(): void {
@@ -23,39 +23,36 @@ class TooltipManager {
     }
 
     public positionTooltip(event: MouseEvent): void {
-        const x =
-            event.pageX -
-            this.getBoundingClient().left +
-            this.tooltipConfig.offsetX;
-        const y =
-            event.pageY -
-            this.getBoundingClient().top +
-            this.tooltipConfig.offsetY;
-        this.tooltip.style('transform', `translate(${x}px,${y}px)`);
+        const wrapperRect = this.getWrapperBounds();
+        if (!wrapperRect) return;
+
+        const x = event.pageX - wrapperRect.left + this.tooltipConfig.offsetX;
+        const y = event.pageY - wrapperRect.top + this.tooltipConfig.offsetY;
+
+        this.tooltip.style('transform', `translate(${x}px, ${y}px)`);
     }
 
     public formatTooltip(d: Record<string, any>, displayKeys: string[]): void {
-        let content = '';
-        displayKeys = [...new Set(displayKeys)];
-        for (let displayKey of displayKeys) {
-            const data = d[displayKey];
-            if (data) {
-                let displayData = data;
-                if (typeof data === 'number') {
-                    displayData = d3.format('.3f')(data);
-                }
-                content += `${displayKey}: ${displayData}<br/>`;
-            }
-        }
+        const uniqueKeys = [...new Set(displayKeys)];
+        const content = uniqueKeys
+            .filter((key) => d[key] !== undefined && d[key] !== null)
+            .map((key) => {
+                const val =
+                    typeof d[key] === 'number'
+                        ? d3.format('.3f')(d[key])
+                        : d[key];
+                return `<div>${key}: ${val}</div>`;
+            })
+            .join('');
+
         this.tooltip.html(content);
     }
 
-    // Returns an object with the absolute left and top position of the current chart as well as the width and height. Used for moving tooltips.
-    private getBoundingClient() {
-        if (!this.plotRef.current) {
-            throw new Error('Plot ref is not available');
+    private getWrapperBounds() {
+        if (!this.wrapperRef.current) {
+            return null;
         }
-        const rect = this.plotRef.current.getBoundingClientRect();
+        const rect = this.wrapperRef.current.getBoundingClientRect();
         return {
             left: rect.left + window.scrollX,
             top: rect.top + window.scrollY,

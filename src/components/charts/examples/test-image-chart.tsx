@@ -4,7 +4,6 @@ import BaseImagePlot from '@/components/plots/templates/image-plot';
 import { PlotConfig } from '@/components/plots/common/config';
 import {
     ChartLayout,
-    ChartPlotWrapper,
     ChartFooter,
     ChartCaptions,
 } from '@/components/charts/chart-layout';
@@ -37,15 +36,13 @@ const IMAGE_DATA: ImageData[] = [
 export default function TestImageChart() {
     return (
         <ChartLayout>
-            <ChartPlotWrapper>
-                <BaseImagePlot
-                    data={IMAGE_DATA}
-                    imageURLKey="url"
-                    coordsKey="coords"
-                    widthKey="width"
-                    {...PLOT_CONFIG}
-                />
-            </ChartPlotWrapper>
+            <BaseImagePlot
+                data={IMAGE_DATA}
+                imageURLKey="url"
+                coordsKey="coords"
+                widthKey="width"
+                {...PLOT_CONFIG}
+            />
             <ChartFooter>
                 <ChartCaptions>
                     A chart displaying some nature illustrations from this{' '}

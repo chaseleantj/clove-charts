@@ -4,10 +4,7 @@ import * as d3 from 'd3';
 import { useEffect, useState, useMemo } from 'react';
 import BaseBarPlot from '@/components/plots/templates/bar-plot';
 import { PlotConfig } from '@/components/plots/common/config';
-import {
-    ChartLayout,
-    ChartPlotWrapper,
-} from '@/components/charts/chart-layout';
+import { ChartLayout } from '@/components/charts/chart-layout';
 
 interface IrisData {
     sepal_length: number;
@@ -48,16 +45,14 @@ export default function IrisBarChart() {
 
     return (
         <ChartLayout>
-            <ChartPlotWrapper>
-                <BaseBarPlot
-                    data={irisSpeciesCounts}
-                    xKey="species"
-                    yKey="count"
-                    padding={0.4}
-                    useDifferentColors={true}
-                    {...PLOT_CONFIG}
-                />
-            </ChartPlotWrapper>
+            <BaseBarPlot
+                data={irisSpeciesCounts}
+                xKey="species"
+                yKey="count"
+                padding={0.4}
+                useDifferentColors={true}
+                {...PLOT_CONFIG}
+            />
         </ChartLayout>
     );
 }

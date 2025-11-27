@@ -1,8 +1,6 @@
 'use client';
 
-import { ReactNode, forwardRef, useMemo, useRef } from 'react';
-
-import { LegendConfig, TooltipConfig } from '@/components/plots/common/config';
+import { ReactNode } from 'react';
 
 import styles from '@/components/page.module.css';
 
@@ -20,18 +18,6 @@ interface ChartHeaderProps {
 
 export function ChartHeader({ children }: ChartHeaderProps) {
     return <div className={styles.header}>{children}</div>;
-}
-
-interface ChartPlotWrapperProps {
-    children: ReactNode;
-}
-
-export function ChartPlotWrapper({ children }: ChartPlotWrapperProps) {
-    return (
-        <div className={styles.plotWrapper}>
-            <div className={styles.plot}>{children}</div>
-        </div>
-    );
 }
 
 interface ChartFooterProps {
@@ -52,61 +38,4 @@ export function ChartCaptions({ children }: ChartCaptionsProps) {
             {typeof children === 'string' ? <p>{children}</p> : children}
         </div>
     );
-}
-
-export const ChartLegend = forwardRef<HTMLDivElement>(
-    function ChartLegend(_, ref) {
-        return <div ref={ref} className={styles.legend}></div>;
-    }
-);
-
-export const ChartTooltip = forwardRef<HTMLDivElement>(
-    function ChartTooltip(_, ref) {
-        return <div ref={ref} className={styles.tooltip}></div>;
-    }
-);
-
-type LegendOverrides = Omit<LegendConfig, 'legendRef'>;
-type TooltipOverrides = Omit<TooltipConfig, 'tooltipRef'>;
-
-interface UseChartLegendReturn {
-    legendRef: React.RefObject<HTMLDivElement | null>;
-    legendConfig: LegendConfig;
-}
-
-interface UseChartTooltipReturn {
-    tooltipRef: React.RefObject<HTMLDivElement | null>;
-    tooltipConfig: TooltipConfig;
-}
-
-export function useChartLegend(
-    legendOverrides?: LegendOverrides
-): UseChartLegendReturn {
-    const legendRef = useRef<HTMLDivElement>(null);
-
-    const legendConfig = useMemo<LegendConfig>(
-        () => ({
-            legendRef,
-            ...legendOverrides,
-        }),
-        [legendOverrides]
-    );
-
-    return { legendRef, legendConfig };
-}
-
-export function useChartTooltip(
-    tooltipOverrides?: TooltipOverrides
-): UseChartTooltipReturn {
-    const tooltipRef = useRef<HTMLDivElement>(null);
-
-    const tooltipConfig = useMemo<TooltipConfig>(
-        () => ({
-            tooltipRef,
-            ...tooltipOverrides,
-        }),
-        [tooltipOverrides]
-    );
-
-    return { tooltipRef, tooltipConfig };
 }

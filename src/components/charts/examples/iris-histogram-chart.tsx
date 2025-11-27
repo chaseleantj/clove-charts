@@ -6,13 +6,8 @@ import BaseHistogramPlot from '@/components/plots/templates/histogram-plot';
 import { PlotConfig } from '@/components/plots/common/config';
 import {
     ChartLayout,
-    ChartPlotWrapper,
-    ChartLegend,
-    ChartTooltip,
     ChartFooter,
     ChartCaptions,
-    useChartLegend,
-    useChartTooltip,
 } from '@/components/charts/chart-layout';
 
 interface IrisData {
@@ -26,12 +21,16 @@ interface IrisData {
 const PLOT_CONFIG: PlotConfig = {
     themeConfig: { enableZoom: true },
     axisConfig: { xLabel: 'Sepal width (cm)', yLabel: 'Frequency' },
+    legendConfig: {
+        enabled: false,
+    },
+    tooltipConfig: {
+        enabled: false,
+    },
 };
 
 export default function IrisHistogramChart() {
     const [irisData, setIrisData] = useState<IrisData[]>([]);
-    const { legendRef, legendConfig } = useChartLegend();
-    const { tooltipRef, tooltipConfig } = useChartTooltip();
 
     useEffect(() => {
         async function fetchData(): Promise<void> {
@@ -49,18 +48,12 @@ export default function IrisHistogramChart() {
 
     return (
         <ChartLayout>
-            <ChartPlotWrapper>
-                <ChartLegend ref={legendRef} />
-                <ChartTooltip ref={tooltipRef} />
-                <BaseHistogramPlot
-                    data={irisData}
-                    xKey="sepal_width"
-                    numBins={10}
-                    legendConfig={legendConfig}
-                    tooltipConfig={tooltipConfig}
-                    {...PLOT_CONFIG}
-                />
-            </ChartPlotWrapper>
+            <BaseHistogramPlot
+                data={irisData}
+                xKey="sepal_width"
+                numBins={10}
+                {...PLOT_CONFIG}
+            />
             <ChartFooter>
                 <ChartCaptions>
                     A histogram plot of the iris dataset.

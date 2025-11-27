@@ -5,19 +5,21 @@ import BaseMatrixPlot from '@/components/plots/templates/matrix-plot';
 import { PlotConfig } from '@/components/plots/common/config';
 import {
     ChartLayout,
-    ChartPlotWrapper,
-    ChartLegend,
-    ChartTooltip,
     ChartFooter,
     ChartCaptions,
-    useChartLegend,
-    useChartTooltip,
 } from '@/components/charts/chart-layout';
 
 const PLOT_CONFIG: PlotConfig = {
     themeConfig: { enableZoom: false, opacity: 0.9 },
     colorConfig: { continuousColorScheme: d3.interpolatePuBu },
     axisConfig: { showGrid: false, showAxis: true },
+    legendConfig: {
+        enabled: true,
+        title: 'Values',
+    },
+    tooltipConfig: {
+        enabled: true,
+    },
     margin: { left: 80, right: 80 },
 };
 
@@ -35,24 +37,15 @@ for (const x of xLabels) {
 }
 
 export default function TestMatrixPlotChart() {
-    const { legendRef, legendConfig } = useChartLegend({ title: 'Values' });
-    const { tooltipRef, tooltipConfig } = useChartTooltip();
-
     return (
         <ChartLayout>
-            <ChartPlotWrapper>
-                <ChartLegend ref={legendRef} />
-                <ChartTooltip ref={tooltipRef} />
-                <BaseMatrixPlot
-                    data={data}
-                    xKey="xCol"
-                    yKey="yCol"
-                    valueKey="value"
-                    legendConfig={legendConfig}
-                    tooltipConfig={tooltipConfig}
-                    {...PLOT_CONFIG}
-                />
-            </ChartPlotWrapper>
+            <BaseMatrixPlot
+                data={data}
+                xKey="xCol"
+                yKey="yCol"
+                valueKey="value"
+                {...PLOT_CONFIG}
+            />
             <ChartFooter>
                 <ChartCaptions>A random matrix plot example.</ChartCaptions>
             </ChartFooter>

@@ -6,13 +6,8 @@ import BaseScatterPlot from '@/components/plots/templates/scatter-plot';
 import { PlotConfig } from '@/components/plots/common/config';
 import {
     ChartLayout,
-    ChartPlotWrapper,
-    ChartLegend,
-    ChartTooltip,
     ChartFooter,
     ChartCaptions,
-    useChartLegend,
-    useChartTooltip,
 } from '@/components/charts/chart-layout';
 
 interface IrisData {
@@ -25,19 +20,22 @@ interface IrisData {
 
 const PLOT_CONFIG: PlotConfig = {
     themeConfig: { enableZoom: true },
-    // scaleConfig: {logY: true},
     axisConfig: {
         xLabel: 'Sepal width (cm)',
         yLabel: 'Petal length (cm)',
-        showGrid: true,
     },
-    margin: { right: 80 },
+    legendConfig: {
+        enabled: true,
+        title: 'Species',
+    },
+    tooltipConfig: {
+        enabled: true,
+    },
+    margin: { right: 100 },
 };
 
 export default function IrisScatterChart() {
     const [irisData, setIrisData] = useState<IrisData[]>([]);
-    const { legendRef, legendConfig } = useChartLegend();
-    const { tooltipRef, tooltipConfig } = useChartTooltip();
 
     useEffect(() => {
         async function fetchData(): Promise<void> {
@@ -55,19 +53,13 @@ export default function IrisScatterChart() {
 
     return (
         <ChartLayout>
-            <ChartPlotWrapper>
-                <ChartLegend ref={legendRef} />
-                <ChartTooltip ref={tooltipRef} />
-                <BaseScatterPlot
-                    data={irisData}
-                    xKey="petal_width"
-                    yKey="sepal_length"
-                    colorKey="species"
-                    legendConfig={legendConfig}
-                    tooltipConfig={tooltipConfig}
-                    {...PLOT_CONFIG}
-                />
-            </ChartPlotWrapper>
+            <BaseScatterPlot
+                data={irisData}
+                xKey="petal_width"
+                yKey="sepal_length"
+                colorKey="species"
+                {...PLOT_CONFIG}
+            />
             <ChartFooter>
                 <ChartCaptions>
                     A scatter plot of the iris dataset. Hover over the points

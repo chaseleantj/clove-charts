@@ -249,7 +249,7 @@ class BaseLinePlot<
     }
 
     onSetupBrush() {
-        if (!this.config.tooltipConfig.tooltipRef.current) return;
+        if (!this.config.tooltipConfig.enabled) return;
         if (this.brushManager && this.brushManager.brush) {
             this.brushManager.brush.on('start.tooltip', () => {
                 this.hideTooltip();

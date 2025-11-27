@@ -6,13 +6,8 @@ import BaseLinePlot from '@/components/plots/templates/line-plot';
 import { PlotConfig } from '@/components/plots/common/config';
 import {
     ChartLayout,
-    ChartPlotWrapper,
-    ChartLegend,
-    ChartTooltip,
     ChartFooter,
     ChartCaptions,
-    useChartLegend,
-    useChartTooltip,
 } from '@/components/charts/chart-layout';
 
 interface StockData {
@@ -33,13 +28,17 @@ const PLOT_CONFIG: PlotConfig = {
         showGrid: true,
         tickFormatY: (domainValue: number) => '$' + String(domainValue),
     },
-    margin: { left: 60, right: 80 },
+    legendConfig: {
+        enabled: true,
+    },
+    tooltipConfig: {
+        enabled: true,
+    },
+    margin: { left: 60, right: 100 },
 };
 
 export default function StocksLineChart() {
     const [stockData, setStockData] = useState<StockData[]>([]);
-    const { legendRef, legendConfig } = useChartLegend();
-    const { tooltipRef, tooltipConfig } = useChartTooltip();
 
     useEffect(() => {
         async function fetchData(): Promise<void> {
@@ -61,18 +60,12 @@ export default function StocksLineChart() {
 
     return (
         <ChartLayout>
-            <ChartPlotWrapper>
-                <ChartLegend ref={legendRef} />
-                <ChartTooltip ref={tooltipRef} />
-                <BaseLinePlot
-                    data={stockData}
-                    xKey="Date"
-                    yKeys={['AAPL', 'ABB', 'HPQ', 'MSFT', 'NVDA']}
-                    legendConfig={legendConfig}
-                    tooltipConfig={tooltipConfig}
-                    {...PLOT_CONFIG}
-                />
-            </ChartPlotWrapper>
+            <BaseLinePlot
+                data={stockData}
+                xKey="Date"
+                yKeys={['AAPL', 'ABB', 'HPQ', 'MSFT', 'NVDA']}
+                {...PLOT_CONFIG}
+            />
             <ChartFooter>
                 <ChartCaptions>
                     Historical stock prices for major tech companies.

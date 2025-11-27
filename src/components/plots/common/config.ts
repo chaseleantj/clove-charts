@@ -23,10 +23,10 @@ export interface PlotMarginConfig {
 export interface DomainConfig {
     paddingX?: number;
     paddingY?: number;
-    domainX?: readonly [number, number] | readonly [string, string] | readonly [Date, Date] | null;
-    domainY?: readonly [number, number] | readonly [string, string] | readonly [Date, Date] | null;
-    defaultDomainX?: readonly [number, number] | readonly [string, string] | readonly [Date, Date];
-    defaultDomainY?: readonly [number, number] | readonly [string, string] | readonly [Date, Date];
+    domainX?: [number, number] | [string, string] | [Date, Date] | null;
+    domainY?: [number, number] | [string, string] | [Date, Date] | null;
+    defaultDomainX?: [number, number] | [string, string] | [Date, Date];
+    defaultDomainY?: [number, number] | [string, string] | [Date, Date];
 }
 
 export interface ScaleConfig {
@@ -58,12 +58,14 @@ export interface AxisConfig {
 }
 
 export interface LegendConfig {
-    legendRef?: { current: HTMLDivElement | null };
+    enabled?: boolean;
     title?: string | null;
     maxHeight?: number | null;
     absolutePositions?: {
-        top: string;
-        right: string;
+        top?: string;
+        right?: string;
+        bottom?: string;
+        left?: string;
     };
     categoricalItemHeight?: number;
     continuousBarWidth?: number;
@@ -71,7 +73,7 @@ export interface LegendConfig {
 }
 
 export interface TooltipConfig {
-    tooltipRef?: { current: HTMLDivElement | null };
+    enabled?: boolean;
     tooltipKeys?: string[] | null;
     offsetX?: number;
     offsetY?: number;
@@ -204,13 +206,14 @@ export const DEFAULT_AXIS_CONFIG: Required<AxisConfig> = {
 };
 
 export const DEFAULT_LEGEND_CONFIG: Required<LegendConfig> = {
-    legendRef: { current: null },
+    enabled: false,
     title: null,
     maxHeight: null, // automatically set to plotHeight otherwise
     absolutePositions: {
-        // position: absolute; top: 0%; right: 0%;
-        top: '5%',
-        right: '0%',
+        top: '25px',
+        right: '10px',
+        bottom: undefined,
+        left: undefined,
     },
     categoricalItemHeight: 20,
     continuousBarWidth: 20,
@@ -218,10 +221,10 @@ export const DEFAULT_LEGEND_CONFIG: Required<LegendConfig> = {
 };
 
 export const DEFAULT_TOOLTIP_CONFIG: Required<TooltipConfig> = {
-    tooltipRef: { current: null },
+    enabled: true,
     tooltipKeys: null,
-    offsetX: 20,
-    offsetY: -20,
+    offsetX: 15,
+    offsetY: -15,
 };
 
 export const DEFAULT_COLOR_CONFIG: Required<ColorConfig> = {

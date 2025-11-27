@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import * as d3 from 'd3';
 import { v4 as uuidv4 } from 'uuid';
 
+import styles from '@/components/page.module.css';
 import PrimitiveManager from '@/components/plots/common/primitives/primitive-manager';
 import TooltipManager from '@/components/plots/common/tooltip-manager';
 import LegendManager from '@/components/plots/common/legend-manager';
@@ -86,7 +87,14 @@ abstract class BasePlot<
     legendManager!: LegendManager;
     primitiveManager!: PrimitiveManager;
 
+    // Main refs
+    wrapperRef: React.RefObject<HTMLDivElement | null>;
     ref: React.RefObject<HTMLDivElement | null>;
+
+    // Internal refs for legend and tooltip
+    legendRef: React.RefObject<HTMLDivElement | null>;
+    tooltipRef: React.RefObject<HTMLDivElement | null>;
+
     svg!: d3.Selection<SVGSVGElement, unknown, null, undefined>;
     plotArea!: d3.Selection<SVGGElement, unknown, null, undefined>;
     plot!: d3.Selection<SVGGElement, unknown, null, undefined>;
@@ -101,7 +109,10 @@ abstract class BasePlot<
     constructor(props: BasePlotProps<TData>) {
         super(props);
         this.config = getPlotConfig(props);
+        this.wrapperRef = React.createRef<HTMLDivElement>();
         this.ref = React.createRef<HTMLDivElement>();
+        this.legendRef = React.createRef<HTMLDivElement>();
+        this.tooltipRef = React.createRef<HTMLDivElement>();
         this.clipPathId = 'clip-' + uuidv4();
         this.updateFunctions = [];
         this.handleResize = this.handleResize.bind(this);
@@ -154,7 +165,6 @@ abstract class BasePlot<
     }
 
     protected shouldInitializeChart(): boolean {
-        // return this.props.data !== undefined && this.props.data.length > 0;
         return true;
     }
 
@@ -177,9 +187,10 @@ abstract class BasePlot<
 
     private initializePlot(): void {
         d3.select(this.ref.current).selectAll('*').remove();
-        d3.select(this.config.legendConfig.legendRef.current)
-            .selectAll('*')
-            .remove();
+
+        if (this.legendRef.current) {
+            d3.select(this.legendRef.current).selectAll('*').remove();
+        }
 
         this.plotWidth = Math.max(
             0,
@@ -194,7 +205,8 @@ abstract class BasePlot<
             .select(this.ref.current)
             .append('svg')
             .attr('width', this.width)
-            .attr('height', this.height);
+            .attr('height', this.height)
+            .style('display', 'block');
 
         this.svg
             .append('defs')
@@ -210,11 +222,9 @@ abstract class BasePlot<
                 'transform',
                 `translate(${this.config.margin.left},${this.config.margin.top})`
             )
-            .attr('class', 'plot-area');
 
         this.plot = this.plotArea
             .append('g')
-            .attr('class', 'plot')
             .attr('clip-path', `url(#${this.clipPathId})`);
 
         this.onInitializePlot();
@@ -421,19 +431,30 @@ abstract class BasePlot<
     }
 
     setupLegend(): void {
-        if (!this.config.legendConfig.legendRef.current) return;
-        this.legendManager = new LegendManager({
-            ...this.config.legendConfig,
-            maxHeight: this.config.legendConfig.maxHeight ?? this.plotHeight,
-        });
+        const { enabled } = this.config.legendConfig;
+        if (!enabled || !this.legendRef.current) return;
+
+        // Clear previous content
+        d3.select(this.legendRef.current).selectAll('*').remove();
+
+        this.legendManager = new LegendManager(
+            {
+                ...this.config.legendConfig,
+                maxHeight: this.config.legendConfig.maxHeight ?? this.plotHeight,
+            },
+            this.legendRef.current
+        );
         this.drawLegend();
     }
 
     setupTooltip(): void {
-        if (!this.config.tooltipConfig.tooltipRef.current) return;
+        const { enabled } = this.config.tooltipConfig;
+        if (!enabled || !this.tooltipRef.current) return;
+
         this.tooltipManager = new TooltipManager(
             this.config.tooltipConfig,
-            this.ref
+            this.tooltipRef.current,
+            this.wrapperRef
         );
         this.tooltipManager.hideTooltip();
         this.drawTooltip();
@@ -449,7 +470,7 @@ abstract class BasePlot<
 
         if (typeof ResizeObserver !== 'undefined') {
             this.resizeObserver = new ResizeObserver((entries) => {
-                const { width, height } = entries[0].contentRect;
+                const { width } = entries[0].contentRect;
                 this.updateDimensions(width);
             });
             this.resizeObserver.observe(element);
@@ -461,7 +482,7 @@ abstract class BasePlot<
 
     handleResize(): void {
         if (!this.ref.current) return;
-        const { width, height } = this.ref.current.getBoundingClientRect();
+        const { width } = this.ref.current.getBoundingClientRect();
         this.updateDimensions(width);
     }
 
@@ -529,10 +550,8 @@ abstract class BasePlot<
 
         d3.select(this.ref.current).selectAll('*').remove();
 
-        if (this.config.legendConfig?.legendRef?.current) {
-            d3.select(this.config.legendConfig.legendRef.current)
-                .selectAll('*')
-                .remove();
+        if (this.legendRef.current) {
+            d3.select(this.legendRef.current).selectAll('*').remove();
         }
 
         this.updateFunctions = [];
@@ -570,7 +589,28 @@ abstract class BasePlot<
     handleDrawError(error: unknown): void {}
 
     render() {
-        return <div ref={this.ref} style={{ width: '100%' }}></div>;
+        const legendEnabled = this.config.legendConfig.enabled;
+        const tooltipEnabled = this.config.tooltipConfig.enabled;
+
+        return (
+            <div ref={this.wrapperRef} className={styles.chartWrapper}>
+                {tooltipEnabled && (
+                    <div
+                        ref={this.tooltipRef}
+                        className={styles.tooltip}
+                    />
+                )}
+
+                <div ref={this.ref} style={{ width: '100%' }} />
+
+                {legendEnabled && (
+                    <div
+                        ref={this.legendRef}
+                        className={styles.legend}
+                    />
+                )}
+            </div>
+        );
     }
 }
 
