@@ -41,8 +41,6 @@ export default function StocksLineChart() {
     const [stockData, setStockData] = useState<StockData[]>([]);
 
     useEffect(() => {
-        async function fetchData(): Promise<void> {
-            try {
                 d3.csv('/data/stocks.csv', d3.autoType).then((data) => {
                     const parsedData = data as StockData[];
                     const filteredData = parsedData.filter((d) => {
@@ -50,12 +48,6 @@ export default function StocksLineChart() {
                     });
                     setStockData(filteredData);
                 });
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                setStockData([]);
-            }
-        }
-        fetchData();
     }, []);
 
     return (

@@ -31,24 +31,16 @@ const PLOT_CONFIG: PlotConfig = {
     tooltipConfig: {
         enabled: true,
     },
-    margin: { right: 100 },
+    margin: { right: 80 },
 };
 
 export default function IrisScatterChart() {
     const [irisData, setIrisData] = useState<IrisData[]>([]);
 
     useEffect(() => {
-        async function fetchData(): Promise<void> {
-            try {
-                d3.csv('/data/iris.csv', d3.autoType).then((data) => {
-                    setIrisData(data as IrisData[]);
-                });
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                setIrisData([]);
-            }
-        }
-        fetchData();
+        d3.csv('/data/iris.csv', d3.autoType).then((data) => {
+            setIrisData(data as IrisData[]);
+        });
     }, []);
 
     return (

@@ -214,7 +214,8 @@ abstract class BasePlot<
             .attr('id', this.clipPathId)
             .append('svg:rect')
             .attr('width', this.plotWidth)
-            .attr('height', this.plotHeight);
+            .attr('height', this.plotHeight)
+            .attr('class', styles.plotBackground);
 
         this.plotArea = this.svg
             .append('g')
@@ -222,9 +223,10 @@ abstract class BasePlot<
                 'transform',
                 `translate(${this.config.margin.left},${this.config.margin.top})`
             );
-
+            
         this.plot = this.plotArea
             .append('g')
+            .attr('class', styles.plot)
             .attr('clip-path', `url(#${this.clipPathId})`);
 
         this.onInitializePlot();

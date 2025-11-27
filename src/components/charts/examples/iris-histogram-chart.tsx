@@ -33,17 +33,9 @@ export default function IrisHistogramChart() {
     const [irisData, setIrisData] = useState<IrisData[]>([]);
 
     useEffect(() => {
-        async function fetchData(): Promise<void> {
-            try {
                 d3.csv('/data/iris.csv', d3.autoType).then((data) => {
                     setIrisData(data as IrisData[]);
                 });
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                setIrisData([]);
-            }
-        }
-        fetchData();
     }, []);
 
     return (

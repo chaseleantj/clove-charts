@@ -235,6 +235,9 @@ class BaseLinePlot<
             })
             .on('mouseout', () => {
                 this.hideTooltip();
+            })
+            .on('mousedown', () => {
+                this.hideTooltip();
             });
     }
 
