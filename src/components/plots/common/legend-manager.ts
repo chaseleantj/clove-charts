@@ -228,7 +228,7 @@ class LegendManager {
         // Set SVG dimensions based on content
         const bbox = svg.node()?.getBBox();
         if (bbox) {
-            const w = Math.max(bbox.width + 10, 1);
+            const w = Math.max(bbox.width, 1);
             const h = Math.max(this.legendConfig.continuousBarLength + 10, 1);
             svg.attr('viewBox', `${bbox.x} ${bbox.y} ${w} ${h}`)
                 .attr('width', w)

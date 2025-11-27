@@ -34,7 +34,7 @@ const PLOT_CONFIG: PlotConfig = {
     tooltipConfig: {
         enabled: true,
     },
-    margin: { left: 60, right: 100 },
+    margin: { left: 60, right: 60 },
 };
 
 export default function StocksLineChart() {

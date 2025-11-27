@@ -206,7 +206,6 @@ abstract class BasePlot<
             .append('svg')
             .attr('width', this.width)
             .attr('height', this.height)
-            .style('display', 'block');
 
         this.svg
             .append('defs')
