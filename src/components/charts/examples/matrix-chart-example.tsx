@@ -12,7 +12,7 @@ import {
 const PLOT_CONFIG: PlotConfig = {
     themeConfig: { enableZoom: false, opacity: 0.9 },
     colorConfig: { continuousColorScheme: d3.interpolatePuBu },
-    axisConfig: { showGrid: false, showAxis: true },
+    axisConfig: { showGrid: false, showAxis: true, xLabel: 'X', yLabel: 'Y' },
     legendConfig: {
         enabled: true,
         title: 'Values',
@@ -35,7 +35,7 @@ for (const x of xLabels) {
     }
 }
 
-export default function TestMatrixPlotChart() {
+export default function MatrixChartExample() {
     return (
         <ChartLayout>
             <MatrixPlot

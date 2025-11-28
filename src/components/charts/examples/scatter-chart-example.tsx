@@ -19,7 +19,7 @@ interface IrisData {
 }
 
 const PLOT_CONFIG: PlotConfig = {
-    themeConfig: { enableZoom: true },
+    themeConfig: { enableZoom: false },
     axisConfig: {
         xLabel: 'Sepal width (cm)',
         yLabel: 'Petal length (cm)',
@@ -33,7 +33,7 @@ const PLOT_CONFIG: PlotConfig = {
     },
 };
 
-export default function IrisScatterChart() {
+export default function ScatterChartExample() {
     const [irisData, setIrisData] = useState<IrisData[]>([]);
 
     useEffect(() => {

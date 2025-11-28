@@ -25,11 +25,11 @@ const PLOT_CONFIG: PlotConfig = {
     },
 };
 
-export default function ContourChartExample() {
-    const f = useCallback((x: number, y: number) => {
-        return Math.cos(2 * Math.PI * x * y) + Math.sin(2 * Math.PI * x + y);
-    }, []);
+const f = (x: number, y: number) => {
+    return Math.cos(2 * Math.PI * x * y) + Math.sin(2 * Math.PI * x + y);
+};
 
+export default function ContourChartExample() {
     return (
         <ChartLayout>
             <ContourPlot

@@ -16,7 +16,7 @@ import {
 export const DEFAULT_THEME_CONFIG: Required<ThemeConfig> = {
     opacity: 1,
     transitionDuration: 500,
-    enableZoom: true,
+    enableZoom: false,
     zoomAreaThreshold: 1000,
 };
 

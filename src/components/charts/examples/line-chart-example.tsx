@@ -42,14 +42,14 @@ const PLOT_CONFIG: PlotConfig = {
     },
 };
 
-export default function StocksLineChart() {
+export default function LineChartExample() {
     const [stockData, setStockData] = useState<StockData[]>([]);
 
     useEffect(() => {
         d3.csv('/data/stocks.csv', d3.autoType).then((data) => {
             const parsedData = data as StockData[];
             const filteredData = parsedData.filter((d) => {
-                return d.Date && d.Date.getFullYear() >= 2010;
+                return d.Date && d.Date.getFullYear() >= 2018;
             });
             setStockData(filteredData);
         });
