@@ -239,7 +239,6 @@ abstract class BasePlot<
         domainY: Domain['y']
     ): Partial<Required<PlotMarginConfig>> {
         const { axisConfig, legendConfig } = this.config;
-        const PADDING = 10;
 
         const hasXLabel =
             axisConfig.xLabel !== '' &&
@@ -253,15 +252,16 @@ abstract class BasePlot<
         const hasStringDomainY = isStringArray(domainY);
 
         const { fontSize } = getChartFontStyles();
-        const labelHeight = fontSize + 5;
+        const xLabelHeight = fontSize + 10;
+        const yLabelHeight = fontSize;
 
         let leftMargin: number;
         if (hasStringDomainY) {
             const yTickLabels = domainY as string[];
             const maxYTickWidth = measureMaxTextWidth(yTickLabels);
-            leftMargin = maxYTickWidth + axisConfig.tickSize + PADDING;
+            leftMargin = maxYTickWidth + axisConfig.tickSize;
             if (hasYLabel) {
-                leftMargin += labelHeight + axisConfig.labelOffsetY;
+                leftMargin += yLabelHeight + axisConfig.labelOffsetY;
             }
         } else {
             leftMargin = hasYLabel
@@ -271,9 +271,9 @@ abstract class BasePlot<
 
         let bottomMargin: number;
         if (hasStringDomainX) {
-            bottomMargin = fontSize + axisConfig.tickSize + PADDING;
+            bottomMargin = fontSize + axisConfig.tickSize;
             if (hasXLabel) {
-                bottomMargin += labelHeight + axisConfig.labelOffsetX;
+                bottomMargin += xLabelHeight + axisConfig.labelOffsetX;
             }
         } else {
             bottomMargin = hasXLabel

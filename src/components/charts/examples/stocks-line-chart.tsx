@@ -22,19 +22,24 @@ interface StockData {
 const PLOT_CONFIG: PlotConfig = {
     themeConfig: { enableZoom: true },
     domainConfig: { domainY: [0, 350] },
+    margin: { left: 60, right: 20 },
     axisConfig: {
         xLabel: 'Date',
         yLabel: 'Price',
-        showGrid: true,
         tickFormatY: (domainValue: number) => '$' + String(domainValue),
     },
     legendConfig: {
         enabled: true,
+        absolutePositions: {
+            top: '20px',
+            left: '80px',
+            right: undefined,
+            bottom: undefined,
+        }
     },
     tooltipConfig: {
         enabled: true,
     },
-    margin: { left: 60, right: 60 },
 };
 
 export default function StocksLineChart() {

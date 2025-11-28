@@ -166,7 +166,7 @@ export const DEFAULT_PLOT_DIMENSIONS: Required<PlotDimensionConfig> = {
 };
 
 export const DEFAULT_PLOT_MARGIN: Required<PlotMarginConfig> = {
-    top: 20,
+    top: 10,
     bottom: 45,
     left: 55,
     right: 20,
@@ -182,7 +182,7 @@ export const MARGIN_PRESETS = {
     bottomNoLabel: 30,
     leftNoLabel: 40,
 
-    rightWithLegend: 80,
+    rightWithLegend: 90,
 } as const;
 
 export const DEFAULT_DOMAIN_CONFIG: Required<DomainConfig> = {
@@ -235,7 +235,7 @@ export const DEFAULT_LEGEND_CONFIG: Required<LegendConfig> = {
     },
     categoricalItemHeight: 20,
     continuousBarWidth: 20,
-    continuousBarLength: 200,
+    continuousBarLength: 150,
 };
 
 export const DEFAULT_TOOLTIP_CONFIG: Required<TooltipConfig> = {
