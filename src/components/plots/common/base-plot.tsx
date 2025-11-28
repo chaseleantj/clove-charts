@@ -88,8 +88,12 @@ function hasUserDefinedMargins(margin?: PlotMarginConfig): boolean {
 
 abstract class BasePlot<
     TData extends DataRecord = DataRecord,
-> extends Component<BasePlotProps<TData>> {
+> extends Component<BasePlotProps<TData>, { isVisible: boolean }> {
     config: RequiredPlotConfig;
+
+    state = {
+        isVisible: false,
+    };
 
     width!: number;
     height!: number;
@@ -328,8 +332,7 @@ abstract class BasePlot<
             .attr('id', this.clipPathId)
             .append('svg:rect')
             .attr('width', this.plotWidth)
-            .attr('height', this.plotHeight)
-            .attr('class', styles.plotBackground);
+            .attr('height', this.plotHeight);
 
         this.plotArea = this.svg
             .append('g')
@@ -337,6 +340,13 @@ abstract class BasePlot<
                 'transform',
                 `translate(${this.config.margin.left},${this.config.margin.top})`
             );
+
+        this.plotArea
+            .append('rect')
+            .attr('width', this.plotWidth)
+            .attr('height', this.plotHeight)
+            .attr('fill', 'none') // so that the background is transparent
+            .attr('class', styles.plotBackground);
 
         this.plot = this.plotArea
             .append('g')
@@ -674,6 +684,10 @@ abstract class BasePlot<
             this.draw();
             this.setupLegend();
             this.setupTooltip();
+
+            if (!this.state.isVisible) {
+                this.setState({ isVisible: true });
+            }
         } catch (error) {
             this.handleDrawError(error);
             this.cleanup();
@@ -697,7 +711,11 @@ abstract class BasePlot<
         const tooltipEnabled = this.config.tooltipConfig.enabled;
 
         return (
-            <div ref={this.wrapperRef} className={styles.chartWrapper}>
+            <div
+                ref={this.wrapperRef}
+                className={styles.chartWrapper}
+                style={{opacity: this.state.isVisible ? 1 : 0}}
+            >
                 {tooltipEnabled && (
                     <div ref={this.tooltipRef} className={styles.tooltip} />
                 )}
