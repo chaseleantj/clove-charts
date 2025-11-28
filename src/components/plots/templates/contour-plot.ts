@@ -39,7 +39,7 @@ export const DEFAULT_CONTOUR_PLOT_CONFIG: Omit<ContourPlotConfig, 'func'> = {
     shadeContour: true,
 };
 
-class BaseContourPlot extends BasePlot {
+class ContourPlot extends BasePlot {
     declare domain: ContourPlotDomain;
     declare scale: ContourPlotScale;
     declare props: ContourPlotProps;
@@ -146,4 +146,4 @@ class BaseContourPlot extends BasePlot {
     }
 }
 
-export default BaseContourPlot;
+export default ContourPlot;

@@ -8,10 +8,12 @@ import { mergeWithDefaults } from '@/components/plots/common/template-config';
 
 export interface HistogramPlotConfig {
     numBins: number;
+    barPadding: number;
 }
 
 export const DEFAULT_HISTOGRAM_PLOT_CONFIG: HistogramPlotConfig = {
     numBins: 10,
+    barPadding: 0.025,
 };
 
 interface HistogramPlotProps<
@@ -27,7 +29,7 @@ interface HistogramPlotDomain {
     y: [number, number];
 }
 
-class BaseHistogramPlot<
+class HistogramPlot<
     TData extends Record<string, any> = Record<string, any>,
 > extends BasePlot<TData> {
     bins: d3.Bin<number, number>[];
@@ -111,7 +113,7 @@ class BaseHistogramPlot<
             .map((binData) => {
                 const x0 = binData.x0 ?? binData.x1 ?? 0;
                 const x1 = binData.x1 ?? binData.x0 ?? x0;
-                const pad = 0.025 * (x1 - x0);
+                const pad = this.histogramPlotConfig.barPadding * (x1 - x0);
                 return {
                     x1: x0 + pad,
                     y1: binData.length,
@@ -134,4 +136,4 @@ class BaseHistogramPlot<
     }
 }
 
-export default BaseHistogramPlot;
+export default HistogramPlot;

@@ -2,7 +2,7 @@
 
 import * as d3 from 'd3';
 import { useCallback } from 'react';
-import BaseContourPlot from '@/components/plots/templates/contour-plot';
+import ContourPlot from '@/components/plots/templates/contour-plot';
 import { PlotConfig } from '@/components/plots/common/config';
 import {
     ChartLayout,
@@ -25,14 +25,14 @@ const PLOT_CONFIG: PlotConfig = {
     },
 };
 
-export default function TestContourChart() {
+export default function ContourChartExample() {
     const f = useCallback((x: number, y: number) => {
         return Math.cos(2 * Math.PI * x * y) + Math.sin(2 * Math.PI * x + y);
     }, []);
 
     return (
         <ChartLayout>
-            <BaseContourPlot
+            <ContourPlot
                 func={f}
                 thresholds={20}
                 strokeColor="none"

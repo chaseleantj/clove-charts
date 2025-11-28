@@ -60,7 +60,7 @@ export function getScatterPlotConfig<TData extends Record<string, any>>(
     };
 }
 
-class BaseScatterPlot<
+class ScatterPlot<
     TData extends Record<string, any> = Record<string, any>,
 > extends BasePlot<TData> {
     dataPoints!: BatchPointsPrimitive;
@@ -217,4 +217,4 @@ class BaseScatterPlot<
     }
 }
 
-export default BaseScatterPlot;
+export default ScatterPlot;

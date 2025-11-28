@@ -1,6 +1,6 @@
 'use client';
 
-import BaseImagePlot from '@/components/plots/templates/image-plot';
+import ImagePlot from '@/components/plots/templates/image-plot';
 import { PlotConfig } from '@/components/plots/common/config';
 import {
     ChartLayout,
@@ -36,7 +36,7 @@ const IMAGE_DATA: ImageData[] = [
 export default function TestImageChart() {
     return (
         <ChartLayout>
-            <BaseImagePlot
+            <ImagePlot
                 data={IMAGE_DATA}
                 imageURLKey="url"
                 coordsKey="coords"

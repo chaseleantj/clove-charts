@@ -1,7 +1,7 @@
 'use client';
 
 import * as d3 from 'd3';
-import BaseMatrixPlot from '@/components/plots/templates/matrix-plot';
+import MatrixPlot from '@/components/plots/templates/matrix-plot';
 import { PlotConfig } from '@/components/plots/common/config';
 import {
     ChartLayout,
@@ -38,7 +38,7 @@ for (const x of xLabels) {
 export default function TestMatrixPlotChart() {
     return (
         <ChartLayout>
-            <BaseMatrixPlot
+            <MatrixPlot
                 data={data}
                 xKey="xCol"
                 yKey="yCol"

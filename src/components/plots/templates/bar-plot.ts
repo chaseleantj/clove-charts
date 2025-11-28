@@ -35,7 +35,7 @@ export const DEFAULT_BAR_PLOT_CONFIG: BarPlotConfig = {
     useDifferentColors: true,
 };
 
-class BaseBarPlot<
+class BarPlot<
     TData extends Record<string, any> = Record<string, any>,
 > extends BasePlot<TData> {
     declare domain: BarPlotDomain;
@@ -115,4 +115,4 @@ class BaseBarPlot<
     }
 }
 
-export default BaseBarPlot;
+export default BarPlot;

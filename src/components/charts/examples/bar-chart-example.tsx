@@ -1,6 +1,6 @@
 'use client';
 
-import BaseBarPlot from '@/components/plots/templates/bar-plot';
+import BarPlot from '@/components/plots/templates/bar-plot';
 import { PlotConfig } from '@/components/plots/common/config';
 import { ChartLayout } from '@/components/charts/chart-layout';
 
@@ -15,13 +15,12 @@ const data = [
     { species: 'Cedar', count: 16 },
     { species: 'Birch', count: 9 },
     { species: 'Pine', count: 8 },
-]
+];
 
-export default function IrisBarChart() {
-
+export default function BarChartExample() {
     return (
         <ChartLayout>
-            <BaseBarPlot
+            <BarPlot
                 data={data}
                 xKey="species"
                 yKey="count"

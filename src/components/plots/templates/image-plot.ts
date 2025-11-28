@@ -27,7 +27,7 @@ export const DEFAULT_IMAGE_PLOT_CONFIG: ImagePlotConfig = {
     useCornerCoords: false,
 };
 
-class BaseImagePlot<
+class ImagePlot<
     TData extends Record<string, any> = Record<string, any>,
 > extends BasePlot<TData> {
     declare domain: ImagePlotDomain;
@@ -57,4 +57,4 @@ class BaseImagePlot<
     }
 }
 
-export default BaseImagePlot;
+export default ImagePlot;

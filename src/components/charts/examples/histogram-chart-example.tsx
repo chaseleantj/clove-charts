@@ -2,7 +2,7 @@
 
 import * as d3 from 'd3';
 import { useEffect, useState } from 'react';
-import BaseHistogramPlot from '@/components/plots/templates/histogram-plot';
+import HistogramPlot from '@/components/plots/templates/histogram-plot';
 import { PlotConfig } from '@/components/plots/common/config';
 import {
     ChartLayout,
@@ -40,7 +40,7 @@ export default function IrisHistogramChart() {
 
     return (
         <ChartLayout>
-            <BaseHistogramPlot
+            <HistogramPlot
                 data={irisData}
                 xKey="sepal_width"
                 {...PLOT_CONFIG}

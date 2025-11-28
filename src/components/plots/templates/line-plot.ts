@@ -40,7 +40,7 @@ export const DEFAULT_LINE_PLOT_CONFIG: LinePlotConfig = {
     lineLabelColor: 'gray',
 };
 
-class BaseLinePlot<
+class LinePlot<
     TData extends Record<string, any> = Record<string, any>,
 > extends BasePlot<TData> {
     declare props: LinePlotProps<TData>;
@@ -259,4 +259,4 @@ class BaseLinePlot<
     }
 }
 
-export default BaseLinePlot;
+export default LinePlot;

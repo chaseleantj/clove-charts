@@ -2,7 +2,7 @@
 
 import * as d3 from 'd3';
 import { useEffect, useState } from 'react';
-import BaseScatterPlot from '@/components/plots/templates/scatter-plot';
+import ScatterPlot from '@/components/plots/templates/scatter-plot';
 import { PlotConfig } from '@/components/plots/common/config';
 import {
     ChartLayout,
@@ -44,7 +44,7 @@ export default function IrisScatterChart() {
 
     return (
         <ChartLayout>
-            <BaseScatterPlot
+            <ScatterPlot
                 data={irisData}
                 xKey="petal_width"
                 yKey="sepal_length"

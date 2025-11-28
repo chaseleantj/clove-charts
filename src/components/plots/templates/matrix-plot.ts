@@ -53,7 +53,7 @@ export function getMatrixPlotConfig<TData extends Record<string, any>>(
     };
 }
 
-class BaseMatrixPlot<
+class MatrixPlot<
     TData extends Record<string, any> = Record<string, any>,
 > extends BasePlot<TData> {
     declare domain: MatrixPlotDomain;
@@ -152,4 +152,4 @@ class BaseMatrixPlot<
     }
 }
 
-export default BaseMatrixPlot;
+export default MatrixPlot;
