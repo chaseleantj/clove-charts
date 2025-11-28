@@ -4,7 +4,7 @@ import {
     isDateTuple,
     isNumberTuple,
     isStringArray,
-} from '@/components/plots/common/type-guards';
+} from '@/components/plots/common/utils/type-guards';
 
 export type ContinuousD3Scale =
     | d3.ScaleTime<number, number>

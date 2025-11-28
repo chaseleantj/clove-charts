@@ -1,9 +1,9 @@
 import * as d3 from 'd3';
-import { CLOVE_CLASSES } from '@/components/plots/common/class-names';
+import { CLOVE_CLASSES } from '@/components/plots/common/config/classes';
 import { v4 as uuidv4 } from 'uuid';
 
 import { LegendConfig } from '@/components/plots/common/config';
-import { getDomainKind } from '@/components/plots/common/type-guards';
+import { getDomainKind } from '@/components/plots/common/utils';
 
 interface PointStyles {
     size?: number;

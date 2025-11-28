@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 import React from 'react';
 
-import { CLOVE_CLASSES } from '@/components/plots/common/class-names';
+import { CLOVE_CLASSES } from '@/components/plots/common/config/classes';
 import {
     TooltipConfig,
     TooltipValueFormatter,

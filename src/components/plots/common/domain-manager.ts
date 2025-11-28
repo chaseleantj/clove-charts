@@ -8,7 +8,7 @@ import {
     isNumberValue,
     isStringArray,
     isStringValue,
-} from '@/components/plots/common/type-guards';
+} from '@/components/plots/common/utils/type-guards';
 
 export type DataValue = string | number | Date | null | undefined;
 

@@ -2,7 +2,7 @@
 
 import { ReactNode } from 'react';
 
-import { CLOVE_CLASSES } from '@/components/plots/common/class-names';
+import { CLOVE_CLASSES } from '@/components/plots/common/config/classes';
 
 interface ChartLayoutProps {
     children: ReactNode;

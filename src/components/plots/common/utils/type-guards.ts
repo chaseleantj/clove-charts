@@ -57,12 +57,3 @@ export function isDateTuple(value: unknown): value is [Date, Date] {
         value[1] instanceof Date
     );
 }
-
-export function getDomainKind(
-    domain: string[] | [Date, Date] | [number, number]
-): 'string' | 'number' | 'date' | 'unknown' {
-    if (isStringArray(domain)) return 'string';
-    if (isNumberTuple(domain)) return 'number';
-    if (isDateTuple(domain)) return 'date';
-    return 'unknown';
-}

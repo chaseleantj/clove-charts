@@ -4,7 +4,7 @@ import BasePlot, {
     BasePlotProps,
     DataKey,
 } from '@/components/plots/common/base-plot';
-import { mergeWithDefaults } from '@/components/plots/common/template-config';
+import { mergeWithDefaults } from '@/components/plots/common/utils';
 
 export interface HistogramPlotConfig {
     numBins: number;

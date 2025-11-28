@@ -4,7 +4,7 @@ import BasePlot, {
     BasePlotProps,
     Scale,
 } from '@/components/plots/common/base-plot';
-import { mergeWithDefaults } from '@/components/plots/common/template-config';
+import { mergeWithDefaults } from '@/components/plots/common/utils';
 
 export interface ContourPlotConfig {
     func: (x: number, y: number) => number;

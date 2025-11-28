@@ -5,13 +5,13 @@ import BasePlot, {
     DataKey,
     Scale,
 } from '@/components/plots/common/base-plot';
-import { isDefined } from '@/components/plots/common/type-guards';
+import { isDefined } from '@/components/plots/common/utils/type-guards';
 import { isContinuousScale } from '@/components/plots/common/scale-manager';
 import {
     LinePrimitive,
     PointPrimitive,
 } from '@/components/plots/common/primitives/primitives';
-import { mergeWithDefaults } from '@/components/plots/common/template-config';
+import { mergeWithDefaults } from '@/components/plots/common/utils';
 
 export interface LinePlotConfig {
     lineWidth: number;
