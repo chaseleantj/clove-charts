@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 import React from 'react';
 
-import styles from '@/components/page.module.css';
+import { CLOVE_CLASSES } from '@/components/plots/common/class-names';
 import {
     TooltipConfig,
     TooltipValueFormatter,
@@ -114,7 +114,7 @@ class TooltipManager {
                 const formattedValue = formatter
                     ? formatter(c.value, c.label)
                     : this.defaultFormat(c.value);
-                return `<div class="${styles.tooltipRow}"><span class="${styles.tooltipLabel}">${c.label}</span><span class="${styles.tooltipValue}">${formattedValue}</span></div>`;
+                return `<div class="${CLOVE_CLASSES.tooltipRow}"><span class="${CLOVE_CLASSES.tooltipLabel}">${c.label}</span><span class="${CLOVE_CLASSES.tooltipValue}">${formattedValue}</span></div>`;
             })
             .join('');
 

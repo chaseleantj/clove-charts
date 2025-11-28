@@ -1,7 +1,7 @@
 import katex from 'katex';
 import * as d3 from 'd3';
 
-import styles from '@/components/page.module.css';
+import { CLOVE_CLASSES } from '@/components/plots/common/class-names';
 
 export interface TextMeasurement {
     width: number;
@@ -35,7 +35,7 @@ function getMeasurementSvg(): d3.Selection<
             .select('body')
             .append('svg')
             .attr('id', '__text-measure-svg')
-            .attr('class', styles.chart) // Apply chart class for CSS inheritance
+            .attr('class', CLOVE_CLASSES.chart) // Apply chart class for CSS inheritance
             .style('position', 'absolute')
             .style('visibility', 'hidden')
             .style('pointer-events', 'none')

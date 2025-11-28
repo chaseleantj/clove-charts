@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import styles from '@/components/page.module.css';
+import { CLOVE_CLASSES } from '@/components/plots/common/class-names';
 import { v4 as uuidv4 } from 'uuid';
 
 import { LegendConfig } from '@/components/plots/common/config';
@@ -66,13 +66,13 @@ class LegendManager {
     }
 
     public setTitle(title?: string) {
-        this.container.selectAll(`.${styles.legendTitle}`).remove();
+        this.container.selectAll(`.${CLOVE_CLASSES.legendTitle}`).remove();
         const newTitle = title ?? this.legendConfig.title;
 
         if (newTitle) {
             this.container
                 .insert('div', ':first-child')
-                .attr('class', styles.legendTitle)
+                .attr('class', CLOVE_CLASSES.legendTitle)
                 .text(newTitle);
         }
     }
@@ -115,10 +115,10 @@ class LegendManager {
     ) {
         const row = this.container
             .append('div')
-            .attr('class', styles.legendItem);
+            .attr('class', CLOVE_CLASSES.legendItem);
 
         // Symbol container with small SVG
-        const symbol = row.append('div').attr('class', styles.legendSymbol);
+        const symbol = row.append('div').attr('class', CLOVE_CLASSES.legendSymbol);
 
         const svg = symbol
             .append('svg')

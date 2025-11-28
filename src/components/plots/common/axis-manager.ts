@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 import { AxisConfig } from '@/components/plots/common/config';
-import styles from '@/components/page.module.css';
+import { CLOVE_CLASSES } from '@/components/plots/common/class-names';
 import {
     isDateArray,
     isNumberArray,
@@ -29,7 +29,7 @@ class AxisManager {
 
         this.axisGroup = this.plotArea
             .append('g')
-            .attr('class', styles.axes)
+            .attr('class', CLOVE_CLASSES.axes)
             .attr('overflow', 'visible');
     }
 
@@ -62,7 +62,7 @@ class AxisManager {
         this.x = this.axisGroup
             .append('g')
             .attr('transform', `translate(0, ${this.plotHeight})`)
-            .attr('class', styles.xAxis)
+            .attr('class', CLOVE_CLASSES.xAxis)
             .call(xAxis);
     }
 
@@ -78,7 +78,7 @@ class AxisManager {
 
         this.y = this.axisGroup
             .append('g')
-            .attr('class', styles.yAxis)
+            .attr('class', CLOVE_CLASSES.yAxis)
             .call(yAxis);
     }
 
@@ -88,7 +88,7 @@ class AxisManager {
                 .selectAll('.tick > line')
                 .filter((d, i, nodes) => i < nodes.length)
                 .clone()
-                .attr('class', styles.grid)
+                .attr('class', CLOVE_CLASSES.grid)
                 .attr('pointer-events', 'none')
                 .attr('y1', -this.plotHeight)
                 .attr('y2', 0)
@@ -101,7 +101,7 @@ class AxisManager {
                 .selectAll('.tick > line')
                 .filter((d, i, nodes) => i < nodes.length)
                 .clone()
-                .attr('class', styles.grid)
+                .attr('class', CLOVE_CLASSES.grid)
                 .attr('pointer-events', 'none')
                 .attr('x1', 0)
                 .attr('x2', this.plotWidth)
@@ -115,7 +115,7 @@ class AxisManager {
                 'transform',
                 `translate(${this.plotWidth / 2}, ${margin - this.axisConfig.labelOffsetX})`
             )
-            .attr('class', styles.axisLabel)
+            .attr('class', CLOVE_CLASSES.axisLabel)
             .append('text')
             .attr('fill', 'currentColor')
             .attr('text-anchor', 'middle')
@@ -129,7 +129,7 @@ class AxisManager {
                 'transform',
                 `translate(${-margin + this.axisConfig.labelOffsetY}, ${this.plotHeight / 2})`
             )
-            .attr('class', styles.axisLabel)
+            .attr('class', CLOVE_CLASSES.axisLabel)
             .append('text')
             .attr('fill', 'currentColor')
             .attr('text-anchor', 'middle')
@@ -168,11 +168,11 @@ class AxisManager {
     }
 
     removeXGrid() {
-        this.x.call((g) => g.selectAll(`.${styles.grid}`).remove());
+        this.x.call((g) => g.selectAll(`.${CLOVE_CLASSES.grid}`).remove());
     }
 
     removeYGrid() {
-        this.y.call((g) => g.selectAll(`.${styles.grid}`).remove());
+        this.y.call((g) => g.selectAll(`.${CLOVE_CLASSES.grid}`).remove());
     }
 }
 

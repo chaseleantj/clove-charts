@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import * as d3 from 'd3';
 import { v4 as uuidv4 } from 'uuid';
 
-import styles from '@/components/page.module.css';
+import { CLOVE_CLASSES } from '@/components/plots/common/class-names';
 import PrimitiveManager from '@/components/plots/common/primitives/primitive-manager';
 import TooltipManager from '@/components/plots/common/tooltip-manager';
 import LegendManager from '@/components/plots/common/legend-manager';
@@ -346,11 +346,11 @@ abstract class BasePlot<
             .attr('width', this.plotWidth)
             .attr('height', this.plotHeight)
             .attr('fill', 'none') // so that the background is transparent
-            .attr('class', styles.plotBackground);
+            .attr('class', CLOVE_CLASSES.plotBackground);
 
         this.plot = this.plotArea
             .append('g')
-            .attr('class', styles.plot)
+            .attr('class', CLOVE_CLASSES.plot)
             .attr('clip-path', `url(#${this.clipPathId})`);
 
         this.onInitializePlot();
@@ -713,17 +713,17 @@ abstract class BasePlot<
         return (
             <div
                 ref={this.wrapperRef}
-                className={styles.chartWrapper}
+                className={CLOVE_CLASSES.chartWrapper}
                 style={{opacity: this.state.isVisible ? 1 : 0}}
             >
                 {tooltipEnabled && (
-                    <div ref={this.tooltipRef} className={styles.tooltip} />
+                    <div ref={this.tooltipRef} className={CLOVE_CLASSES.tooltip} />
                 )}
 
                 <div ref={this.ref} style={{ width: '100%' }} />
 
                 {legendEnabled && (
-                    <div ref={this.legendRef} className={styles.legend} />
+                    <div ref={this.legendRef} className={CLOVE_CLASSES.legend} />
                 )}
             </div>
         );

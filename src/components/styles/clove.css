@@ -1,0 +1,136 @@
+/* CSS Custom Properties for theming */
+:root {
+    --clove-font-family: 'Geist', Arial, Helvetica, sans-serif;
+    --clove-font-size: 12px;
+    --clove-plot-background: transparent;
+    --clove-grid-color: gray;
+    --clove-grid-opacity: 0.25;
+    --clove-tooltip-bg: rgba(255, 255, 255, 0.9);
+    --clove-tooltip-border: 1px solid rgba(127, 127, 127, 0.25);
+    --clove-legend-bg: rgba(255, 255, 255, 0.9);
+}
+
+/* Stable class names with clove- prefix */
+
+.clove-chart {
+    width: 100%;
+    max-width: 700px;
+    padding: 10px;
+    margin: auto;
+    box-sizing: border-box;
+    font-family: var(--clove-font-family);
+}
+
+.clove-chart text {
+    font-family: var(--clove-font-family);
+    font-size: var(--clove-font-size);
+}
+
+.clove-chart-wrapper {
+    position: relative;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 600px;
+    margin: auto;
+}
+
+.clove-plot {
+}
+
+.clove-plot-background {
+    fill: var(--clove-plot-background);
+}
+
+.clove-axes {
+    overflow: visible;
+}
+
+.clove-x-axis {
+}
+
+.clove-y-axis {
+}
+
+.clove-axis-label {
+}
+
+.clove-grid {
+    color: var(--clove-grid-color);
+    opacity: var(--clove-grid-opacity);
+}
+
+.clove-legend {
+    position: absolute;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 300px;
+    padding: 8px;
+    font-size: var(--clove-font-size);
+    overflow-y: auto;
+    background: var(--clove-legend-bg);
+}
+
+.clove-legend-title {
+    margin-bottom: 5px;
+}
+
+.clove-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.clove-legend-symbol {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+}
+
+.clove-tooltip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    min-width: 120px;
+    max-width: 200px;
+    padding: 8px;
+    font-size: var(--clove-font-size);
+    background: var(--clove-tooltip-bg);
+    border: var(--clove-tooltip-border);
+    pointer-events: none;
+}
+
+.clove-tooltip-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.clove-tooltip-label {
+}
+
+.clove-tooltip-value {
+}
+
+.clove-header {
+}
+
+.clove-footer {
+    padding: 0;
+}
+
+.clove-footer p {
+    margin: 0;
+}
+
+.clove-captions {
+    max-width: 400px;
+    margin: 0 auto;
+    font-size: 0.75em;
+    text-align: center;
+}
+

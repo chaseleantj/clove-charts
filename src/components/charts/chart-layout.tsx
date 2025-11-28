@@ -2,14 +2,14 @@
 
 import { ReactNode } from 'react';
 
-import styles from '@/components/page.module.css';
+import { CLOVE_CLASSES } from '@/components/plots/common/class-names';
 
 interface ChartLayoutProps {
     children: ReactNode;
 }
 
 export function ChartLayout({ children }: ChartLayoutProps) {
-    return <div className={styles.chart}>{children}</div>;
+    return <div className={CLOVE_CLASSES.chart}>{children}</div>;
 }
 
 interface ChartHeaderProps {
@@ -17,7 +17,7 @@ interface ChartHeaderProps {
 }
 
 export function ChartHeader({ children }: ChartHeaderProps) {
-    return <div className={styles.header}>{children}</div>;
+    return <div className={CLOVE_CLASSES.header}>{children}</div>;
 }
 
 interface ChartFooterProps {
@@ -25,7 +25,7 @@ interface ChartFooterProps {
 }
 
 export function ChartFooter({ children }: ChartFooterProps) {
-    return <div className={styles.footer}>{children}</div>;
+    return <div className={CLOVE_CLASSES.footer}>{children}</div>;
 }
 
 interface ChartCaptionsProps {
@@ -34,7 +34,7 @@ interface ChartCaptionsProps {
 
 export function ChartCaptions({ children }: ChartCaptionsProps) {
     return (
-        <div className={styles.captions}>
+        <div className={CLOVE_CLASSES.captions}>
             {typeof children === 'string' ? <p>{children}</p> : children}
         </div>
     );
