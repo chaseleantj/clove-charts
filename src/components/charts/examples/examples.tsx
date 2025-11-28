@@ -1,10 +1,35 @@
-import BarChartExample from '@/components/charts/examples/bar-chart-example';
-import ScatterChartExample from '@/components/charts/examples/scatter-chart-example';
-import HistogramChartExample from '@/components/charts/examples/histogram-chart-example';
-import ContourChartExample from '@/components/charts/examples/contour-chart-example';
-import MatrixChartExample from '@/components/charts/examples/matrix-chart-example';
-import ImageChartExample from '@/components/charts/examples/image-chart-example';
-import LineChartExample from '@/components/charts/examples/line-chart-example';
+'use client';
+
+import dynamic from 'next/dynamic';
+
+const BarChartExample = dynamic(
+    () => import('@/components/charts/examples/bar-chart-example'),
+    { ssr: false }
+);
+const ScatterChartExample = dynamic(
+    () => import('@/components/charts/examples/scatter-chart-example'),
+    { ssr: false }
+);
+const HistogramChartExample = dynamic(
+    () => import('@/components/charts/examples/histogram-chart-example'),
+    { ssr: false }
+);
+const ContourChartExample = dynamic(
+    () => import('@/components/charts/examples/contour-chart-example'),
+    { ssr: false }
+);
+const MatrixChartExample = dynamic(
+    () => import('@/components/charts/examples/matrix-chart-example'),
+    { ssr: false }
+);
+const ImageChartExample = dynamic(
+    () => import('@/components/charts/examples/image-chart-example'),
+    { ssr: false }
+);
+const LineChartExample = dynamic(
+    () => import('@/components/charts/examples/line-chart-example'),
+    { ssr: false }
+);
 
 export {
     BarChartExample,

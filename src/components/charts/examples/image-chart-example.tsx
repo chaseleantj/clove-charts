@@ -33,7 +33,7 @@ const IMAGE_DATA: ImageData[] = [
     },
 ];
 
-export default function TestImageChart() {
+export default function ImageChartExample() {
     return (
         <ChartLayout>
             <ImagePlot
