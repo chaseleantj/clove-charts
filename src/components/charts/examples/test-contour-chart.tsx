@@ -23,7 +23,6 @@ const PLOT_CONFIG: PlotConfig = {
     tooltipConfig: {
         enabled: false,
     },
-    margin: { right: 80 },
 };
 
 export default function TestContourChart() {

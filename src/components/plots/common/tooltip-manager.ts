@@ -2,7 +2,10 @@ import * as d3 from 'd3';
 import React from 'react';
 
 import styles from '@/components/page.module.css';
-import { TooltipConfig, TooltipValueFormatter } from '@/components/plots/common/config';
+import {
+    TooltipConfig,
+    TooltipValueFormatter,
+} from '@/components/plots/common/config';
 
 export interface TooltipContent {
     label: string;
@@ -72,7 +75,11 @@ class TooltipManager {
 
             // Flip horizontally if tooltip would overflow right edge
             if (x + tooltipWidth > wrapperRect.width - padding) {
-                x = event.pageX - wrapperRect.left - tooltipWidth - this.config.offsetX;
+                x =
+                    event.pageX -
+                    wrapperRect.left -
+                    tooltipWidth -
+                    this.config.offsetX;
             }
 
             // Ensure tooltip doesn't go past left edge
@@ -82,7 +89,11 @@ class TooltipManager {
 
             // Flip vertically if tooltip would overflow bottom edge
             if (y + tooltipHeight > wrapperRect.height - padding) {
-                y = event.pageY - wrapperRect.top - tooltipHeight - this.config.offsetY;
+                y =
+                    event.pageY -
+                    wrapperRect.top -
+                    tooltipHeight -
+                    this.config.offsetY;
             }
 
             // Ensure tooltip doesn't go past top edge
@@ -125,7 +136,9 @@ class TooltipManager {
             }
             // Round to 4 decimal places max, then remove trailing zeros
             const rounded = Math.round(value * 10000) / 10000;
-            return rounded.toLocaleString(undefined, { maximumFractionDigits: 4 });
+            return rounded.toLocaleString(undefined, {
+                maximumFractionDigits: 4,
+            });
         }
 
         if (typeof value === 'boolean') {

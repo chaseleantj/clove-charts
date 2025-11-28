@@ -41,13 +41,13 @@ export default function StocksLineChart() {
     const [stockData, setStockData] = useState<StockData[]>([]);
 
     useEffect(() => {
-                d3.csv('/data/stocks.csv', d3.autoType).then((data) => {
-                    const parsedData = data as StockData[];
-                    const filteredData = parsedData.filter((d) => {
-                        return d.Date && d.Date.getFullYear() >= 2010;
-                    });
-                    setStockData(filteredData);
-                });
+        d3.csv('/data/stocks.csv', d3.autoType).then((data) => {
+            const parsedData = data as StockData[];
+            const filteredData = parsedData.filter((d) => {
+                return d.Date && d.Date.getFullYear() >= 2010;
+            });
+            setStockData(filteredData);
+        });
     }, []);
 
     return (

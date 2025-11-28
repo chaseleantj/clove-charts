@@ -213,9 +213,7 @@ class BaseScatterPlot<
                 }
             });
 
-        this.interactionSurface.on('click', () =>
-            this.tooltipManager.hide()
-        );
+        this.interactionSurface.on('click', () => this.tooltipManager.hide());
     }
 }
 

@@ -30,9 +30,9 @@ export default function IrisBarChart() {
     );
 
     useEffect(() => {
-                d3.csv('/data/iris.csv', d3.autoType).then((data) => {
-                    setIrisData(data as IrisData[]);
-                });
+        d3.csv('/data/iris.csv', d3.autoType).then((data) => {
+            setIrisData(data as IrisData[]);
+        });
     }, []);
 
     return (

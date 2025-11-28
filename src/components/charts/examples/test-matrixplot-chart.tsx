@@ -20,7 +20,6 @@ const PLOT_CONFIG: PlotConfig = {
     tooltipConfig: {
         enabled: true,
     },
-    margin: { left: 80, right: 80 },
 };
 
 const xLabels = ['Label 1', 'Label 2', 'Label 3', 'Label 4', 'Label 5'];

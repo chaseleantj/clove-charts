@@ -11,7 +11,7 @@ export interface HistogramPlotConfig {
 }
 
 export const DEFAULT_HISTOGRAM_PLOT_CONFIG: HistogramPlotConfig = {
-    numBins: 20,
+    numBins: 10,
 };
 
 interface HistogramPlotProps<

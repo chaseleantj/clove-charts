@@ -33,9 +33,9 @@ export default function IrisHistogramChart() {
     const [irisData, setIrisData] = useState<IrisData[]>([]);
 
     useEffect(() => {
-                d3.csv('/data/iris.csv', d3.autoType).then((data) => {
-                    setIrisData(data as IrisData[]);
-                });
+        d3.csv('/data/iris.csv', d3.autoType).then((data) => {
+            setIrisData(data as IrisData[]);
+        });
     }, []);
 
     return (
@@ -43,7 +43,6 @@ export default function IrisHistogramChart() {
             <BaseHistogramPlot
                 data={irisData}
                 xKey="sepal_width"
-                numBins={10}
                 {...PLOT_CONFIG}
             />
             <ChartFooter>

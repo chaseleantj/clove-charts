@@ -18,6 +18,7 @@ export interface PlotMarginConfig {
     bottom?: number;
     left?: number;
     right?: number;
+    auto?: boolean;
 }
 
 export interface DomainConfig {
@@ -169,7 +170,20 @@ export const DEFAULT_PLOT_MARGIN: Required<PlotMarginConfig> = {
     bottom: 45,
     left: 55,
     right: 20,
+    auto: true,
 };
+
+export const MARGIN_PRESETS = {
+    top: DEFAULT_PLOT_MARGIN.top,
+    bottom: DEFAULT_PLOT_MARGIN.bottom,
+    left: DEFAULT_PLOT_MARGIN.left,
+    right: DEFAULT_PLOT_MARGIN.right,
+
+    bottomNoLabel: 30,
+    leftNoLabel: 40,
+
+    rightWithLegend: 80,
+} as const;
 
 export const DEFAULT_DOMAIN_CONFIG: Required<DomainConfig> = {
     paddingX: 0.05,

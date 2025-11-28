@@ -13,9 +13,15 @@ import ScaleManager, {
 } from '@/components/plots/common/scale-manager';
 import AxisManager from '@/components/plots/common/axis-manager';
 import BrushManager from '@/components/plots/common/brush-manager';
+import {
+    measureMaxTextWidth,
+    getChartFontStyles,
+} from '@/components/plots/common/utils';
+import { isStringArray } from '@/components/plots/common/type-guards';
 
 import {
     PlotConfig,
+    PlotMarginConfig,
     RequiredPlotConfig,
     DEFAULT_PLOT_MARGIN,
     DEFAULT_PLOT_DIMENSIONS,
@@ -26,6 +32,7 @@ import {
     DEFAULT_LEGEND_CONFIG,
     DEFAULT_TOOLTIP_CONFIG,
     DEFAULT_COLOR_CONFIG,
+    MARGIN_PRESETS,
 } from '@/components/plots/common/config';
 
 export interface Domain {
@@ -64,6 +71,19 @@ export function getPlotConfig(
         tooltipConfig: { ...DEFAULT_TOOLTIP_CONFIG, ...config?.tooltipConfig },
         colorConfig: { ...DEFAULT_COLOR_CONFIG, ...config?.colorConfig },
     };
+}
+
+/**
+ * Checks if user explicitly passed margin values (excluding the `auto` property)
+ */
+function hasUserDefinedMargins(margin?: PlotMarginConfig): boolean {
+    if (!margin) return false;
+    return (
+        margin.top !== undefined ||
+        margin.bottom !== undefined ||
+        margin.left !== undefined ||
+        margin.right !== undefined
+    );
 }
 
 abstract class BasePlot<
@@ -182,7 +202,102 @@ abstract class BasePlot<
             this.config.dimensions.height ??
             this.width * this.config.dimensions.heightToWidthRatio;
 
+        this.domainManager = new DomainManager(
+            this.config.domainConfig,
+            this.config.scaleConfig
+        );
+        this.scaleManager = new ScaleManager(
+            this.config.scaleConfig,
+            this.config.colorConfig
+        );
+
         this.onInitializeProperties();
+
+        // Apply auto-margins if enabled and user hasn't passed explicit margins
+        if (
+            this.config.margin.auto &&
+            !hasUserDefinedMargins(this.props.margin)
+        ) {
+            this.applyAutoMargins();
+        }
+    }
+
+    private applyAutoMargins(): void {
+        const domainX = this.getDefaultDomainX();
+        const domainY = this.getDefaultDomainY();
+
+        const calculatedMargins = this.calculateAutoMargins(domainX, domainY);
+
+        this.config.margin = {
+            ...this.config.margin,
+            ...calculatedMargins,
+        };
+    }
+
+    protected calculateAutoMargins(
+        domainX: Domain['x'],
+        domainY: Domain['y']
+    ): Partial<Required<PlotMarginConfig>> {
+        const { axisConfig, legendConfig } = this.config;
+        const PADDING = 10;
+
+        const hasXLabel =
+            axisConfig.xLabel !== '' &&
+            (axisConfig.xLabel !== null || this.props.xKey !== undefined);
+        const hasYLabel =
+            axisConfig.yLabel !== '' &&
+            (axisConfig.yLabel !== null || this.props.yKey !== undefined);
+        const hasLegend = legendConfig.enabled;
+
+        const hasStringDomainX = isStringArray(domainX);
+        const hasStringDomainY = isStringArray(domainY);
+
+        const { fontSize } = getChartFontStyles();
+        const labelHeight = fontSize + 5;
+
+        let leftMargin: number;
+        if (hasStringDomainY) {
+            const yTickLabels = domainY as string[];
+            const maxYTickWidth = measureMaxTextWidth(yTickLabels);
+            leftMargin = maxYTickWidth + axisConfig.tickSize + PADDING;
+            if (hasYLabel) {
+                leftMargin += labelHeight + axisConfig.labelOffsetY;
+            }
+        } else {
+            leftMargin = hasYLabel
+                ? MARGIN_PRESETS.left
+                : MARGIN_PRESETS.leftNoLabel;
+        }
+
+        let bottomMargin: number;
+        if (hasStringDomainX) {
+            bottomMargin = fontSize + axisConfig.tickSize + PADDING;
+            if (hasXLabel) {
+                bottomMargin += labelHeight + axisConfig.labelOffsetX;
+            }
+        } else {
+            bottomMargin = hasXLabel
+                ? MARGIN_PRESETS.bottom
+                : MARGIN_PRESETS.bottomNoLabel;
+        }
+
+        let rightMargin: number;
+        if (hasLegend) {
+            rightMargin = MARGIN_PRESETS.rightWithLegend;
+        } else if (hasStringDomainX) {
+            const xTickLabels = domainX as string[];
+            const maxXTickWidth = measureMaxTextWidth(xTickLabels);
+            rightMargin = Math.max(maxXTickWidth / 2, MARGIN_PRESETS.right);
+        } else {
+            rightMargin = MARGIN_PRESETS.right;
+        }
+
+        return {
+            top: Math.ceil(MARGIN_PRESETS.top),
+            bottom: Math.ceil(bottomMargin),
+            left: Math.ceil(leftMargin),
+            right: Math.ceil(rightMargin),
+        };
     }
 
     private initializePlot(): void {
@@ -205,7 +320,7 @@ abstract class BasePlot<
             .select(this.ref.current)
             .append('svg')
             .attr('width', this.width)
-            .attr('height', this.height)
+            .attr('height', this.height);
 
         this.svg
             .append('defs')
@@ -222,7 +337,7 @@ abstract class BasePlot<
                 'transform',
                 `translate(${this.config.margin.left},${this.config.margin.top})`
             );
-            
+
         this.plot = this.plotArea
             .append('g')
             .attr('class', styles.plot)
@@ -278,19 +393,6 @@ abstract class BasePlot<
     protected configureDomainAndScales(): void {
         this.domain = this.getDefaultDomain();
         this.scale = this.getDefaultScales();
-    }
-
-    private setupDomainAndScales(): void {
-        this.domainManager = new DomainManager(
-            this.config.domainConfig,
-            this.config.scaleConfig
-        );
-
-        this.scaleManager = new ScaleManager(
-            this.config.scaleConfig,
-            this.config.colorConfig
-        );
-        this.configureDomainAndScales();
     }
 
     private setupAxes(): void {
@@ -565,7 +667,7 @@ abstract class BasePlot<
         try {
             this.initializePlot();
             this.setupPrimitives();
-            this.setupDomainAndScales();
+            this.configureDomainAndScales();
             this.setupAxes();
             this.setupBrush();
             this.setupInteractionSurface();

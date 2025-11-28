@@ -31,7 +31,6 @@ const PLOT_CONFIG: PlotConfig = {
     tooltipConfig: {
         enabled: true,
     },
-    margin: { right: 80 },
 };
 
 export default function IrisScatterChart() {
