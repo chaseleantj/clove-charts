@@ -181,4 +181,3 @@ export function getDomainKind(
 
 // Re-export katex utilities
 export { renderKatex } from './katex';
-

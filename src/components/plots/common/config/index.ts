@@ -152,4 +152,3 @@ export interface RequiredPlotConfig {
 
 // Re-export defaults for convenience
 export * from './defaults';
-

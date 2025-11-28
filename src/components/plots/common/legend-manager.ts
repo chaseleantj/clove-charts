@@ -118,7 +118,9 @@ class LegendManager {
             .attr('class', CLOVE_CLASSES.legendItem);
 
         // Symbol container with small SVG
-        const symbol = row.append('div').attr('class', CLOVE_CLASSES.legendSymbol);
+        const symbol = row
+            .append('div')
+            .attr('class', CLOVE_CLASSES.legendSymbol);
 
         const svg = symbol
             .append('svg')

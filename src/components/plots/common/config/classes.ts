@@ -20,4 +20,3 @@ export const CLOVE_CLASSES = {
     footer: 'clove-footer',
     captions: 'clove-captions',
 } as const;
-

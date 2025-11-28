@@ -125,4 +125,3 @@ export const DEFAULT_PRIMITIVE_CONFIG: Required<PrimitiveConfig> = {
     layerName: 'default',
     className: 'primitive',
 };
-

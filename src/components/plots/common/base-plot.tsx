@@ -714,16 +714,22 @@ abstract class BasePlot<
             <div
                 ref={this.wrapperRef}
                 className={CLOVE_CLASSES.chartWrapper}
-                style={{opacity: this.state.isVisible ? 1 : 0}}
+                style={{ opacity: this.state.isVisible ? 1 : 0 }}
             >
                 {tooltipEnabled && (
-                    <div ref={this.tooltipRef} className={CLOVE_CLASSES.tooltip} />
+                    <div
+                        ref={this.tooltipRef}
+                        className={CLOVE_CLASSES.tooltip}
+                    />
                 )}
 
                 <div ref={this.ref} style={{ width: '100%' }} />
 
                 {legendEnabled && (
-                    <div ref={this.legendRef} className={CLOVE_CLASSES.legend} />
+                    <div
+                        ref={this.legendRef}
+                        className={CLOVE_CLASSES.legend}
+                    />
                 )}
             </div>
         );
