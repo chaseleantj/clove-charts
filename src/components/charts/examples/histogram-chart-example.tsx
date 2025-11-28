@@ -29,7 +29,7 @@ const PLOT_CONFIG: PlotConfig = {
     },
 };
 
-export default function IrisHistogramChart() {
+export default function HistogramChartExample() {
     const [irisData, setIrisData] = useState<IrisData[]>([]);
 
     useEffect(() => {
