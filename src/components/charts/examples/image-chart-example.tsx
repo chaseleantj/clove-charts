@@ -29,7 +29,7 @@ const IMAGE_DATA: ImageData[] = [
     {
         url: '/images/zebrafish.png',
         coords: [800, 600],
-        width: 150,
+        width: 140,
     },
 ];
 
