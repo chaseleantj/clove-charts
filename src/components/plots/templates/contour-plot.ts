@@ -1,9 +1,6 @@
 import * as d3 from 'd3';
 
-import BasePlot, {
-    BasePlotProps,
-    Scale,
-} from '../common/base-plot';
+import BasePlot, { BasePlotProps, Scale } from '../common/base-plot';
 import { mergeWithDefaults } from '../common/utils';
 
 export interface ContourPlotConfig {

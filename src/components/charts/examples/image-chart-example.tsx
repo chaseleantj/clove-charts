@@ -2,11 +2,7 @@
 
 import ImagePlot from '../../plots/templates/image-plot';
 import { PlotConfig } from '../../plots/common/config';
-import {
-    ChartLayout,
-    ChartFooter,
-    ChartCaptions,
-} from '../chart-layout';
+import { ChartLayout, ChartFooter, ChartCaptions } from '../chart-layout';
 
 interface ImageData {
     url: string;

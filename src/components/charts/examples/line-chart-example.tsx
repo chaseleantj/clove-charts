@@ -4,11 +4,7 @@ import * as d3 from 'd3';
 import { useEffect, useState } from 'react';
 import LinePlot from '../../plots/templates/line-plot';
 import { PlotConfig } from '../../plots/common/config';
-import {
-    ChartLayout,
-    ChartFooter,
-    ChartCaptions,
-} from '../chart-layout';
+import { ChartLayout, ChartFooter, ChartCaptions } from '../chart-layout';
 
 interface StockData {
     Date: Date;
@@ -60,7 +56,7 @@ export default function LineChartExample() {
             <LinePlot
                 data={stockData}
                 xKey="Date"
-                yKeys={['AAPL', 'ABB', 'HPQ', 'MSFT', 'NVDA']}
+                yKeys={['AAPL', 'MSFT', 'NVDA']}
                 {...PLOT_CONFIG}
             />
             <ChartFooter>

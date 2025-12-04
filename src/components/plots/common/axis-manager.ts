@@ -1,11 +1,7 @@
 import * as d3 from 'd3';
 import { AxisConfig } from './config';
 import { CLOVE_CLASSES } from './config/classes';
-import {
-    isDateArray,
-    isNumberArray,
-    isStringArray,
-} from './utils/type-guards';
+import { isDateArray, isNumberArray, isStringArray } from './utils/type-guards';
 
 class AxisManager {
     x!: d3.Selection<SVGGElement, unknown, null, undefined>;

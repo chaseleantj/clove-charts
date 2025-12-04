@@ -1,7 +1,4 @@
-import BasePlot, {
-    BasePlotProps,
-    DataKey,
-} from '../common/base-plot';
+import BasePlot, { BasePlotProps, DataKey } from '../common/base-plot';
 import { mergeWithDefaults } from '../common/utils';
 
 export interface ImagePlotConfig {

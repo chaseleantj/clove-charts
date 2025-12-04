@@ -4,11 +4,7 @@ import * as d3 from 'd3';
 import { useEffect, useState } from 'react';
 import HistogramPlot from '../../plots/templates/histogram-plot';
 import { PlotConfig } from '../../plots/common/config';
-import {
-    ChartLayout,
-    ChartFooter,
-    ChartCaptions,
-} from '../chart-layout';
+import { ChartLayout, ChartFooter, ChartCaptions } from '../chart-layout';
 
 interface IrisData {
     sepal_length: number;

@@ -1,8 +1,5 @@
 import * as d3 from 'd3';
-import BasePlot, {
-    BasePlotProps,
-    DataKey,
-} from '../common/base-plot';
+import BasePlot, { BasePlotProps, DataKey } from '../common/base-plot';
 import { mergeWithDefaults } from '../common/utils';
 
 export interface BarPlotConfig {

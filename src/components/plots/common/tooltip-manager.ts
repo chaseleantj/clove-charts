@@ -2,10 +2,7 @@ import * as d3 from 'd3';
 import React from 'react';
 
 import { CLOVE_CLASSES } from './config/classes';
-import {
-    TooltipConfig,
-    TooltipValueFormatter,
-} from './config';
+import { TooltipConfig, TooltipValueFormatter } from './config';
 
 export interface TooltipContent {
     label: string;

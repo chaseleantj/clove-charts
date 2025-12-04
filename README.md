@@ -4,7 +4,7 @@ An extremely flexible React plotting library.
 
 Easily build interactive plots to visualize data.
 
-Unlike Plotly/Recharts, you can draw *whatever* you want.
+Unlike Plotly/Recharts, you can draw _whatever_ you want.
 
 Use the Clove API for lots of control with none of the hassle of D3. Fall back to D3 whenever you want.
 
@@ -27,6 +27,7 @@ Clove comes with 7 beautiful templates that you can easily import into your code
 More coming soon!
 
 ### Example
+
 ```
 import { BarPlot, ChartLayout } from 'clove-charts';
 
@@ -60,7 +61,7 @@ Easily customize your plots with 70+ config options.
 
 ```
 const PLOT_CONFIG = {
-    themeConfig: { 
+    themeConfig: {
         enableZoom: true
     },
     axisConfig: {
@@ -98,7 +99,3 @@ For a full list of config options, see here. (under construction)
 For even more granular control, edit/override `clove-charts/styles/clove.css`.
 
 ## Make your own plots
-
-
-
-

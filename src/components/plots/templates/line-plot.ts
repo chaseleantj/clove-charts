@@ -1,16 +1,9 @@
 import * as d3 from 'd3';
 
-import BasePlot, {
-    BasePlotProps,
-    DataKey,
-    Scale,
-} from '../common/base-plot';
+import BasePlot, { BasePlotProps, DataKey, Scale } from '../common/base-plot';
 import { isDefined } from '../common/utils/type-guards';
 import { isContinuousScale } from '../common/scale-manager';
-import {
-    LinePrimitive,
-    PointPrimitive,
-} from '../common/primitives/primitives';
+import { LinePrimitive, PointPrimitive } from '../common/primitives/primitives';
 import { mergeWithDefaults } from '../common/utils';
 
 export interface LinePlotConfig {

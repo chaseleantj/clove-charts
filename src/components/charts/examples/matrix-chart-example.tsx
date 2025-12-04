@@ -3,11 +3,7 @@
 import * as d3 from 'd3';
 import MatrixPlot from '../../plots/templates/matrix-plot';
 import { PlotConfig } from '../../plots/common/config';
-import {
-    ChartLayout,
-    ChartFooter,
-    ChartCaptions,
-} from '../chart-layout';
+import { ChartLayout, ChartFooter, ChartCaptions } from '../chart-layout';
 
 const PLOT_CONFIG: PlotConfig = {
     themeConfig: { enableZoom: false, opacity: 0.9 },

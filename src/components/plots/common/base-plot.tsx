@@ -7,16 +7,10 @@ import PrimitiveManager from './primitives/primitive-manager';
 import TooltipManager from './tooltip-manager';
 import LegendManager from './legend-manager';
 import DomainManager from './domain-manager';
-import ScaleManager, {
-    D3Scale,
-    isContinuousScale,
-} from './scale-manager';
+import ScaleManager, { D3Scale, isContinuousScale } from './scale-manager';
 import AxisManager from './axis-manager';
 import BrushManager from './brush-manager';
-import {
-    measureMaxTextWidth,
-    getChartFontStyles,
-} from './utils';
+import { measureMaxTextWidth, getChartFontStyles } from './utils';
 import { isStringArray } from './utils/type-guards';
 
 import {
@@ -406,7 +400,9 @@ abstract class BasePlot<
     }
 
     private setupAxes(): void {
-        const showAnyAxis = this.config.axisConfig.showAxisX || this.config.axisConfig.showAxisY;
+        const showAnyAxis =
+            this.config.axisConfig.showAxisX ||
+            this.config.axisConfig.showAxisY;
         if (!showAnyAxis) return;
 
         this.axisManager = new AxisManager(
@@ -423,10 +419,16 @@ abstract class BasePlot<
             this.axisManager.setYAxis(this.scale.y as d3.AxisScale<string>);
         }
 
-        if (this.config.axisConfig.showGridX && this.config.axisConfig.showAxisX) {
+        if (
+            this.config.axisConfig.showGridX &&
+            this.config.axisConfig.showAxisX
+        ) {
             this.axisManager.setXGrid();
         }
-        if (this.config.axisConfig.showGridY && this.config.axisConfig.showAxisY) {
+        if (
+            this.config.axisConfig.showGridY &&
+            this.config.axisConfig.showAxisY
+        ) {
             this.axisManager.setYGrid();
         }
 
@@ -449,10 +451,16 @@ abstract class BasePlot<
         }
 
         this.addUpdateFunction(() => {
-            if (this.config.axisConfig.showGridX && this.config.axisConfig.showAxisX) {
+            if (
+                this.config.axisConfig.showGridX &&
+                this.config.axisConfig.showAxisX
+            ) {
                 this.axisManager.removeXGrid();
             }
-            if (this.config.axisConfig.showGridY && this.config.axisConfig.showAxisY) {
+            if (
+                this.config.axisConfig.showGridY &&
+                this.config.axisConfig.showAxisY
+            ) {
                 this.axisManager.removeYGrid();
             }
             if (this.config.axisConfig.showAxisX) {
@@ -467,10 +475,16 @@ abstract class BasePlot<
                     this.config.themeConfig.transitionDuration
                 );
             }
-            if (this.config.axisConfig.showGridX && this.config.axisConfig.showAxisX) {
+            if (
+                this.config.axisConfig.showGridX &&
+                this.config.axisConfig.showAxisX
+            ) {
                 this.axisManager.setXGrid();
             }
-            if (this.config.axisConfig.showGridY && this.config.axisConfig.showAxisY) {
+            if (
+                this.config.axisConfig.showGridY &&
+                this.config.axisConfig.showAxisY
+            ) {
                 this.axisManager.setYGrid();
             }
         });

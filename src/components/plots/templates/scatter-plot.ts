@@ -1,16 +1,9 @@
 import * as d3 from 'd3';
 
-import BasePlot, {
-    BasePlotProps,
-    DataKey,
-    Scale,
-} from '../common/base-plot';
+import BasePlot, { BasePlotProps, DataKey, Scale } from '../common/base-plot';
 import { RequiredPlotConfig } from '../common/config';
 import { BatchPointsPrimitive } from '../common/primitives/primitives';
-import {
-    isContinuousScale,
-    D3Scale,
-} from '../common/scale-manager';
+import { isContinuousScale, D3Scale } from '../common/scale-manager';
 
 export interface ScatterPlotConfig<
     TData extends Record<string, any> = Record<string, any>,

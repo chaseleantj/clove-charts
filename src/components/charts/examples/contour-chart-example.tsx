@@ -4,11 +4,7 @@ import * as d3 from 'd3';
 import { useCallback } from 'react';
 import ContourPlot from '../../plots/templates/contour-plot';
 import { PlotConfig } from '../../plots/common/config';
-import {
-    ChartLayout,
-    ChartFooter,
-    ChartCaptions,
-} from '../chart-layout';
+import { ChartLayout, ChartFooter, ChartCaptions } from '../chart-layout';
 
 import { InlineMath } from 'react-katex';
 

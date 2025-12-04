@@ -4,11 +4,7 @@ import * as d3 from 'd3';
 import { useEffect, useState } from 'react';
 import ScatterPlot from '../../plots/templates/scatter-plot';
 import { PlotConfig } from '../../plots/common/config';
-import {
-    ChartLayout,
-    ChartFooter,
-    ChartCaptions,
-} from '../chart-layout';
+import { ChartLayout, ChartFooter, ChartCaptions } from '../chart-layout';
 
 interface IrisData {
     sepal_length: number;
@@ -30,7 +26,13 @@ const PLOT_CONFIG: PlotConfig = {
     },
     tooltipConfig: {
         enabled: true,
-        tooltipKeys: ['species', 'sepal_length', 'sepal_width', 'petal_length', 'petal_width']
+        tooltipKeys: [
+            'species',
+            'sepal_length',
+            'sepal_width',
+            'petal_length',
+            'petal_width',
+        ],
     },
 };
 

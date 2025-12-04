@@ -1,10 +1,6 @@
 import * as d3 from 'd3';
 import { ColorConfig, ScaleConfig } from './config';
-import {
-    isDateTuple,
-    isNumberTuple,
-    isStringArray,
-} from './utils/type-guards';
+import { isDateTuple, isNumberTuple, isStringArray } from './utils/type-guards';
 
 export type ContinuousD3Scale =
     | d3.ScaleTime<number, number>
