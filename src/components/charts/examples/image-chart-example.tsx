@@ -12,7 +12,7 @@ interface ImageData {
 
 const PLOT_CONFIG: PlotConfig = {
     themeConfig: { enableZoom: true },
-    axisConfig: { showGrid: false },
+    axisConfig: { showGridX: false, showGridY: false },
     domainConfig: { domainX: [0, 1000], domainY: [0, 1000] },
 };
 

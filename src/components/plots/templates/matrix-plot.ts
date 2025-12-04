@@ -9,7 +9,6 @@ import BasePlot, {
 
 export interface MatrixPlotConfig {
     padding: number;
-    showGrid: boolean;
     showCellLabel: boolean;
 }
 
@@ -38,7 +37,6 @@ interface MatrixPlotScale extends Scale {
 
 export const DEFAULT_MATRIX_PLOT_CONFIG: Partial<MatrixPlotConfig> = {
     padding: 0.05,
-    showGrid: false,
     showCellLabel: true,
 };
 
@@ -47,7 +45,6 @@ export function getMatrixPlotConfig<TData extends Record<string, any>>(
 ): MatrixPlotConfig {
     return {
         padding: props.padding ?? DEFAULT_MATRIX_PLOT_CONFIG.padding!,
-        showGrid: props.showGrid ?? DEFAULT_MATRIX_PLOT_CONFIG.showGrid!,
         showCellLabel:
             props.showCellLabel ?? DEFAULT_MATRIX_PLOT_CONFIG.showCellLabel!,
     };
