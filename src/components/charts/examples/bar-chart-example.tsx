@@ -5,7 +5,7 @@ import { PlotConfig } from '../../plots/common/config';
 import { ChartLayout } from '../chart-layout';
 
 const PLOT_CONFIG: PlotConfig = {
-    axisConfig: { xLabel: 'Species', yLabel: 'Frequency' },
+    axisConfig: { xLabel: 'Species', yLabel: 'Frequency', showGridX: false },
 };
 
 const data = [

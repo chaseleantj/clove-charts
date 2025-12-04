@@ -296,36 +296,51 @@ class BasePlot extends react_1.Component {
         this.scale = this.getDefaultScales();
     }
     setupAxes() {
-        if (!this.config.axisConfig.showAxis)
+        const showAnyAxis = this.config.axisConfig.showAxisX || this.config.axisConfig.showAxisY;
+        if (!showAnyAxis)
             return;
         this.axisManager = new axis_manager_1.default(this.plotArea, this.plotWidth, this.plotHeight, this.config.axisConfig);
-        this.axisManager.setXAxis(this.scale.x);
-        this.axisManager.setYAxis(this.scale.y);
-        if (this.config.axisConfig.showGrid) {
+        if (this.config.axisConfig.showAxisX) {
+            this.axisManager.setXAxis(this.scale.x);
+        }
+        if (this.config.axisConfig.showAxisY) {
+            this.axisManager.setYAxis(this.scale.y);
+        }
+        if (this.config.axisConfig.showGridX && this.config.axisConfig.showAxisX) {
             this.axisManager.setXGrid();
+        }
+        if (this.config.axisConfig.showGridY && this.config.axisConfig.showAxisY) {
             this.axisManager.setYGrid();
         }
         const xLabel = this.config.axisConfig.xLabel === null
             ? this.props.xKey
             : this.config.axisConfig.xLabel;
-        if (xLabel) {
+        if (xLabel && this.config.axisConfig.showAxisX) {
             this.axisManager.setXLabel(xLabel, this.config.margin.bottom);
         }
         const yLabel = this.config.axisConfig.yLabel === null
             ? this.props.yKey
             : this.config.axisConfig.yLabel;
-        if (yLabel) {
+        if (yLabel && this.config.axisConfig.showAxisY) {
             this.axisManager.setYLabel(yLabel, this.config.margin.left);
         }
         this.addUpdateFunction(() => {
-            if (this.config.axisConfig.showGrid) {
+            if (this.config.axisConfig.showGridX && this.config.axisConfig.showAxisX) {
                 this.axisManager.removeXGrid();
+            }
+            if (this.config.axisConfig.showGridY && this.config.axisConfig.showAxisY) {
                 this.axisManager.removeYGrid();
             }
-            this.axisManager.updateXAxis(this.scale.x, this.config.themeConfig.transitionDuration);
-            this.axisManager.updateYAxis(this.scale.y, this.config.themeConfig.transitionDuration);
-            if (this.config.axisConfig.showGrid) {
+            if (this.config.axisConfig.showAxisX) {
+                this.axisManager.updateXAxis(this.scale.x, this.config.themeConfig.transitionDuration);
+            }
+            if (this.config.axisConfig.showAxisY) {
+                this.axisManager.updateYAxis(this.scale.y, this.config.themeConfig.transitionDuration);
+            }
+            if (this.config.axisConfig.showGridX && this.config.axisConfig.showAxisX) {
                 this.axisManager.setXGrid();
+            }
+            if (this.config.axisConfig.showGridY && this.config.axisConfig.showAxisY) {
                 this.axisManager.setYGrid();
             }
         });

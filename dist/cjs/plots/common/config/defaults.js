@@ -77,8 +77,10 @@ exports.DEFAULT_SCALE_CONFIG = {
     formatNiceY: true,
 };
 exports.DEFAULT_AXIS_CONFIG = {
-    showAxis: true,
-    showGrid: true,
+    showAxisX: true,
+    showAxisY: true,
+    showGridX: true,
+    showGridY: true,
     xLabel: null,
     yLabel: null,
     tickCount: 5,

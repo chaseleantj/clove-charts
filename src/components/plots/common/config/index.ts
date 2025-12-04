@@ -36,8 +36,10 @@ export interface ScaleConfig {
 }
 
 export interface AxisConfig {
-    showAxis?: boolean;
-    showGrid?: boolean;
+    showAxisX?: boolean;
+    showAxisY?: boolean;
+    showGridX?: boolean;
+    showGridY?: boolean;
     xLabel?: string | null;
     yLabel?: string | null;
     tickCount?: number;

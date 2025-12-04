@@ -12,7 +12,7 @@ import {
 const PLOT_CONFIG: PlotConfig = {
     themeConfig: { enableZoom: false, opacity: 0.9 },
     colorConfig: { continuousColorScheme: d3.interpolatePuBu },
-    axisConfig: { showGrid: false, showAxis: true, xLabel: 'X', yLabel: 'Y' },
+    axisConfig: { showGridX: false, showGridY: false },
     legendConfig: {
         enabled: true,
         title: 'Values',

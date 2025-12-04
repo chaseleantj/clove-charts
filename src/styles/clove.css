@@ -5,9 +5,9 @@
     --clove-plot-background: transparent;
     --clove-grid-color: gray;
     --clove-grid-opacity: 0.25;
-    --clove-tooltip-bg: rgba(255, 255, 255, 0.9);
+    --clove-tooltip-bg: rgba(255, 255, 255, 0.85);
     --clove-tooltip-border: 1px solid rgba(127, 127, 127, 0.25);
-    --clove-legend-bg: rgba(255, 255, 255, 0.9);
+    --clove-legend-bg: rgba(255, 255, 255, 0.85);
 }
 
 .clove-chart {

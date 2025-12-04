@@ -406,7 +406,8 @@ abstract class BasePlot<
     }
 
     private setupAxes(): void {
-        if (!this.config.axisConfig.showAxis) return;
+        const showAnyAxis = this.config.axisConfig.showAxisX || this.config.axisConfig.showAxisY;
+        if (!showAnyAxis) return;
 
         this.axisManager = new AxisManager(
             this.plotArea,
@@ -415,11 +416,17 @@ abstract class BasePlot<
             this.config.axisConfig
         );
 
-        this.axisManager.setXAxis(this.scale.x as d3.AxisScale<string>);
-        this.axisManager.setYAxis(this.scale.y as d3.AxisScale<string>);
+        if (this.config.axisConfig.showAxisX) {
+            this.axisManager.setXAxis(this.scale.x as d3.AxisScale<string>);
+        }
+        if (this.config.axisConfig.showAxisY) {
+            this.axisManager.setYAxis(this.scale.y as d3.AxisScale<string>);
+        }
 
-        if (this.config.axisConfig.showGrid) {
+        if (this.config.axisConfig.showGridX && this.config.axisConfig.showAxisX) {
             this.axisManager.setXGrid();
+        }
+        if (this.config.axisConfig.showGridY && this.config.axisConfig.showAxisY) {
             this.axisManager.setYGrid();
         }
 
@@ -428,7 +435,7 @@ abstract class BasePlot<
                 ? this.props.xKey
                 : this.config.axisConfig.xLabel;
 
-        if (xLabel) {
+        if (xLabel && this.config.axisConfig.showAxisX) {
             this.axisManager.setXLabel(xLabel, this.config.margin.bottom);
         }
 
@@ -437,25 +444,33 @@ abstract class BasePlot<
                 ? this.props.yKey
                 : this.config.axisConfig.yLabel;
 
-        if (yLabel) {
+        if (yLabel && this.config.axisConfig.showAxisY) {
             this.axisManager.setYLabel(yLabel, this.config.margin.left);
         }
 
         this.addUpdateFunction(() => {
-            if (this.config.axisConfig.showGrid) {
+            if (this.config.axisConfig.showGridX && this.config.axisConfig.showAxisX) {
                 this.axisManager.removeXGrid();
+            }
+            if (this.config.axisConfig.showGridY && this.config.axisConfig.showAxisY) {
                 this.axisManager.removeYGrid();
             }
-            this.axisManager.updateXAxis(
-                this.scale.x as d3.AxisScale<string>,
-                this.config.themeConfig.transitionDuration
-            );
-            this.axisManager.updateYAxis(
-                this.scale.y as d3.AxisScale<string>,
-                this.config.themeConfig.transitionDuration
-            );
-            if (this.config.axisConfig.showGrid) {
+            if (this.config.axisConfig.showAxisX) {
+                this.axisManager.updateXAxis(
+                    this.scale.x as d3.AxisScale<string>,
+                    this.config.themeConfig.transitionDuration
+                );
+            }
+            if (this.config.axisConfig.showAxisY) {
+                this.axisManager.updateYAxis(
+                    this.scale.y as d3.AxisScale<string>,
+                    this.config.themeConfig.transitionDuration
+                );
+            }
+            if (this.config.axisConfig.showGridX && this.config.axisConfig.showAxisX) {
                 this.axisManager.setXGrid();
+            }
+            if (this.config.axisConfig.showGridY && this.config.axisConfig.showAxisY) {
                 this.axisManager.setYGrid();
             }
         });

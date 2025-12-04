@@ -16,7 +16,7 @@ const PLOT_CONFIG: PlotConfig = {
     themeConfig: { enableZoom: true },
     domainConfig: { domainX: [-1, 1], domainY: [-1, 1] },
     colorConfig: { continuousColorScheme: d3.interpolateRdYlBu },
-    axisConfig: { showGrid: false },
+    axisConfig: { showGridX: false, showGridY: false },
     legendConfig: {
         enabled: true,
     },

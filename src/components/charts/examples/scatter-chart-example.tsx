@@ -19,7 +19,7 @@ interface IrisData {
 }
 
 const PLOT_CONFIG: PlotConfig = {
-    themeConfig: { enableZoom: false },
+    themeConfig: { enableZoom: true },
     axisConfig: {
         xLabel: 'Sepal width (cm)',
         yLabel: 'Petal length (cm)',
@@ -30,6 +30,7 @@ const PLOT_CONFIG: PlotConfig = {
     },
     tooltipConfig: {
         enabled: true,
+        tooltipKeys: ['species', 'sepal_length', 'sepal_width', 'petal_length', 'petal_width']
     },
 };
 

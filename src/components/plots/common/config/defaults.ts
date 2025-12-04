@@ -63,8 +63,10 @@ export const DEFAULT_SCALE_CONFIG: Required<ScaleConfig> = {
 };
 
 export const DEFAULT_AXIS_CONFIG: Required<AxisConfig> = {
-    showAxis: true,
-    showGrid: true,
+    showAxisX: true,
+    showAxisY: true,
+    showGridX: true,
+    showGridY: true,
     xLabel: null,
     yLabel: null,
     tickCount: 5,
