@@ -1,11 +1,11 @@
 import * as d3 from 'd3';
-import { AxisConfig } from '@/components/plots/common/config';
-import { CLOVE_CLASSES } from '@/components/plots/common/config/classes';
+import { AxisConfig } from './config';
+import { CLOVE_CLASSES } from './config/classes';
 import {
     isDateArray,
     isNumberArray,
     isStringArray,
-} from '@/components/plots/common/utils/type-guards';
+} from './utils/type-guards';
 
 class AxisManager {
     x!: d3.Selection<SVGGElement, unknown, null, undefined>;

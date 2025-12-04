@@ -1,0 +1,22 @@
+export declare const CLOVE_CLASSES: {
+    readonly chart: "clove-chart";
+    readonly chartWrapper: "clove-chart-wrapper";
+    readonly plot: "clove-plot";
+    readonly plotBackground: "clove-plot-background";
+    readonly axes: "clove-axes";
+    readonly xAxis: "clove-x-axis";
+    readonly yAxis: "clove-y-axis";
+    readonly axisLabel: "clove-axis-label";
+    readonly grid: "clove-grid";
+    readonly legend: "clove-legend";
+    readonly legendTitle: "clove-legend-title";
+    readonly legendItem: "clove-legend-item";
+    readonly legendSymbol: "clove-legend-symbol";
+    readonly tooltip: "clove-tooltip";
+    readonly tooltipRow: "clove-tooltip-row";
+    readonly tooltipLabel: "clove-tooltip-label";
+    readonly tooltipValue: "clove-tooltip-value";
+    readonly header: "clove-header";
+    readonly footer: "clove-footer";
+    readonly captions: "clove-captions";
+};

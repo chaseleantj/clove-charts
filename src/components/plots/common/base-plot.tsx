@@ -2,22 +2,22 @@ import React, { Component } from 'react';
 import * as d3 from 'd3';
 import { v4 as uuidv4 } from 'uuid';
 
-import { CLOVE_CLASSES } from '@/components/plots/common/config/classes';
-import PrimitiveManager from '@/components/plots/common/primitives/primitive-manager';
-import TooltipManager from '@/components/plots/common/tooltip-manager';
-import LegendManager from '@/components/plots/common/legend-manager';
-import DomainManager from '@/components/plots/common/domain-manager';
+import { CLOVE_CLASSES } from './config/classes';
+import PrimitiveManager from './primitives/primitive-manager';
+import TooltipManager from './tooltip-manager';
+import LegendManager from './legend-manager';
+import DomainManager from './domain-manager';
 import ScaleManager, {
     D3Scale,
     isContinuousScale,
-} from '@/components/plots/common/scale-manager';
-import AxisManager from '@/components/plots/common/axis-manager';
-import BrushManager from '@/components/plots/common/brush-manager';
+} from './scale-manager';
+import AxisManager from './axis-manager';
+import BrushManager from './brush-manager';
 import {
     measureMaxTextWidth,
     getChartFontStyles,
-} from '@/components/plots/common/utils';
-import { isStringArray } from '@/components/plots/common/utils/type-guards';
+} from './utils';
+import { isStringArray } from './utils/type-guards';
 
 import {
     PlotConfig,
@@ -33,7 +33,7 @@ import {
     DEFAULT_TOOLTIP_CONFIG,
     DEFAULT_COLOR_CONFIG,
     MARGIN_PRESETS,
-} from '@/components/plots/common/config';
+} from './config';
 
 export interface Domain {
     x: [number, number] | [Date, Date] | string[];

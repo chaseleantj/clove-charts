@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 import { v4 as uuidv4 } from 'uuid';
-import BasePlot from '@/components/plots/common/base-plot';
+import BasePlot from '../base-plot';
 import {
     Primitive,
     PointPrimitive,
@@ -29,13 +29,13 @@ import {
     BatchTextPrimitiveOptions,
     PrimitiveInfo,
     PrimitiveInfoMap,
-} from '@/components/plots/common/primitives/primitives';
-import type { CoordinateAccessor } from '@/components/plots/common/primitives/primitives';
+} from './primitives';
+import type { CoordinateAccessor } from './primitives';
 import {
     DEFAULT_PRIMITIVE_CONFIG,
     PrimitiveConfig,
     BatchPrimitiveConfig,
-} from '@/components/plots/common/config';
+} from '../config';
 
 type Layer = d3.Selection<SVGGElement, unknown, null, undefined>;
 

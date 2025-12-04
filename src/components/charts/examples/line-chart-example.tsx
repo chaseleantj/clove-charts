@@ -2,13 +2,13 @@
 
 import * as d3 from 'd3';
 import { useEffect, useState } from 'react';
-import LinePlot from '@/components/plots/templates/line-plot';
-import { PlotConfig } from '@/components/plots/common/config';
+import LinePlot from '../../plots/templates/line-plot';
+import { PlotConfig } from '../../plots/common/config';
 import {
     ChartLayout,
     ChartFooter,
     ChartCaptions,
-} from '@/components/charts/chart-layout';
+} from '../chart-layout';
 
 interface StockData {
     Date: Date;

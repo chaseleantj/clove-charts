@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { DomainConfig, ScaleConfig } from '@/components/plots/common/config';
+import { DomainConfig, ScaleConfig } from './config';
 import {
     isDateArray,
     isDateValue,
@@ -8,7 +8,7 @@ import {
     isNumberValue,
     isStringArray,
     isStringValue,
-} from '@/components/plots/common/utils/type-guards';
+} from './utils/type-guards';
 
 export type DataValue = string | number | Date | null | undefined;
 

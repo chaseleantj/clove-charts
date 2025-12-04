@@ -1,11 +1,11 @@
 import * as d3 from 'd3';
 
-import { CLOVE_CLASSES } from '@/components/plots/common/config/classes';
+import { CLOVE_CLASSES } from '../config/classes';
 import {
     isStringArray,
     isNumberTuple,
     isDateTuple,
-} from '@/components/plots/common/utils/type-guards';
+} from './type-guards';
 
 export interface TextMeasurement {
     width: number;

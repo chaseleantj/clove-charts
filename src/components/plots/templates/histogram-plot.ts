@@ -3,8 +3,8 @@ import * as d3 from 'd3';
 import BasePlot, {
     BasePlotProps,
     DataKey,
-} from '@/components/plots/common/base-plot';
-import { mergeWithDefaults } from '@/components/plots/common/utils';
+} from '../common/base-plot';
+import { mergeWithDefaults } from '../common/utils';
 
 export interface HistogramPlotConfig {
     numBins: number;

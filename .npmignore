@@ -1,0 +1,14 @@
+.next/
+node_modules/
+src/app/
+public/
+*.config.*
+!tsconfig.json
+!tsconfig.build.json
+tsconfig.build.cjs.json
+eslint.config.*
+.git/
+.gitignore
+README.md
+*.md
+.claude/

@@ -1,15 +1,15 @@
 import * as d3 from 'd3';
 
-import PrimitiveManager from '@/components/plots/common/primitives/primitive-manager';
-import type BasePlot from '@/components/plots/common/base-plot';
-import { isContinuousScale } from '@/components/plots/common/scale-manager';
+import PrimitiveManager from './primitive-manager';
+import type BasePlot from '../base-plot';
+import { isContinuousScale } from '../scale-manager';
 import {
     ImmutablePrimitiveConfig,
     PrimitiveConfig,
     BatchPrimitiveConfig,
     DataDrivenValue,
-} from '@/components/plots/common/config';
-import { renderKatex } from '@/components/plots/common/utils';
+} from '../config';
+import { renderKatex } from '../utils';
 
 type Element = d3.Selection<any, any, any, any>;
 type Transition = d3.Transition<any, any, any, any>;

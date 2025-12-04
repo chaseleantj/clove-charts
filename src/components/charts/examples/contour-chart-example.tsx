@@ -2,13 +2,13 @@
 
 import * as d3 from 'd3';
 import { useCallback } from 'react';
-import ContourPlot from '@/components/plots/templates/contour-plot';
-import { PlotConfig } from '@/components/plots/common/config';
+import ContourPlot from '../../plots/templates/contour-plot';
+import { PlotConfig } from '../../plots/common/config';
 import {
     ChartLayout,
     ChartFooter,
     ChartCaptions,
-} from '@/components/charts/chart-layout';
+} from '../chart-layout';
 
 import { InlineMath } from 'react-katex';
 

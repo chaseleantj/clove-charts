@@ -1,12 +1,12 @@
 'use client';
 
-import ImagePlot from '@/components/plots/templates/image-plot';
-import { PlotConfig } from '@/components/plots/common/config';
+import ImagePlot from '../../plots/templates/image-plot';
+import { PlotConfig } from '../../plots/common/config';
 import {
     ChartLayout,
     ChartFooter,
     ChartCaptions,
-} from '@/components/charts/chart-layout';
+} from '../chart-layout';
 
 interface ImageData {
     url: string;

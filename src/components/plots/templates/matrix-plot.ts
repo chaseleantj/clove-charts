@@ -5,7 +5,7 @@ import BasePlot, {
     DataKey,
     DataRecord,
     Scale,
-} from '@/components/plots/common/base-plot';
+} from '../common/base-plot';
 
 export interface MatrixPlotConfig {
     padding: number;

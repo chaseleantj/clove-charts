@@ -4,14 +4,14 @@ import BasePlot, {
     BasePlotProps,
     DataKey,
     Scale,
-} from '@/components/plots/common/base-plot';
-import { isDefined } from '@/components/plots/common/utils/type-guards';
-import { isContinuousScale } from '@/components/plots/common/scale-manager';
+} from '../common/base-plot';
+import { isDefined } from '../common/utils/type-guards';
+import { isContinuousScale } from '../common/scale-manager';
 import {
     LinePrimitive,
     PointPrimitive,
-} from '@/components/plots/common/primitives/primitives';
-import { mergeWithDefaults } from '@/components/plots/common/utils';
+} from '../common/primitives/primitives';
+import { mergeWithDefaults } from '../common/utils';
 
 export interface LinePlotConfig {
     lineWidth: number;

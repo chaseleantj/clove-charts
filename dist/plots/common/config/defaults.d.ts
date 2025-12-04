@@ -1,0 +1,20 @@
+import { ThemeConfig, PlotDimensionConfig, PlotMarginConfig, DomainConfig, ScaleConfig, AxisConfig, LegendConfig, TooltipConfig, ColorConfig, PrimitiveConfig } from './index';
+export declare const DEFAULT_THEME_CONFIG: Required<ThemeConfig>;
+export declare const DEFAULT_PLOT_DIMENSIONS: Required<PlotDimensionConfig>;
+export declare const DEFAULT_PLOT_MARGIN: Required<PlotMarginConfig>;
+export declare const MARGIN_PRESETS: {
+    readonly top: number;
+    readonly bottom: number;
+    readonly left: number;
+    readonly right: number;
+    readonly bottomNoLabel: 30;
+    readonly leftNoLabel: 40;
+    readonly rightWithLegend: 90;
+};
+export declare const DEFAULT_DOMAIN_CONFIG: Required<DomainConfig>;
+export declare const DEFAULT_SCALE_CONFIG: Required<ScaleConfig>;
+export declare const DEFAULT_AXIS_CONFIG: Required<AxisConfig>;
+export declare const DEFAULT_LEGEND_CONFIG: Required<LegendConfig>;
+export declare const DEFAULT_TOOLTIP_CONFIG: Required<TooltipConfig>;
+export declare const DEFAULT_COLOR_CONFIG: Required<ColorConfig>;
+export declare const DEFAULT_PRIMITIVE_CONFIG: Required<PrimitiveConfig>;

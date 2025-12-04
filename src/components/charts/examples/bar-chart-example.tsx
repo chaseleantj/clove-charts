@@ -1,8 +1,8 @@
 'use client';
 
-import BarPlot from '@/components/plots/templates/bar-plot';
-import { PlotConfig } from '@/components/plots/common/config';
-import { ChartLayout } from '@/components/charts/chart-layout';
+import BarPlot from '../../plots/templates/bar-plot';
+import { PlotConfig } from '../../plots/common/config';
+import { ChartLayout } from '../chart-layout';
 
 const PLOT_CONFIG: PlotConfig = {
     axisConfig: { xLabel: 'Species', yLabel: 'Frequency' },

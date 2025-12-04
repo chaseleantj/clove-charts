@@ -3,8 +3,8 @@ import * as d3 from 'd3';
 import BasePlot, {
     BasePlotProps,
     Scale,
-} from '@/components/plots/common/base-plot';
-import { mergeWithDefaults } from '@/components/plots/common/utils';
+} from '../common/base-plot';
+import { mergeWithDefaults } from '../common/utils';
 
 export interface ContourPlotConfig {
     func: (x: number, y: number) => number;

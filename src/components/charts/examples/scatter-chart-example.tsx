@@ -2,13 +2,13 @@
 
 import * as d3 from 'd3';
 import { useEffect, useState } from 'react';
-import ScatterPlot from '@/components/plots/templates/scatter-plot';
-import { PlotConfig } from '@/components/plots/common/config';
+import ScatterPlot from '../../plots/templates/scatter-plot';
+import { PlotConfig } from '../../plots/common/config';
 import {
     ChartLayout,
     ChartFooter,
     ChartCaptions,
-} from '@/components/charts/chart-layout';
+} from '../chart-layout';
 
 interface IrisData {
     sepal_length: number;
